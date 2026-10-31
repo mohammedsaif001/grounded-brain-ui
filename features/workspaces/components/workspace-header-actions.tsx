@@ -11,11 +11,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { useChatPreferences } from "@/features/chat/stores/chat-preferences";
+import { useWorkspaceChatPrefs } from "@/features/chat/stores/chat-preferences";
 import {
     CHAT_MODEL_LABELS,
     CHAT_MODELS,
-    type ChatModelId,
+    isChatModel,
 } from "@/shared/config/models";
 import { workspaceRoutes } from "../lib/routes";
 import type { Workspace } from "../lib/types";
@@ -27,17 +27,20 @@ type WorkspaceHeaderActionsProps = {
 export function WorkspaceHeaderActions({
     workspace,
 }: WorkspaceHeaderActionsProps) {
-    const getPrefs = useChatPreferences((state) => state.getPrefs);
-    const setModel = useChatPreferences((state) => state.setModel);
-    const prefs = getPrefs(workspace.id, workspace.defaultModel);
+    const { model, setModel } = useWorkspaceChatPrefs(
+        workspace.id,
+        workspace.defaultModel,
+    );
 
     return (
         <div className="flex items-center gap-2">
             <Select
-                value={prefs.model}
-                onValueChange={(value) =>
-                    setModel(workspace.id, value as ChatModelId)
-                }
+                value={model}
+                onValueChange={(value) => {
+                    if (isChatModel(value)) {
+                        setModel(value);
+                    }
+                }}
             >
                 <SelectTrigger className="hidden h-8 w-[140px] sm:flex">
                     <SelectValue />

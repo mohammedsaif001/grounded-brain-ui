@@ -50,7 +50,7 @@ import { CitationSources } from "./citation-sources";
 import { ChatComposer } from "./chat-composer";
 import type { ChatCitation } from "../lib/types";
 import { workspaceRoutes } from "@/features/workspaces/lib/routes";
-import { useChatPreferences } from "../stores/chat-preferences";
+import { useWorkspaceChatPrefs } from "../stores/chat-preferences";
 import {
     downloadMarkdown,
     exportConversationMarkdown,
@@ -82,9 +82,7 @@ export function WorkspaceChat({
         Record<string, ChatCitation[]>
     >({});
 
-    const getPrefs = useChatPreferences((state) => state.getPrefs);
-    const setWebSearch = useChatPreferences((state) => state.setWebSearch);
-    const chatPrefs = getPrefs(workspaceId, defaultModel);
+    const chatPrefs = useWorkspaceChatPrefs(workspaceId, defaultModel);
 
     const { data: conversations = [], isLoading: conversationsLoading } =
         useConversations(workspaceId);
@@ -427,9 +425,7 @@ export function WorkspaceChat({
                 disabled={createConversation.isPending}
                 isStreaming={isStreaming}
                 webSearchEnabled={chatPrefs.webSearch}
-                onWebSearchChange={(enabled) =>
-                    setWebSearch(workspaceId, enabled)
-                }
+                onWebSearchChange={chatPrefs.setWebSearch}
                 onSubmit={(text) => {
                     void sendMessage({ text });
                 }}
