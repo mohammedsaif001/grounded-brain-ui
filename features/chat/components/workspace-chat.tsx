@@ -110,11 +110,16 @@ export function WorkspaceChat({
             new DefaultChatTransport({
                 api: chatStreamPath(workspaceId),
                 credentials: "include",
-                body: {
-                    ...(conversationId ? { conversationId } : {}),
-                    model: chatPrefs.model,
-                    webSearch: chatPrefs.webSearch,
-                },
+                // The API loads history from the database and reads only the newest
+                // message, so do not upload the whole transcript on every turn.
+                prepareSendMessagesRequest: ({ messages }) => ({
+                    body: {
+                        messages: messages.slice(-1),
+                        ...(conversationId ? { conversationId } : {}),
+                        model: chatPrefs.model,
+                        webSearch: chatPrefs.webSearch,
+                    },
+                }),
                 fetch: async (url, init) => {
                     const response = await fetch(url, {
                         ...init,
