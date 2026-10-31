@@ -31,3 +31,6 @@ export const SOURCE_STATUSES: SourceStatus[] = [
     "READY",
     "FAILED",
 ];
+
+/** Mirrors the API upload limit (multer `fileSize`); checked client-side to fail fast. */
+export const MAX_PDF_SIZE_BYTES = 10 * 1024 * 1024;
