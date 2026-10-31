@@ -17,8 +17,8 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: {
-    default: "Chaibook",
-    template: "%s · Chaibook",
+    default: "Grounded Brain",
+    template: "%s · Grounded Brain",
   },
   description: "Chat with your sources, grounded in citations.",
 };

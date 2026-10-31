@@ -43,7 +43,7 @@ const useChatPreferencesStore = create<ChatPreferencesState>()(
                 })),
         }),
         {
-            name: "chaibook-chat-preferences",
+            name: "grounded-brain-chat-preferences",
             storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({ byWorkspace: state.byWorkspace }),
             // Rehydrated after mount (see below) so the first client render matches

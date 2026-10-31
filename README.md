@@ -1,6 +1,6 @@
 # grounded-brain-ui
 
-Web client for **Chaibook**: upload sources (PDFs, websites, YouTube, GitHub repos, notes), chat with them with citations, and generate study material (summaries, flashcards, quizzes, mind maps, repo wikis).
+Web client for **Grounded Brain**: upload sources (PDFs, websites, YouTube, GitHub repos, notes), chat with them with citations, and generate study material (summaries, flashcards, quizzes, mind maps, repo wikis).
 
 Built with Next.js 16 (App Router), React 19, TanStack Query, the Vercel AI SDK, Tailwind CSS 4 and Base UI. It talks to the [grounded-brain API](../grounded-brain-notebook-llm), which owns auth, ingestion, retrieval and generation.
 
