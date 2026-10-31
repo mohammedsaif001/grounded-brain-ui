@@ -45,3 +45,28 @@ export function isProtectedPath(pathname: string) {
 export function isGuestOnlyPath(pathname: string) {
     return matchesPrefix(pathname, GUEST_ONLY_PREFIXES);
 }
+
+/**
+ * Returns `value` only if it is a same-origin path, otherwise `fallback`.
+ *
+ * Guards post-login redirects (`?callbackUrl=`) against open redirects such as
+ * `https://evil.com`, `//evil.com` or `/\evil.com`, which browsers treat as absolute.
+ */
+export function safeRedirectPath(
+    value: string | null | undefined,
+    fallback: string = routes.dashboard,
+): string {
+    if (!value || !value.startsWith("/") || /^\/[/\\]/.test(value)) {
+        return fallback;
+    }
+
+    try {
+        const base = "http://internal.invalid";
+        const url = new URL(value, base);
+        return url.origin === base
+            ? `${url.pathname}${url.search}${url.hash}`
+            : fallback;
+    } catch {
+        return fallback;
+    }
+}

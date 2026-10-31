@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { signIn } from "../lib/auth-client";
-import { routes } from "@/shared/config/routes";
+import { safeRedirectPath } from "@/shared/config/routes";
 
 function GoogleIcon({ className }: { className?: string }) {
     return (
@@ -56,8 +56,7 @@ export function LoginForm({
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const callbackUrl =
-        searchParams.get("callbackUrl") ?? routes.dashboard;
+    const callbackUrl = safeRedirectPath(searchParams.get("callbackUrl"));
 
     async function handleGoogleSignIn() {
         setIsLoading(true);
