@@ -1,27 +1,11 @@
-import { notFound } from "next/navigation";
-import { requireSession } from "@/features/auth/server";
-import { getWorkspace } from "@/features/workspaces/server";
-import { WorkspaceShell } from "@/features/workspaces";
-import { WorkspaceSettingsForm } from "@/features/workspaces/components/workspace-settings-form";
-
-type WorkspaceSettingsPageProps = {
-    params: Promise<{ id: string }>;
-};
+import { WorkspaceSettingsForm } from "@/features/workspaces";
+import { requireWorkspace } from "@/features/workspaces/server";
 
 export default async function WorkspaceSettingsPage({
     params,
-}: WorkspaceSettingsPageProps) {
-    await requireSession();
+}: PageProps<"/workspace/[id]/settings">) {
     const { id } = await params;
-    const workspace = await getWorkspace(id);
+    const workspace = await requireWorkspace(id);
 
-    if (!workspace) {
-        notFound();
-    }
-
-    return (
-        <WorkspaceShell workspace={workspace}>
-            <WorkspaceSettingsForm workspace={workspace} />
-        </WorkspaceShell>
-    );
+    return <WorkspaceSettingsForm workspace={workspace} />;
 }

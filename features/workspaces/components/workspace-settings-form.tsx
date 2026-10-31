@@ -48,10 +48,13 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
 
         await updateWorkspace.mutateAsync({
             title: title.trim(),
-            description: description.trim() || undefined,
+            // Send "" (not undefined) so an emptied description is actually cleared.
+            description: description.trim(),
             icon: icon.trim() || undefined,
             defaultModel,
         });
+        // The workspace shell is rendered by a server layout; refresh it with the new values.
+        router.refresh();
     }
 
     async function handleDelete() {

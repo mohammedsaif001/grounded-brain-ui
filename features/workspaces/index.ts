@@ -28,4 +28,5 @@ export { DeleteWorkspaceDialog } from "./components/delete-workspace-dialog";
 export { WorkspaceCard } from "./components/workspace-card";
 export { WorkspaceFormDialog } from "./components/workspace-form-dialog";
 export { WorkspaceList } from "./components/workspace-list";
+export { WorkspaceSettingsForm } from "./components/workspace-settings-form";
 export { WorkspaceShell } from "./components/workspace-shell";

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
+import { notFound } from "next/navigation";
 import { ApiError } from "@/shared/lib/api";
 import { backendFetch } from "@/shared/server/backend";
 import type { Workspace } from "./lib/types";
@@ -28,3 +29,14 @@ export const getWorkspace = cache(
         }
     },
 );
+
+/** Like {@link getWorkspace}, but renders the 404 page when the workspace is missing. */
+export async function requireWorkspace(workspaceId: string): Promise<Workspace> {
+    const workspace = await getWorkspace(workspaceId);
+
+    if (!workspace) {
+        notFound();
+    }
+
+    return workspace;
+}
