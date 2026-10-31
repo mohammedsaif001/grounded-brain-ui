@@ -11,12 +11,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useChatPreferences } from "@/features/chat/stores/chat-preferences";
 import {
     CHAT_MODEL_LABELS,
     CHAT_MODELS,
-    useChatPreferences,
     type ChatModelId,
-} from "@/features/chat/stores/chat-preferences";
+} from "@/shared/config/models";
 import { workspaceRoutes } from "../lib/routes";
 import type { Workspace } from "../lib/types";
 

@@ -2,14 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-export const CHAT_MODELS = ["gpt-4o-mini", "gpt-4o"] as const;
-export type ChatModelId = (typeof CHAT_MODELS)[number];
-
-export const CHAT_MODEL_LABELS: Record<ChatModelId, string> = {
-    "gpt-4o-mini": "GPT-4o mini",
-    "gpt-4o": "GPT-4o",
-};
+import { resolveChatModel, type ChatModelId } from "@/shared/config/models";
 
 type WorkspaceChatPrefs = {
     model: ChatModelId;
@@ -26,14 +19,6 @@ type ChatPreferencesState = {
     setWebSearch: (workspaceId: string, enabled: boolean) => void;
 };
 
-function resolveModel(model?: string): ChatModelId {
-    if (model && CHAT_MODELS.includes(model as ChatModelId)) {
-        return model as ChatModelId;
-    }
-
-    return "gpt-4o-mini";
-}
-
 export const useChatPreferences = create<ChatPreferencesState>()(
     persist(
         (set, get) => ({
@@ -45,7 +30,7 @@ export const useChatPreferences = create<ChatPreferencesState>()(
                 }
 
                 return {
-                    model: resolveModel(defaultModel),
+                    model: resolveChatModel(defaultModel),
                     webSearch: false,
                 };
             },

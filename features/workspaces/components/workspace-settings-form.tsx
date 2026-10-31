@@ -16,8 +16,9 @@ import { Textarea } from "@/components/ui/textarea";
 import {
     CHAT_MODEL_LABELS,
     CHAT_MODELS,
+    resolveChatModel,
     type ChatModelId,
-} from "@/features/chat/stores/chat-preferences";
+} from "@/shared/config/models";
 import {
     useDeleteWorkspace,
     useUpdateWorkspace,
@@ -38,10 +39,8 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
     const [title, setTitle] = useState(workspace.title);
     const [description, setDescription] = useState(workspace.description ?? "");
     const [icon, setIcon] = useState(workspace.icon ?? "");
-    const [defaultModel, setDefaultModel] = useState<ChatModelId>(
-        CHAT_MODELS.includes(workspace.defaultModel as ChatModelId)
-            ? (workspace.defaultModel as ChatModelId)
-            : "gpt-4o-mini",
+    const [defaultModel, setDefaultModel] = useState<ChatModelId>(() =>
+        resolveChatModel(workspace.defaultModel),
     );
 
     async function handleSave(event: React.FormEvent) {
