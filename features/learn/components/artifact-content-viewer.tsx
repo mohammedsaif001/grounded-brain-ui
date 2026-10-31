@@ -19,6 +19,8 @@ export function ArtifactContentViewer({
     workspaceId,
 }: ArtifactContentViewerProps) {
     const content = artifact.content;
+    // Stateful viewers (quiz, flashcards) restart when the artifact is regenerated.
+    const versionKey = `${artifact.id}:${artifact.updatedAt}`;
 
     if (!content) {
         return null;
@@ -48,12 +50,14 @@ export function ArtifactContentViewer({
         case "FLASHCARDS":
             return (
                 <FlashcardsViewer
+                    key={versionKey}
                     cards={Array.isArray(content.cards) ? content.cards : []}
                 />
             );
         case "QUIZ":
             return (
                 <QuizViewer
+                    key={versionKey}
                     questions={
                         Array.isArray(content.questions)
                             ? content.questions

@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "@/components/ui/toast";
 import { ApiError } from "@/shared/lib/api";
+import { getErrorMessage } from "@/shared/lib/errors";
 
 declare module "@tanstack/react-query" {
     interface Register {
@@ -19,13 +20,6 @@ declare module "@tanstack/react-query" {
 }
 
 const MAX_RETRIES = 2;
-
-export function getErrorMessage(error: unknown) {
-    if (error instanceof Error && error.message) {
-        return error.message;
-    }
-    return "Something went wrong. Please try again.";
-}
 
 function createQueryClient() {
     return new QueryClient({

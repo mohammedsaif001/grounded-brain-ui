@@ -20,6 +20,7 @@ import {
 import { useSources } from "@/features/sources/hooks/use-sources";
 import { useCreateArtifact } from "../hooks/use-artifacts";
 import type { ArtifactType } from "../lib/types";
+import { getErrorMessage } from "@/shared/lib/errors";
 
 type GenerateArtifactDialogProps = {
     workspaceId: string;
@@ -53,11 +54,7 @@ export function GenerateArtifactDialog({
                 title: title.trim() || undefined,
             });
         } catch (submitError) {
-            setError(
-                submitError instanceof Error
-                    ? submitError.message
-                    : "Failed to start generation",
-            );
+            setError(getErrorMessage(submitError, "Failed to start generation"));
             return;
         }
 

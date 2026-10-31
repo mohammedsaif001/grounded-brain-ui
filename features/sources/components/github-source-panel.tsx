@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { useGithubFiles, useSyncGithubSource } from "../hooks/use-sources";
 import type { Source } from "../lib/types";
+import { getErrorMessage } from "@/shared/lib/errors";
 
 type GithubSourcePanelProps = {
     workspaceId: string;
@@ -38,9 +39,7 @@ export function GithubSourcePanel({
                     : "Already up to date.",
             );
         } catch (error) {
-            setMessage(
-                error instanceof Error ? error.message : "Sync failed",
-            );
+            setMessage(getErrorMessage(error, "Sync failed"));
         }
     }
 

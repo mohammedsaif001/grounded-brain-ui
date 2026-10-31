@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CheckIcon, RotateCcwIcon, TrophyIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,18 +13,12 @@ const questionVariants = {
     exit: { opacity: 0, x: -40 },
 };
 
+/** Progress resets when the parent remounts it (keyed by artifact version). */
 export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
     const [index, setIndex] = useState(0);
     const [selected, setSelected] = useState<number | null>(null);
     const [score, setScore] = useState(0);
     const [finished, setFinished] = useState(false);
-
-    useEffect(() => {
-        setIndex(0);
-        setSelected(null);
-        setScore(0);
-        setFinished(false);
-    }, [questions]);
 
     const question = questions[index];
 

@@ -46,6 +46,7 @@ function shuffleOrder(length: number) {
     return order;
 }
 
+/** Progress resets when the parent remounts it (keyed by artifact version). */
 export function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
     const [order, setOrder] = useState(() =>
         Array.from({ length: cards.length }, (_, index) => index),
@@ -55,13 +56,6 @@ export function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
     const [flipped, setFlipped] = useState(false);
     const [known, setKnown] = useState<Set<number>>(new Set());
     const dragged = useRef(false);
-
-    useEffect(() => {
-        setOrder(Array.from({ length: cards.length }, (_, index) => index));
-        setPosition(0);
-        setFlipped(false);
-        setKnown(new Set());
-    }, [cards]);
 
     const cardIndex = order[position];
     const card = cards[cardIndex];

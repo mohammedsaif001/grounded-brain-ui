@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -11,14 +11,18 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { getErrorMessage } from "@/shared/lib/errors";
 import type { UserMemory } from "../lib/types";
+
+type MemoryFormValues = { memory: string };
 
 type MemoryFormDialogProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     memory?: UserMemory | null;
-    onSubmit: (values: { memory: string }) => Promise<void>;
+    onSubmit: (values: MemoryFormValues) => Promise<void>;
     isPending?: boolean;
 };
 
@@ -29,23 +33,38 @@ export function MemoryFormDialog({
     onSubmit,
     isPending = false,
 }: MemoryFormDialogProps) {
-    const isEditing = Boolean(memory);
-    const [value, setValue] = useState("");
-    const [error, setError] = useState<string | null>(null);
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-lg">
+                {/* Mounted only while open, so each opening starts from fresh state. */}
+                <MemoryForm
+                    memory={memory}
+                    onSubmit={onSubmit}
+                    onClose={() => onOpenChange(false)}
+                    isPending={isPending}
+                />
+            </DialogContent>
+        </Dialog>
+    );
+}
 
-    useEffect(() => {
-        if (open) {
-            setValue(memory?.memory ?? "");
-            setError(null);
-        }
-    }, [open, memory]);
+type MemoryFormProps = {
+    memory?: UserMemory | null;
+    onSubmit: (values: MemoryFormValues) => Promise<void>;
+    onClose: () => void;
+    isPending: boolean;
+};
+
+function MemoryForm({ memory, onSubmit, onClose, isPending }: MemoryFormProps) {
+    const isEditing = Boolean(memory);
+    const [value, setValue] = useState(memory?.memory ?? "");
+    const [error, setError] = useState<string | null>(null);
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setError(null);
 
         const trimmedValue = value.trim();
-
         if (!trimmedValue) {
             setError("Memory text is required.");
             return;
@@ -53,62 +72,55 @@ export function MemoryFormDialog({
 
         try {
             await onSubmit({ memory: trimmedValue });
-            onOpenChange(false);
+            onClose();
         } catch (submitError) {
-            setError(
-                submitError instanceof Error
-                    ? submitError.message
-                    : "Could not save memory.",
-            );
+            setError(getErrorMessage(submitError, "Could not save memory."));
         }
     }
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-lg">
-                <form onSubmit={(event) => void handleSubmit(event)}>
-                    <DialogHeader>
-                        <DialogTitle>
-                            {isEditing ? "Edit memory" : "Add memory"}
-                        </DialogTitle>
-                        <DialogDescription>
-                            Memories are stored in Mem0 and injected into chat
-                            when relevant.
-                        </DialogDescription>
-                    </DialogHeader>
+        <form onSubmit={(event) => void handleSubmit(event)}>
+            <DialogHeader>
+                <DialogTitle>{isEditing ? "Edit memory" : "Add memory"}</DialogTitle>
+                <DialogDescription>
+                    Memories are stored in Mem0 and injected into chat when
+                    relevant.
+                </DialogDescription>
+            </DialogHeader>
 
-                    <div className="grid gap-4 py-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="memory-value">Memory</Label>
-                            <Textarea
-                                id="memory-value"
-                                value={value}
-                                onChange={(event) =>
-                                    setValue(event.target.value)
-                                }
-                                placeholder="Prefers concise explanations with examples"
-                                rows={5}
-                            />
-                        </div>
-                        {error ? (
-                            <p className="text-sm text-destructive">{error}</p>
-                        ) : null}
-                    </div>
+            <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                    <Label htmlFor="memory-value">Memory</Label>
+                    <Textarea
+                        id="memory-value"
+                        value={value}
+                        onChange={(event) => setValue(event.target.value)}
+                        placeholder="Prefers concise explanations with examples"
+                        rows={5}
+                        disabled={isPending}
+                    />
+                </div>
+                {error ? (
+                    <p role="alert" className="text-sm text-destructive">
+                        {error}
+                    </p>
+                ) : null}
+            </div>
 
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => onOpenChange(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={isPending}>
-                            {isEditing ? "Save" : "Add"}
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
+            <DialogFooter>
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                    disabled={isPending}
+                >
+                    Cancel
+                </Button>
+                <Button type="submit" disabled={isPending}>
+                    {isPending ? <Spinner /> : null}
+                    {isEditing ? "Save" : "Add"}
+                </Button>
+            </DialogFooter>
+        </form>
     );
 }

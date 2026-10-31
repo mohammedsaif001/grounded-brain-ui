@@ -8,7 +8,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
     BotIcon,
     DownloadIcon,
-    GlobeIcon,
     MessageSquarePlusIcon,
     Trash2Icon,
 } from "lucide-react";
@@ -42,13 +41,11 @@ import {
     chatKeys,
     useConversationMessages,
     useConversations,
-    useCreateConversation,
     useDeleteConversation,
 } from "../hooks/use-conversations";
 import { ChatMessageBody } from "./chat-message-body";
 import { CitationSources } from "./citation-sources";
 import { ChatComposer } from "./chat-composer";
-import type { ChatCitation } from "../lib/types";
 import { useWorkspaceChatPrefs } from "../stores/chat-preferences";
 import { chatStreamPath } from "../lib/api";
 import {
@@ -79,9 +76,6 @@ export function WorkspaceChat({
     const askPrompt = searchParams.get("ask");
     const handledAskPrompt = useRef<string | null>(null);
     const [conversationId, setConversationId] = useState<string | null>(null);
-    const [citationsByMessageId, setCitationsByMessageId] = useState<
-        Record<string, ChatCitation[]>
-    >({});
 
     const chatPrefs = useWorkspaceChatPrefs(workspaceId, defaultModel);
 
@@ -89,8 +83,13 @@ export function WorkspaceChat({
         useConversations(workspaceId);
     const { data: storedMessages, isLoading: messagesLoading } =
         useConversationMessages(workspaceId, conversationId);
-    const createConversation = useCreateConversation(workspaceId);
     const deleteConversation = useDeleteConversation(workspaceId);
+
+    // Citations come from the persisted messages; derived, never copied into state.
+    const citationsByMessageId = useMemo(
+        () => (storedMessages ? buildCitationMap(storedMessages) : {}),
+        [storedMessages],
+    );
 
     const activeConversation = conversations.find(
         (conversation) => conversation.id === conversationId,
@@ -149,7 +148,6 @@ export function WorkspaceChat({
     useEffect(() => {
         if (!conversationId) {
             setMessages([]);
-            setCitationsByMessageId({});
             return;
         }
 
@@ -164,7 +162,6 @@ export function WorkspaceChat({
                 parts: [{ type: "text" as const, text: message.content }],
             })),
         );
-        setCitationsByMessageId(buildCitationMap(storedMessages));
     }, [conversationId, storedMessages, setMessages, isStreaming]);
 
     useEffect(() => {
@@ -176,14 +173,6 @@ export function WorkspaceChat({
             queryKey: chatKeys(workspaceId).messages(conversationId),
         });
     }, [status, conversationId, queryClient, workspaceId]);
-
-    useEffect(() => {
-        if (!storedMessages || status === "streaming") {
-            return;
-        }
-
-        setCitationsByMessageId(buildCitationMap(storedMessages));
-    }, [storedMessages, status]);
 
     useEffect(() => {
         if (
@@ -212,7 +201,6 @@ export function WorkspaceChat({
     function handleNewChat() {
         setConversationId(null);
         setMessages([]);
-        setCitationsByMessageId({});
     }
 
     function handleDeleteConversation() {
@@ -424,7 +412,6 @@ export function WorkspaceChat({
             ) : null}
 
             <ChatComposer
-                disabled={createConversation.isPending}
                 isStreaming={isStreaming}
                 webSearchEnabled={chatPrefs.webSearch}
                 onWebSearchChange={chatPrefs.setWebSearch}
