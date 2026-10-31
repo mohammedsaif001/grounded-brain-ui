@@ -1,12 +1,7 @@
-export type UserMemory = {
-    id: string;
-    memory: string;
-    createdAt: string;
-    updatedAt: string;
-    metadata?: Record<string, unknown> | null;
-    categories?: string[];
-    source: "manual" | "learned";
-};
+import type { z } from "zod";
+import type { userMemorySchema } from "./schemas";
+
+export type UserMemory = z.infer<typeof userMemorySchema>;
 
 export type CreateMemoryInput = {
     memory: string;

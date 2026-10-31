@@ -1,19 +1,22 @@
-export type SourceType = "PDF" | "WEBSITE" | "YOUTUBE" | "TEXT" | "MARKDOWN" | "GITHUB";
+import type { z } from "zod";
+import type {
+    githubFilesResponseSchema,
+    githubSyncResultSchema,
+    sourceChunkSchema,
+    sourceChunksResponseSchema,
+    sourceSchema,
+    sourceStatusSchema,
+    sourceTypeSchema,
+} from "./schemas";
 
-export type SourceStatus = "PENDING" | "PROCESSING" | "READY" | "FAILED";
-
-export type Source = {
-    id: string;
-    workspaceId: string;
-    type: SourceType;
-    title: string;
-    content: string | null;
-    url: string | null;
-    status: SourceStatus;
-    metadata: Record<string, unknown> | null;
-    createdAt: string;
-    updatedAt: string;
-};
+export type SourceType = z.infer<typeof sourceTypeSchema>;
+export type SourceStatus = z.infer<typeof sourceStatusSchema>;
+export type Source = z.infer<typeof sourceSchema>;
+export type SourceChunk = z.infer<typeof sourceChunkSchema>;
+export type SourceChunksResponse = z.infer<typeof sourceChunksResponseSchema>;
+export type GithubFilesResponse = z.infer<typeof githubFilesResponseSchema>;
+export type GithubFile = GithubFilesResponse["files"][number];
+export type GithubSyncResult = z.infer<typeof githubSyncResultSchema>;
 
 export type SourceFilters = {
     q?: string;
@@ -21,21 +24,11 @@ export type SourceFilters = {
     status?: SourceStatus;
 };
 
-export type CreateTextSourceInput = {
-    type: "TEXT";
+export type CreateSourceInput = {
+    type: "TEXT" | "MARKDOWN";
     title: string;
     content: string;
 };
-
-export type CreateMarkdownSourceInput = {
-    type: "MARKDOWN";
-    title: string;
-    content: string;
-};
-
-export type CreateSourceInput =
-    | CreateTextSourceInput
-    | CreateMarkdownSourceInput;
 
 export type ImportWebsiteInput = {
     url: string;
@@ -47,43 +40,14 @@ export type ImportYoutubeInput = {
     title?: string;
 };
 
-export type SourceChunk = {
-    id: string;
-    sourceId: string;
-    index: number;
-    content: string;
-    tokenCount: number | null;
-    metadata: Record<string, unknown> | null;
-    createdAt: string;
-};
-
-export type SourceChunksResponse = {
-    chunks: SourceChunk[];
-    count: number;
-};
-
 export type ImportGithubInput = {
     url: string;
     branch?: string;
     title?: string;
 };
 
-export type GithubFile = {
-    path: string;
-    size: number;
-    chunkCount: number;
-};
-
-export type GithubFilesResponse = {
-    repo: string | null;
-    branch: string | null;
-    commitSha: string | null;
-    totalFiles: number | null;
-    truncated: boolean;
-    files: GithubFile[];
-};
-
-export type GithubSyncResult = {
-    source: Source;
-    changed: boolean;
+export type ImportWebSearchInput = {
+    title: string;
+    content: string;
+    url: string;
 };

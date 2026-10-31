@@ -1,26 +1,15 @@
-export type ArtifactType =
-    | "SUMMARY"
-    | "TAKEAWAYS"
-    | "FLASHCARDS"
-    | "QUIZ"
-    | "MINDMAP"
-    | "REPORT"
-    | "WIKI";
+import type { z } from "zod";
+import type {
+    artifactStatusSchema,
+    artifactTypeSchema,
+    learningArtifactSchema,
+} from "./schemas";
 
-export type ArtifactStatus = "PENDING" | "PROCESSING" | "READY" | "FAILED";
+export type ArtifactType = z.infer<typeof artifactTypeSchema>;
 
-export type LearningArtifact = {
-    id: string;
-    workspaceId: string;
-    type: ArtifactType;
-    title: string;
-    content: Record<string, unknown> | null;
-    sourceIds: string[];
-    status: ArtifactStatus;
-    metadata: Record<string, unknown> | null;
-    createdAt: string;
-    updatedAt: string;
-};
+export type ArtifactStatus = z.infer<typeof artifactStatusSchema>;
+
+export type LearningArtifact = z.infer<typeof learningArtifactSchema>;
 
 export type CreateArtifactInput = {
     type: ArtifactType;

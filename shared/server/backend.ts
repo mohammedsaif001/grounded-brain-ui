@@ -2,7 +2,7 @@ import "server-only";
 
 import { headers } from "next/headers";
 import { serverEnv } from "@/shared/config/env";
-import { parseApiResponse } from "@/shared/lib/api";
+import { parseApiResponse, type ParseOptions } from "@/shared/lib/api";
 
 /**
  * Calls the API directly from the server (Server Components, Route Handlers).
@@ -11,9 +11,9 @@ import { parseApiResponse } from "@/shared/lib/api";
  * saves a network hop and avoids depending on the app knowing its own public URL.
  * The incoming request's cookies are forwarded so the API sees the user's session.
  */
-export async function backendFetch<T>(
+export async function backendFetch<T = void>(
     path: string,
-    init: RequestInit = {},
+    { schema, ...init }: RequestInit & Pick<ParseOptions<T>, "schema"> = {},
 ): Promise<T> {
     const incoming = await headers();
     const outgoing = new Headers(init.headers);
@@ -31,5 +31,5 @@ export async function backendFetch<T>(
         signal: init.signal ?? AbortSignal.timeout(serverEnv.API_TIMEOUT_MS),
     });
 
-    return parseApiResponse<T>(response);
+    return parseApiResponse(response, { schema });
 }

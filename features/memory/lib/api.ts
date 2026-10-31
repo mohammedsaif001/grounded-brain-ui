@@ -1,30 +1,27 @@
-import { apiFetch } from "@/shared/lib/api";
-import type {
-    CreateMemoryInput,
-    UpdateMemoryInput,
-    UserMemory,
-} from "./types";
+import { apiFetch, apiPath } from "@/shared/lib/api";
+import { userMemoryListSchema, userMemorySchema } from "./schemas";
+import type { CreateMemoryInput, UpdateMemoryInput } from "./types";
 
 export function listMemories() {
-    return apiFetch<UserMemory[]>("/api/memory");
+    return apiFetch("/api/memory", { schema: userMemoryListSchema });
 }
 
 export function createMemory(input: CreateMemoryInput) {
-    return apiFetch<UserMemory>("/api/memory", {
+    return apiFetch("/api/memory", {
         method: "POST",
-        body: JSON.stringify(input),
+        body: input,
+        schema: userMemorySchema,
     });
 }
 
 export function updateMemory(memoryId: string, input: UpdateMemoryInput) {
-    return apiFetch<UserMemory>(`/api/memory/${memoryId}`, {
+    return apiFetch(apiPath`/api/memory/${memoryId}`, {
         method: "PATCH",
-        body: JSON.stringify(input),
+        body: input,
+        schema: userMemorySchema,
     });
 }
 
 export function deleteMemory(memoryId: string) {
-    return apiFetch<void>(`/api/memory/${memoryId}`, {
-        method: "DELETE",
-    });
+    return apiFetch(apiPath`/api/memory/${memoryId}`, { method: "DELETE" });
 }

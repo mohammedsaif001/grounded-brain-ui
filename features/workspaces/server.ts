@@ -2,8 +2,9 @@ import "server-only";
 
 import { cache } from "react";
 import { notFound } from "next/navigation";
-import { ApiError } from "@/shared/lib/api";
+import { ApiError, apiPath } from "@/shared/lib/api";
 import { backendFetch } from "@/shared/server/backend";
+import { workspaceSchema } from "./lib/schemas";
 import type { Workspace } from "./lib/types";
 
 /**
@@ -15,8 +16,9 @@ import type { Workspace } from "./lib/types";
 export const getWorkspace = cache(
     async (workspaceId: string): Promise<Workspace | null> => {
         try {
-            return await backendFetch<Workspace>(
-                `/api/workspaces/${encodeURIComponent(workspaceId)}`,
+            return await backendFetch(
+                apiPath`/api/workspaces/${workspaceId}`,
+                { schema: workspaceSchema },
             );
         } catch (error) {
             if (

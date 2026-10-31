@@ -50,6 +50,7 @@ import { CitationSources } from "./citation-sources";
 import { ChatComposer } from "./chat-composer";
 import type { ChatCitation } from "../lib/types";
 import { useWorkspaceChatPrefs } from "../stores/chat-preferences";
+import { chatStreamPath } from "../lib/api";
 import {
     downloadMarkdown,
     exportConversationMarkdown,
@@ -108,7 +109,7 @@ export function WorkspaceChat({
     const transport = useMemo(
         () =>
             new DefaultChatTransport({
-                api: `/api/workspaces/${workspaceId}/chat`,
+                api: chatStreamPath(workspaceId),
                 credentials: "include",
                 body: {
                     ...(conversationId ? { conversationId } : {}),

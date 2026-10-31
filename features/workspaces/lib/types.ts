@@ -1,12 +1,7 @@
-export type Workspace = {
-    id: string;
-    title: string;
-    description: string | null;
-    icon: string | null;
-    defaultModel: string;
-    createdAt: string;
-    updatedAt: string;
-};
+import type { z } from "zod";
+import type { workspaceSchema } from "./schemas";
+
+export type Workspace = z.infer<typeof workspaceSchema>;
 
 export type CreateWorkspaceInput = {
     title: string;

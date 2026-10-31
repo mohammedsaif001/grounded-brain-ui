@@ -1,28 +1,38 @@
-import { apiFetch } from "@/shared/lib/api";
-import type { ChatMessage, Conversation } from "./types";
+import { apiFetch, apiPath } from "@/shared/lib/api";
+import {
+    chatMessageListSchema,
+    conversationListSchema,
+    conversationSchema,
+} from "./schemas";
+
+const conversationsPath = (workspaceId: string) =>
+    apiPath`/api/workspaces/${workspaceId}/conversations`;
+
+/** Streaming endpoint consumed by the AI SDK transport. */
+export const chatStreamPath = (workspaceId: string) =>
+    apiPath`/api/workspaces/${workspaceId}/chat`;
 
 export function listConversations(workspaceId: string) {
-    return apiFetch<Conversation[]>(
-        `/api/workspaces/${workspaceId}/conversations`,
-    );
+    return apiFetch(conversationsPath(workspaceId), {
+        schema: conversationListSchema,
+    });
 }
 
 export function createConversation(workspaceId: string, title?: string) {
-    return apiFetch<Conversation>(
-        `/api/workspaces/${workspaceId}/conversations`,
-        {
-            method: "POST",
-            body: JSON.stringify(title ? { title } : {}),
-        },
-    );
+    return apiFetch(conversationsPath(workspaceId), {
+        method: "POST",
+        body: title ? { title } : {},
+        schema: conversationSchema,
+    });
 }
 
 export function listConversationMessages(
     workspaceId: string,
     conversationId: string,
 ) {
-    return apiFetch<ChatMessage[]>(
-        `/api/workspaces/${workspaceId}/conversations/${conversationId}/messages`,
+    return apiFetch(
+        `${conversationsPath(workspaceId)}/${encodeURIComponent(conversationId)}/messages`,
+        { schema: chatMessageListSchema },
     );
 }
 
@@ -30,23 +40,8 @@ export function deleteConversation(
     workspaceId: string,
     conversationId: string,
 ) {
-    return apiFetch<void>(
-        `/api/workspaces/${workspaceId}/conversations/${conversationId}`,
+    return apiFetch(
+        `${conversationsPath(workspaceId)}/${encodeURIComponent(conversationId)}`,
         { method: "DELETE" },
-    );
-}
-
-export function parseCitations(value: unknown): ChatMessage["citations"] {
-    if (!Array.isArray(value)) {
-        return null;
-    }
-
-    return value.filter(
-        (item): item is NonNullable<ChatMessage["citations"]>[number] =>
-            typeof item === "object" &&
-            item !== null &&
-            typeof (item as { sourceId?: unknown }).sourceId === "string" &&
-            typeof (item as { sourceTitle?: unknown }).sourceTitle ===
-                "string",
     );
 }

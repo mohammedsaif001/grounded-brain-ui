@@ -1,15 +1,17 @@
-import { apiFetch } from "@/shared/lib/api";
-import type { CreateArtifactInput, LearningArtifact } from "./types";
+import { apiFetch, apiPath } from "@/shared/lib/api";
+import { learningArtifactListSchema, learningArtifactSchema } from "./schemas";
+import type { CreateArtifactInput } from "./types";
 
 export function listArtifacts(workspaceId: string) {
-    return apiFetch<LearningArtifact[]>(
-        `/api/workspaces/${workspaceId}/artifacts`,
-    );
+    return apiFetch(apiPath`/api/workspaces/${workspaceId}/artifacts`, {
+        schema: learningArtifactListSchema,
+    });
 }
 
 export function getArtifact(workspaceId: string, artifactId: string) {
-    return apiFetch<LearningArtifact>(
-        `/api/workspaces/${workspaceId}/artifacts/${artifactId}`,
+    return apiFetch(
+        apiPath`/api/workspaces/${workspaceId}/artifacts/${artifactId}`,
+        { schema: learningArtifactSchema },
     );
 }
 
@@ -17,18 +19,16 @@ export function createArtifact(
     workspaceId: string,
     input: CreateArtifactInput,
 ) {
-    return apiFetch<LearningArtifact>(
-        `/api/workspaces/${workspaceId}/artifacts`,
-        {
-            method: "POST",
-            body: JSON.stringify(input),
-        },
-    );
+    return apiFetch(apiPath`/api/workspaces/${workspaceId}/artifacts`, {
+        method: "POST",
+        body: input,
+        schema: learningArtifactSchema,
+    });
 }
 
 export function deleteArtifact(workspaceId: string, artifactId: string) {
-    return apiFetch<void>(
-        `/api/workspaces/${workspaceId}/artifacts/${artifactId}`,
+    return apiFetch(
+        apiPath`/api/workspaces/${workspaceId}/artifacts/${artifactId}`,
         { method: "DELETE" },
     );
 }

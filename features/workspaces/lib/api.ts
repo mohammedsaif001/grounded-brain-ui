@@ -1,34 +1,38 @@
-import { apiFetch } from "@/shared/lib/api";
-import type {
-    CreateWorkspaceInput,
-    UpdateWorkspaceInput,
-    Workspace,
-} from "./types";
+import { apiFetch, apiPath } from "@/shared/lib/api";
+import { workspaceListSchema, workspaceSchema } from "./schemas";
+import type { CreateWorkspaceInput, UpdateWorkspaceInput } from "./types";
 
 export function listWorkspaces() {
-    return apiFetch<Workspace[]>("/api/workspaces");
+    return apiFetch("/api/workspaces", { schema: workspaceListSchema });
 }
 
-export function getWorkspace(id: string) {
-    return apiFetch<Workspace>(`/api/workspaces/${id}`);
+export function getWorkspace(workspaceId: string) {
+    return apiFetch(apiPath`/api/workspaces/${workspaceId}`, {
+        schema: workspaceSchema,
+    });
 }
 
 export function createWorkspace(input: CreateWorkspaceInput) {
-    return apiFetch<Workspace>("/api/workspaces", {
+    return apiFetch("/api/workspaces", {
         method: "POST",
-        body: JSON.stringify(input),
+        body: input,
+        schema: workspaceSchema,
     });
 }
 
-export function updateWorkspace(id: string, input: UpdateWorkspaceInput) {
-    return apiFetch<Workspace>(`/api/workspaces/${id}`, {
+export function updateWorkspace(
+    workspaceId: string,
+    input: UpdateWorkspaceInput,
+) {
+    return apiFetch(apiPath`/api/workspaces/${workspaceId}`, {
         method: "PATCH",
-        body: JSON.stringify(input),
+        body: input,
+        schema: workspaceSchema,
     });
 }
 
-export function deleteWorkspace(id: string) {
-    return apiFetch<void>(`/api/workspaces/${id}`, {
+export function deleteWorkspace(workspaceId: string) {
+    return apiFetch(apiPath`/api/workspaces/${workspaceId}`, {
         method: "DELETE",
     });
 }

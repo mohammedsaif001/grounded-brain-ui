@@ -1,29 +1,10 @@
-export type ChatCitation = {
-    sourceId?: string;
-    sourceTitle: string;
-    sourceType: string;
-    chunkId?: string;
-    chunkIndex?: number;
-    page?: number;
-    excerpt: string;
-    score?: number;
-    url?: string;
-    path?: string;
-};
+import type { z } from "zod";
+import type {
+    chatCitationSchema,
+    chatMessageSchema,
+    conversationSchema,
+} from "./schemas";
 
-export type Conversation = {
-    id: string;
-    workspaceId: string;
-    title: string | null;
-    createdAt: string;
-    updatedAt: string;
-};
-
-export type ChatMessage = {
-    id: string;
-    conversationId: string;
-    role: "USER" | "ASSISTANT";
-    content: string;
-    citations: ChatCitation[] | null;
-    createdAt: string;
-};
+export type ChatCitation = z.infer<typeof chatCitationSchema>;
+export type Conversation = z.infer<typeof conversationSchema>;
+export type ChatMessage = z.infer<typeof chatMessageSchema>;
