@@ -14,8 +14,8 @@ import {
     SidebarMenuSkeleton,
 } from "@/components/ui/sidebar";
 import { useSources } from "../hooks/use-sources";
-import { sourceRoutes } from "../lib/routes";
 import { SourceTypeIcon } from "./source-type-icon";
+import { routes } from "@/shared/config/routes";
 
 type SourceSidebarListProps = {
     workspaceId: string;
@@ -52,7 +52,7 @@ export function SourceSidebarList({
                                 <SidebarMenuButton
                                     render={
                                         <Link
-                                            href={sourceRoutes.detail(
+                                            href={routes.workspace.source(
                                                 workspaceId,
                                                 source.id,
                                             )}
@@ -71,7 +71,7 @@ export function SourceSidebarList({
                                 <SidebarMenuButton
                                     render={
                                         <Link
-                                            href={sourceRoutes.list(
+                                            href={routes.workspace.sources(
                                                 workspaceId,
                                             )}
                                         />

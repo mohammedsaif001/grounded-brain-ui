@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { authRoutes, getSession } from "@/features/auth";
+import { getSession } from "@/features/auth";
+import { routes } from "@/shared/config/routes";
 
 export default async function HomePage() {
     const session = await getSession();
 
     if (session) {
-        redirect(authRoutes.dashboard);
+        redirect(routes.dashboard);
     }
 
     return (
@@ -19,7 +20,7 @@ export default async function HomePage() {
                 <p className="text-muted-foreground">
                     Sign in to start chatting with your books.
                 </p>
-                <Button nativeButton={false} render={<Link href={authRoutes.login} />}>
+                <Button nativeButton={false} render={<Link href={routes.login} />}>
                     Get started
                 </Button>
             </div>

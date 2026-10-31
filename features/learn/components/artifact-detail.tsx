@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/shared/lib/api";
 import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
-import { learnRoutes } from "../lib/routes";
 import { useArtifact } from "../hooks/use-artifacts";
 import { ArtifactContentViewer } from "./artifact-content-viewer";
 import {
     ArtifactStatusBadge,
     ArtifactTypeBadge,
 } from "./artifact-status-badge";
+import { routes } from "@/shared/config/routes";
 
 type ArtifactDetailProps = {
     workspaceId: string;
@@ -45,7 +45,7 @@ export function ArtifactDetail({
                 <Button
                     nativeButton={false}
                     variant="outline"
-                    render={<Link href={learnRoutes.hub(workspaceId)} />}
+                    render={<Link href={routes.workspace.learn(workspaceId)} />}
                 >
                     Back to Learn
                 </Button>
@@ -78,7 +78,7 @@ export function ArtifactDetail({
                     nativeButton={false}
                     variant="ghost"
                     size="icon-sm"
-                    render={<Link href={learnRoutes.hub(workspaceId)} />}
+                    render={<Link href={routes.workspace.learn(workspaceId)} />}
                 >
                     <ArrowLeftIcon />
                 </Button>

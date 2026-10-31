@@ -17,8 +17,8 @@ import {
     CHAT_MODELS,
     isChatModel,
 } from "@/shared/config/models";
-import { workspaceRoutes } from "../lib/routes";
 import type { Workspace } from "../lib/types";
+import { routes } from "@/shared/config/routes";
 
 type WorkspaceHeaderActionsProps = {
     workspace: Workspace;
@@ -61,7 +61,7 @@ export function WorkspaceHeaderActions({
                 variant="ghost"
                 size="icon-sm"
                 render={
-                    <Link href={workspaceRoutes.settings(workspace.id)} />
+                    <Link href={routes.workspace.settings(workspace.id)} />
                 }
             >
                 <SettingsIcon />

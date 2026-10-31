@@ -6,7 +6,6 @@ import { GraduationCapIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
-import { learnRoutes } from "../lib/routes";
 import { useArtifacts, useDeleteArtifact } from "../hooks/use-artifacts";
 import {
     ArtifactStatusBadge,
@@ -14,6 +13,7 @@ import {
 } from "./artifact-status-badge";
 import { GenerateArtifactDialog } from "./generate-artifact-dialog";
 import { useState } from "react";
+import { routes } from "@/shared/config/routes";
 
 type LearnHubProps = {
     workspaceId: string;
@@ -78,7 +78,7 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                             className="group relative rounded-3xl border bg-card p-4 transition-colors hover:bg-muted/20"
                         >
                             <Link
-                                href={learnRoutes.detail(
+                                href={routes.workspace.artifact(
                                     workspaceId,
                                     artifact.id,
                                 )}

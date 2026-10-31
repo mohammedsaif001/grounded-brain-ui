@@ -28,10 +28,10 @@ import {
 } from "@/components/ui/marker";
 import { SOURCE_TYPE_LABELS } from "@/features/sources/lib/constants";
 import type { SourceType } from "@/features/sources/lib/types";
-import { sourceRoutes } from "@/features/sources/lib/routes";
 import { uniqueCitationsBySource } from "../lib/citations";
 import type { ChatCitation } from "../lib/types";
 import { CitationPreview } from "./citation-preview";
+import { routes } from "@/shared/config/routes";
 
 type CitationSourcesProps = {
     workspaceId: string;
@@ -136,7 +136,7 @@ export function CitationSources({
                                         <AttachmentTrigger
                                             render={
                                                 <Link
-                                                    href={sourceRoutes.detail(
+                                                    href={routes.workspace.source(
                                                         workspaceId,
                                                         citation.sourceId,
                                                     )}

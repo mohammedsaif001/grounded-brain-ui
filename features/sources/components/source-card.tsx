@@ -18,11 +18,11 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SOURCE_TYPE_LABELS } from "../lib/constants";
-import { sourceRoutes } from "../lib/routes";
 import type { Source } from "../lib/types";
 import { SourceStatusBadge } from "./source-status-badge";
 import { SourceTypeIcon } from "./source-type-icon";
 import { cn } from "@/lib/utils";
+import { routes } from "@/shared/config/routes";
 
 type SourceCardProps = {
     source: Source;
@@ -37,7 +37,7 @@ export function SourceCard({
     onReprocess,
     className,
 }: SourceCardProps) {
-    const href = sourceRoutes.detail(source.workspaceId, source.id);
+    const href = routes.workspace.source(source.workspaceId, source.id);
 
     return (
         <Card className={cn("group/card relative transition-shadow hover:shadow-md", className)}>

@@ -13,11 +13,11 @@ import {
     useUpdateWorkspace,
     useWorkspaces,
 } from "../hooks/use-workspaces";
-import { workspaceRoutes } from "../lib/routes";
 import type { Workspace } from "../lib/types";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { WorkspaceCard } from "./workspace-card";
 import { WorkspaceFormDialog } from "./workspace-form-dialog";
+import { routes } from "@/shared/config/routes";
 
 export function WorkspaceList() {
     const router = useRouter();
@@ -111,7 +111,7 @@ export function WorkspaceList() {
                 isPending={createWorkspace.isPending}
                 onSubmit={async (values) => {
                     const workspace = await createWorkspace.mutateAsync(values);
-                    router.push(workspaceRoutes.detail(workspace.id));
+                    router.push(routes.workspace.chat(workspace.id));
                 }}
             />
 

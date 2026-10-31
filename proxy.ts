@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-    authRoutes,
-    isProtectedRoute,
-    isUnauthenticatedRoute,
-} from "@/features/auth";
+    isGuestOnlyPath,
+    isProtectedPath,
+    routes,
+} from "@/shared/config/routes";
 
 async function fetchSession(request: NextRequest) {
     const response = await fetch(
@@ -28,19 +28,19 @@ export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const session = await fetchSession(request);
 
-    if (isProtectedRoute(pathname) && !session) {
-        const loginUrl = new URL(authRoutes.login, request.url);
+    if (isProtectedPath(pathname) && !session) {
+        const loginUrl = new URL(routes.login, request.url);
         loginUrl.searchParams.set("callbackUrl", pathname);
         return NextResponse.redirect(loginUrl);
     }
 
-    if (isUnauthenticatedRoute(pathname) && session) {
-        return NextResponse.redirect(new URL(authRoutes.dashboard, request.url));
+    if (isGuestOnlyPath(pathname) && session) {
+        return NextResponse.redirect(new URL(routes.dashboard, request.url));
     }
 
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/workspace/:path*", "/login"],
+    matcher: ["/dashboard/:path*", "/workspace/:path*", "/settings/:path*", "/login"],
 };

@@ -11,13 +11,8 @@ import {
     PlusIcon,
     SettingsIcon,
 } from "lucide-react";
-import { learnRoutes } from "@/features/learn";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
-import {
-    AddSourceDialog,
-    SourceSidebarList,
-    sourceRoutes,
-} from "@/features/sources";
+import { AddSourceDialog, SourceSidebarList } from "@/features/sources";
 import { Button } from "@/components/ui/button";
 import {
     Sidebar,
@@ -35,9 +30,9 @@ import {
     SidebarRail,
     SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { workspaceRoutes } from "../lib/routes";
 import type { Workspace } from "../lib/types";
 import { WorkspaceHeaderActions } from "./workspace-header-actions";
+import { routes } from "@/shared/config/routes";
 
 type WorkspaceShellProps = {
     workspace: Workspace;
@@ -48,8 +43,8 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
     const pathname = usePathname();
     const [addSourceOpen, setAddSourceOpen] = useState(false);
 
-    const sourcesPath = sourceRoutes.list(workspace.id);
-    const learnPath = learnRoutes.hub(workspace.id);
+    const sourcesPath = routes.workspace.sources(workspace.id);
+    const learnPath = routes.workspace.learn(workspace.id);
     const isSourcesActive = pathname.startsWith(sourcesPath);
     const isLearnActive = pathname.startsWith(learnPath);
     const isChatActive =
@@ -85,7 +80,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
                                         isActive={isChatActive}
                                         render={
                                             <Link
-                                                href={workspaceRoutes.detail(
+                                                href={routes.workspace.chat(
                                                     workspace.id,
                                                 )}
                                             />
@@ -122,7 +117,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
                                         isActive={isSettingsActive}
                                         render={
                                             <Link
-                                                href={workspaceRoutes.settings(
+                                                href={routes.workspace.settings(
                                                     workspace.id,
                                                 )}
                                             />
@@ -147,7 +142,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
                         nativeButton={false}
                         variant="ghost"
                         className="w-full justify-start"
-                        render={<Link href={workspaceRoutes.list} />}
+                        render={<Link href={routes.dashboard} />}
                     >
                         <ArrowLeftIcon />
                         All workspaces

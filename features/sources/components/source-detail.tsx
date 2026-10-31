@@ -8,11 +8,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/shared/lib/api";
 import { useSource } from "../hooks/use-sources";
 import { SOURCE_TYPE_LABELS } from "../lib/constants";
-import { sourceRoutes } from "../lib/routes";
 import { GithubSourcePanel } from "./github-source-panel";
 import { MarkdownPreview } from "./markdown-preview";
 import { SourceStatusBadge } from "./source-status-badge";
 import { SourceTypeIcon } from "./source-type-icon";
+import { routes } from "@/shared/config/routes";
 
 type SourceDetailProps = {
     workspaceId: string;
@@ -40,7 +40,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
                     nativeButton={false}
                     variant="outline"
                     render={
-                        <Link href={sourceRoutes.list(workspaceId)} />
+                        <Link href={routes.workspace.sources(workspaceId)} />
                     }
                 >
                     Back to library
@@ -79,7 +79,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
                     variant="ghost"
                     size="icon-sm"
                     render={
-                        <Link href={sourceRoutes.list(workspaceId)} />
+                        <Link href={routes.workspace.sources(workspaceId)} />
                     }
                 >
                     <ArrowLeftIcon />

@@ -49,12 +49,12 @@ import { ChatMessageBody } from "./chat-message-body";
 import { CitationSources } from "./citation-sources";
 import { ChatComposer } from "./chat-composer";
 import type { ChatCitation } from "../lib/types";
-import { workspaceRoutes } from "@/features/workspaces/lib/routes";
 import { useWorkspaceChatPrefs } from "../stores/chat-preferences";
 import {
     downloadMarkdown,
     exportConversationMarkdown,
 } from "../lib/export-chat";
+import { routes } from "@/shared/config/routes";
 
 type WorkspaceChatProps = {
     workspaceId: string;
@@ -197,7 +197,7 @@ export function WorkspaceChat({
 
         handledAskPrompt.current = askPrompt;
         void sendMessage({ text: askPrompt });
-        router.replace(workspaceRoutes.detail(workspaceId));
+        router.replace(routes.workspace.chat(workspaceId));
     }, [
         askPrompt,
         status,

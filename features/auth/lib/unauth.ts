@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
-import { authRoutes } from "./auth-routes";
 import { getSession } from "./auth-server";
+import { routes } from "@/shared/config/routes";
 
 export async function unauth() {
     const session = await getSession();
 
     if (session) {
-        redirect(authRoutes.dashboard);
+        redirect(routes.dashboard);
     }
 }

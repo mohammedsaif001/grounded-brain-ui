@@ -13,7 +13,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { workspaceRoutes } from "@/features/workspaces/lib/routes";
 import {
     useCreateMemory,
     useDeleteMemory,
@@ -22,6 +21,7 @@ import {
 } from "../hooks/use-memories";
 import type { UserMemory } from "../lib/types";
 import { MemoryFormDialog } from "./memory-form-dialog";
+import { routes } from "@/shared/config/routes";
 
 export function MemorySettings() {
     const { data: memories = [], isLoading, error } = useMemories();
@@ -65,7 +65,7 @@ export function MemorySettings() {
                         variant="ghost"
                         size="sm"
                         className="-ml-2"
-                        render={<Link href={workspaceRoutes.list} />}
+                        render={<Link href={routes.dashboard} />}
                     >
                         <ArrowLeftIcon />
                         Dashboard

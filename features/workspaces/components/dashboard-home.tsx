@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
-import { memoryRoutes } from "@/features/memory";
 import { ApiError } from "@/shared/lib/api";
 import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import {
@@ -31,12 +30,12 @@ import {
     useUpdateWorkspace,
     useWorkspaces,
 } from "../hooks/use-workspaces";
-import { workspaceRoutes } from "../lib/routes";
 import type { Workspace } from "../lib/types";
 import { CreateWorkspaceCard } from "./create-workspace-card";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { WorkspaceCard } from "./workspace-card";
 import { WorkspaceFormDialog } from "./workspace-form-dialog";
+import { routes } from "@/shared/config/routes";
 
 type DashboardHomeProps = {
     userName?: string | null;
@@ -106,7 +105,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
             <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur-md">
                 <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 md:px-8">
                     <Link
-                        href={workspaceRoutes.list}
+                        href={routes.dashboard}
                         className="flex items-center gap-2.5 font-heading text-lg font-semibold tracking-tight"
                     >
                         <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-base">
@@ -121,7 +120,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             variant="ghost"
                             size="sm"
                             className="hidden sm:inline-flex"
-                            render={<Link href={memoryRoutes.settings} />}
+                            render={<Link href={routes.memorySettings} />}
                         >
                             <BrainIcon />
                             Memory
@@ -259,7 +258,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                 isPending={createWorkspace.isPending}
                 onSubmit={async (values) => {
                     const workspace = await createWorkspace.mutateAsync(values);
-                    router.push(workspaceRoutes.detail(workspace.id));
+                    router.push(routes.workspace.chat(workspace.id));
                 }}
             />
 

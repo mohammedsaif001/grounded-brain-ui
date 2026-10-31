@@ -23,7 +23,7 @@ import {
     useImportYoutubeSource,
     useUploadPdfSource,
 } from "../hooks/use-sources";
-import { sourceRoutes } from "../lib/routes";
+import { routes } from "@/shared/config/routes";
 
 type AddSourceDialogProps = {
     workspaceId: string;
@@ -97,7 +97,7 @@ export function AddSourceDialog({
 
     async function handleSuccess(sourceId: string) {
         handleOpenChange(false);
-        router.push(sourceRoutes.detail(workspaceId, sourceId));
+        router.push(routes.workspace.source(workspaceId, sourceId));
         router.refresh();
     }
 

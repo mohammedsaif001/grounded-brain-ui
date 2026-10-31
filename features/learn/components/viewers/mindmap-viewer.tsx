@@ -34,8 +34,8 @@ import {
 } from "lucide-react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
-import { workspaceRoutes } from "@/features/workspaces/lib/routes";
 import type { MindMapEdge, MindMapNode } from "../../lib/types";
+import { routes } from "@/shared/config/routes";
 
 const NODE_WIDTH = 200;
 const ROOT_WIDTH = 230;
@@ -507,7 +507,7 @@ function MindMapCanvas({ nodes, edges, workspaceId }: MindMapCanvasProps) {
 
     const chatHref =
         selectedNode && workspaceId
-            ? `${workspaceRoutes.detail(workspaceId)}?ask=${encodeURIComponent(
+            ? `${routes.workspace.chat(workspaceId)}?ask=${encodeURIComponent(
                   `Tell me more about "${selectedNode.label}" based on my sources.`,
               )}`
             : null;

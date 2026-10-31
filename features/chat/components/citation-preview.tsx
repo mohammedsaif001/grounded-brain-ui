@@ -14,8 +14,8 @@ import { Button } from "@/components/ui/button";
 import { useImportWebSearchSource } from "@/features/sources/hooks/use-sources";
 import { SOURCE_TYPE_LABELS } from "@/features/sources/lib/constants";
 import type { SourceType } from "@/features/sources/lib/types";
-import { sourceRoutes } from "@/features/sources/lib/routes";
 import type { ChatCitation } from "../lib/types";
+import { routes } from "@/shared/config/routes";
 
 type CitationPreviewProps = {
     citation: ChatCitation;
@@ -110,7 +110,7 @@ export function CitationPreview({
                 </div>
             ) : citation.sourceId ? (
                 <Link
-                    href={sourceRoutes.detail(workspaceId, citation.sourceId)}
+                    href={routes.workspace.source(workspaceId, citation.sourceId)}
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-primary underline-offset-4 hover:underline"
                 >
                     <ExternalLinkIcon className="size-3" />

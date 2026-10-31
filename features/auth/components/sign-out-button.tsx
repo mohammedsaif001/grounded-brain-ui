@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { signOut } from "../lib/auth-client";
-import { authRoutes } from "../lib/auth-routes";
+import { routes } from "@/shared/config/routes";
 
 export function SignOutButton() {
     const router = useRouter();
@@ -17,7 +17,7 @@ export function SignOutButton() {
         await signOut({
             fetchOptions: {
                 onSuccess: () => {
-                    router.push(authRoutes.login);
+                    router.push(routes.login);
                     router.refresh();
                 },
             },

@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { getWorkspaceGradient } from "../lib/workspace-gradients";
-import { workspaceRoutes } from "../lib/routes";
 import type { Workspace } from "../lib/types";
+import { routes } from "@/shared/config/routes";
 
 type WorkspaceCardProps = {
     workspace: Workspace;
@@ -28,7 +28,7 @@ export function WorkspaceCard({
     onDelete,
     className,
 }: WorkspaceCardProps) {
-    const href = workspaceRoutes.detail(workspace.id);
+    const href = routes.workspace.chat(workspace.id);
     const gradient = getWorkspaceGradient(workspace.id);
 
     return (

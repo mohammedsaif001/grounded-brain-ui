@@ -24,8 +24,8 @@ import {
     useUpdateWorkspace,
 } from "../hooks/use-workspaces";
 import type { Workspace } from "../lib/types";
-import { workspaceRoutes } from "../lib/routes";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
+import { routes } from "@/shared/config/routes";
 
 type WorkspaceSettingsFormProps = {
     workspace: Workspace;
@@ -56,7 +56,7 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
 
     async function handleDelete() {
         await deleteWorkspace.mutateAsync(workspace.id);
-        router.push(workspaceRoutes.list);
+        router.push(routes.dashboard);
     }
 
     return (

@@ -23,7 +23,6 @@ export {
     uploadPdfSource,
 } from "./lib/api";
 
-export { sourceRoutes } from "./lib/routes";
 export {
     SOURCE_STATUS_LABELS,
     SOURCE_STATUSES,
