@@ -1,6 +1,8 @@
 import "server-only";
 
 import { cache } from "react";
+import { getSessionCookie } from "better-auth/cookies";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { routes } from "@/shared/config/routes";
 import { ApiError } from "@/shared/lib/api";
@@ -17,6 +19,12 @@ export type Session = typeof authClient.$Infer.Session;
  * and surface through the nearest error boundary instead of looking like a sign-out.
  */
 export const getSession = cache(async (): Promise<Session | null> => {
+    // No session cookie means signed out: skip the API round trip. This also keeps the
+    // public pages (landing, login) available while the API is down.
+    if (!getSessionCookie(await headers())) {
+        return null;
+    }
+
     try {
         const session = await backendFetch<Session | null>(
             "/api/auth/get-session",
