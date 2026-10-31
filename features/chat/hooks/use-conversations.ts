@@ -1,6 +1,10 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import {
+    useInvalidatingMutation,
+    type MutationHookOptions,
+} from "@/shared/hooks/use-invalidating-mutation";
 import {
     createConversation,
     deleteConversation,
@@ -10,11 +14,12 @@ import {
 import type { ChatCitation, ChatMessage } from "../lib/types";
 
 export function chatKeys(workspaceId: string) {
+    const all = ["chat", workspaceId] as const;
     return {
-        all: ["chat", workspaceId] as const,
-        conversations: () => ["chat", workspaceId, "conversations"] as const,
+        all,
+        conversations: () => [...all, "conversations"] as const,
         messages: (conversationId: string) =>
-            ["chat", workspaceId, "messages", conversationId] as const,
+            [...all, "messages", conversationId] as const,
     };
 }
 
@@ -30,40 +35,37 @@ export function useConversationMessages(
     conversationId: string | null,
 ) {
     return useQuery({
-        queryKey: chatKeys(workspaceId).messages(conversationId ?? "none"),
+        queryKey: chatKeys(workspaceId).messages(conversationId ?? ""),
         queryFn: () =>
-            conversationId
-                ? listConversationMessages(workspaceId, conversationId)
-                : Promise.resolve([]),
-        enabled: Boolean(conversationId),
+            listConversationMessages(workspaceId, conversationId as string),
+        enabled: conversationId !== null,
     });
 }
 
-export function useCreateConversation(workspaceId: string) {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (title?: string) =>
-            createConversation(workspaceId, title),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({
-                queryKey: chatKeys(workspaceId).conversations(),
-            });
-        },
+export function useCreateConversation(
+    workspaceId: string,
+    options?: MutationHookOptions,
+) {
+    return useInvalidatingMutation({
+        mutationFn: (title?: string) => createConversation(workspaceId, title),
+        invalidates: () => [chatKeys(workspaceId).conversations()],
+        ...options,
     });
 }
 
-export function useDeleteConversation(workspaceId: string) {
-    const queryClient = useQueryClient();
-
-    return useMutation({
+export function useDeleteConversation(
+    workspaceId: string,
+    options?: MutationHookOptions,
+) {
+    return useInvalidatingMutation({
         mutationFn: (conversationId: string) =>
             deleteConversation(workspaceId, conversationId),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({
-                queryKey: chatKeys(workspaceId).all,
-            });
-        },
+        updateCache: (queryClient, _data, conversationId) =>
+            queryClient.removeQueries({
+                queryKey: chatKeys(workspaceId).messages(conversationId),
+            }),
+        invalidates: () => [chatKeys(workspaceId).conversations()],
+        ...options,
     });
 }
 

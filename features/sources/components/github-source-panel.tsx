@@ -19,7 +19,7 @@ export function GithubSourcePanel({
 }: GithubSourcePanelProps) {
     const isReady = source.status === "READY";
     const { data, isLoading } = useGithubFiles(workspaceId, source.id, isReady);
-    const sync = useSyncGithubSource(workspaceId);
+    const sync = useSyncGithubSource(workspaceId, { suppressErrorToast: true });
     const [message, setMessage] = useState<string | null>(null);
     const [filter, setFilter] = useState("");
 

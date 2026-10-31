@@ -25,8 +25,9 @@ import { routes } from "@/shared/config/routes";
 
 export function MemorySettings() {
     const { data: memories = [], isLoading, error } = useMemories();
-    const createMemory = useCreateMemory();
-    const updateMemory = useUpdateMemory();
+    // MemoryFormDialog renders create/update errors inline.
+    const createMemory = useCreateMemory({ suppressErrorToast: true });
+    const updateMemory = useUpdateMemory({ suppressErrorToast: true });
     const deleteMemory = useDeleteMemory();
 
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -154,7 +155,7 @@ export function MemorySettings() {
                                         variant="ghost"
                                         size="icon-sm"
                                         onClick={() =>
-                                            void deleteMemory.mutateAsync(
+                                            deleteMemory.mutate(
                                                 memory.id,
                                             )
                                         }

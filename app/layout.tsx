@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, JetBrains_Mono, Figtree } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import QueryProvider from "@/shared/components/providers/query-provider";
+import { Toaster } from "@/components/ui/toast";
+import { QueryProvider } from "@/shared/components/providers/query-provider";
 import { ThemeProvider } from "@/shared/components/providers/theme-provider";
 
 const figtreeHeading = Figtree({ subsets: ['latin'], variable: '--font-heading' });
@@ -45,6 +46,7 @@ export default function RootLayout({
           <QueryProvider>
             {children}
           </QueryProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

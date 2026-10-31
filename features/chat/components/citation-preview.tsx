@@ -11,6 +11,7 @@ import {
     VideoIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 import { useImportWebSearchSource } from "@/features/sources/hooks/use-sources";
 import { SOURCE_TYPE_LABELS } from "@/features/sources/lib/constants";
 import type { SourceType } from "@/features/sources/lib/types";
@@ -97,11 +98,20 @@ export function CitationPreview({
                         className="h-7 text-xs"
                         disabled={importWebSearch.isPending}
                         onClick={() =>
-                            void importWebSearch.mutateAsync({
-                                title: citation.sourceTitle,
-                                content: citation.excerpt,
-                                url: citation.url!,
-                            })
+                            importWebSearch.mutate(
+                                {
+                                    title: citation.sourceTitle,
+                                    content: citation.excerpt,
+                                    url: citation.url!,
+                                },
+                                {
+                                    onSuccess: () =>
+                                        toast.add({
+                                            type: "success",
+                                            title: "Saved to library",
+                                        }),
+                                },
+                            )
                         }
                     >
                         <PlusIcon className="size-3" />

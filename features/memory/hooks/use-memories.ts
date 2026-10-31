@@ -1,6 +1,10 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import {
+    useInvalidatingMutation,
+    type MutationHookOptions,
+} from "@/shared/hooks/use-invalidating-mutation";
 import {
     createMemory,
     deleteMemory,
@@ -11,7 +15,7 @@ import type { CreateMemoryInput, UpdateMemoryInput } from "../lib/types";
 
 export const memoryKeys = {
     all: ["memory"] as const,
-    list: () => ["memory", "list"] as const,
+    list: () => [...memoryKeys.all, "list"] as const,
 };
 
 export function useMemories() {
@@ -21,21 +25,16 @@ export function useMemories() {
     });
 }
 
-export function useCreateMemory() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
+export function useCreateMemory(options?: MutationHookOptions) {
+    return useInvalidatingMutation({
         mutationFn: (input: CreateMemoryInput) => createMemory(input),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: memoryKeys.all });
-        },
+        invalidates: () => [memoryKeys.all],
+        ...options,
     });
 }
 
-export function useUpdateMemory() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
+export function useUpdateMemory(options?: MutationHookOptions) {
+    return useInvalidatingMutation({
         mutationFn: ({
             memoryId,
             input,
@@ -43,19 +42,15 @@ export function useUpdateMemory() {
             memoryId: string;
             input: UpdateMemoryInput;
         }) => updateMemory(memoryId, input),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: memoryKeys.all });
-        },
+        invalidates: () => [memoryKeys.all],
+        ...options,
     });
 }
 
-export function useDeleteMemory() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
+export function useDeleteMemory(options?: MutationHookOptions) {
+    return useInvalidatingMutation({
         mutationFn: (memoryId: string) => deleteMemory(memoryId),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: memoryKeys.all });
-        },
+        invalidates: () => [memoryKeys.all],
+        ...options,
     });
 }

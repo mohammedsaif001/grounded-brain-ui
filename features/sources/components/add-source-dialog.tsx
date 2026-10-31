@@ -37,11 +37,12 @@ export function AddSourceDialog({
     onOpenChange,
 }: AddSourceDialogProps) {
     const router = useRouter();
-    const createSource = useCreateSource(workspaceId);
-    const uploadPdf = useUploadPdfSource(workspaceId);
-    const importWebsite = useImportWebsiteSource(workspaceId);
-    const importYoutube = useImportYoutubeSource(workspaceId);
-    const importGithub = useImportGithubSource(workspaceId);
+    // Errors are shown inline in the dialog, not as toasts.
+    const createSource = useCreateSource(workspaceId, { suppressErrorToast: true });
+    const uploadPdf = useUploadPdfSource(workspaceId, { suppressErrorToast: true });
+    const importWebsite = useImportWebsiteSource(workspaceId, { suppressErrorToast: true });
+    const importYoutube = useImportYoutubeSource(workspaceId, { suppressErrorToast: true });
+    const importGithub = useImportGithubSource(workspaceId, { suppressErrorToast: true });
 
     const [error, setError] = useState<string | null>(null);
 

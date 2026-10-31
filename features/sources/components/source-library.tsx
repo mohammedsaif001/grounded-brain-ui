@@ -246,9 +246,7 @@ export function SourceLibrary({ workspaceId }: SourceLibraryProps) {
                                         <DropdownMenuItem
                                             disabled={reprocessFailed.isPending}
                                             onClick={() =>
-                                                void reprocessFailed.mutateAsync(
-                                                    undefined,
-                                                )
+                                                reprocessFailed.mutate(undefined)
                                             }
                                         >
                                             <RefreshCwIcon />
@@ -294,9 +292,9 @@ export function SourceLibrary({ workspaceId }: SourceLibraryProps) {
                                     variant="destructive"
                                     disabled={bulkDelete.isPending}
                                     onClick={() => {
-                                        void bulkDelete
-                                            .mutateAsync(selectedIds)
-                                            .then(exitSelectionMode);
+                                        bulkDelete.mutate(selectedIds, {
+                                            onSuccess: exitSelectionMode,
+                                        });
                                     }}
                                 >
                                     <Trash2Icon />
@@ -377,7 +375,7 @@ export function SourceLibrary({ workspaceId }: SourceLibraryProps) {
                                 onReprocess={
                                     source.status === "FAILED"
                                         ? (target) =>
-                                              void reprocessFailed.mutateAsync([
+                                              reprocessFailed.mutate([
                                                   target.id,
                                               ])
                                         : undefined
@@ -451,9 +449,9 @@ export function SourceLibrary({ workspaceId }: SourceLibraryProps) {
                                 if (!deletingSource) {
                                     return;
                                 }
-                                void deleteSource
-                                    .mutateAsync(deletingSource.id)
-                                    .then(() => setDeletingSource(null));
+                                deleteSource.mutate(deletingSource.id, {
+                                    onSuccess: () => setDeletingSource(null),
+                                });
                             }}
                         >
                             {deleteSource.isPending ? <Spinner /> : null}

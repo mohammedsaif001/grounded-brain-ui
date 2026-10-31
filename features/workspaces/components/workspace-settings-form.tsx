@@ -13,6 +13,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/toast";
 import {
     CHAT_MODEL_LABELS,
     CHAT_MODELS,
@@ -33,7 +34,7 @@ type WorkspaceSettingsFormProps = {
 
 export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps) {
     const router = useRouter();
-    const updateWorkspace = useUpdateWorkspace(workspace.id);
+    const updateWorkspace = useUpdateWorkspace();
     const deleteWorkspace = useDeleteWorkspace();
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [title, setTitle] = useState(workspace.title);
@@ -46,20 +47,29 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
     async function handleSave(event: React.FormEvent) {
         event.preventDefault();
 
-        await updateWorkspace.mutateAsync({
-            title: title.trim(),
-            // Send "" (not undefined) so an emptied description is actually cleared.
-            description: description.trim(),
-            icon: icon.trim() || undefined,
-            defaultModel,
-        });
+        try {
+            await updateWorkspace.mutateAsync({
+                workspaceId: workspace.id,
+                input: {
+                    title: title.trim(),
+                    // Send "" (not undefined) so an emptied description is actually cleared.
+                    description: description.trim(),
+                    icon: icon.trim() || undefined,
+                    defaultModel,
+                },
+            });
+        } catch {
+            return; // Reported by the global mutation error toast.
+        }
+
+        toast.add({ type: "success", title: "Workspace updated" });
         // The workspace shell is rendered by a server layout; refresh it with the new values.
         router.refresh();
     }
 
     async function handleDelete() {
         await deleteWorkspace.mutateAsync(workspace.id);
-        router.push(routes.dashboard);
+        router.replace(routes.dashboard);
     }
 
     return (

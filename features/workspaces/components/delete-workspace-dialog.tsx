@@ -50,7 +50,8 @@ export function DeleteWorkspaceDialog({
                         disabled={isPending}
                         onClick={(event) => {
                             event.preventDefault();
-                            void onConfirm();
+                            // Failures are reported by the global mutation error toast.
+                            onConfirm().catch(() => undefined);
                         }}
                     >
                         {isPending ? <Spinner /> : null}

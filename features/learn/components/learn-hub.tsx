@@ -106,7 +106,7 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                                 size="icon-sm"
                                 className="absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100"
                                 onClick={() =>
-                                    void deleteArtifact.mutateAsync(artifact.id)
+                                    deleteArtifact.mutate(artifact.id)
                                 }
                                 disabled={deleteArtifact.isPending}
                             >

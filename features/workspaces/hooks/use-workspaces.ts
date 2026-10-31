@@ -1,7 +1,10 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ApiError } from "@/shared/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import {
+    useInvalidatingMutation,
+    type MutationHookOptions,
+} from "@/shared/hooks/use-invalidating-mutation";
 import {
     createWorkspace,
     deleteWorkspace,
@@ -13,56 +16,61 @@ import type { CreateWorkspaceInput, UpdateWorkspaceInput } from "../lib/types";
 
 export const workspaceKeys = {
     all: ["workspaces"] as const,
-    detail: (id: string) => ["workspaces", id] as const,
+    list: () => [...workspaceKeys.all, "list"] as const,
+    detail: (workspaceId: string) =>
+        [...workspaceKeys.all, "detail", workspaceId] as const,
 };
 
 export function useWorkspaces() {
     return useQuery({
-        queryKey: workspaceKeys.all,
+        queryKey: workspaceKeys.list(),
         queryFn: listWorkspaces,
     });
 }
 
-export function useWorkspace(id: string) {
+export function useWorkspace(workspaceId: string) {
     return useQuery({
-        queryKey: workspaceKeys.detail(id),
-        queryFn: () => getWorkspace(id),
-        retry: (_, error) =>
-            !(error instanceof ApiError && error.status === 404),
+        queryKey: workspaceKeys.detail(workspaceId),
+        queryFn: () => getWorkspace(workspaceId),
     });
 }
 
-export function useCreateWorkspace() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
+export function useCreateWorkspace(options?: MutationHookOptions) {
+    return useInvalidatingMutation({
         mutationFn: (input: CreateWorkspaceInput) => createWorkspace(input),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: workspaceKeys.all });
-        },
+        invalidates: () => [workspaceKeys.list()],
+        ...options,
     });
 }
 
-export function useUpdateWorkspace(id: string) {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (input: UpdateWorkspaceInput) => updateWorkspace(id, input),
-        onSuccess: (workspace) => {
-            queryClient.setQueryData(workspaceKeys.detail(id), workspace);
-            void queryClient.invalidateQueries({ queryKey: workspaceKeys.all });
-        },
+/** `workspaceId` is passed per call so one hook instance can edit any workspace. */
+export function useUpdateWorkspace(options?: MutationHookOptions) {
+    return useInvalidatingMutation({
+        mutationFn: ({
+            workspaceId,
+            input,
+        }: {
+            workspaceId: string;
+            input: UpdateWorkspaceInput;
+        }) => updateWorkspace(workspaceId, input),
+        updateCache: (queryClient, workspace) =>
+            queryClient.setQueryData(
+                workspaceKeys.detail(workspace.id),
+                workspace,
+            ),
+        invalidates: () => [workspaceKeys.list()],
+        ...options,
     });
 }
 
-export function useDeleteWorkspace() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (id: string) => deleteWorkspace(id),
-        onSuccess: (_, id) => {
-            queryClient.removeQueries({ queryKey: workspaceKeys.detail(id) });
-            void queryClient.invalidateQueries({ queryKey: workspaceKeys.all });
-        },
+export function useDeleteWorkspace(options?: MutationHookOptions) {
+    return useInvalidatingMutation({
+        mutationFn: (workspaceId: string) => deleteWorkspace(workspaceId),
+        updateCache: (queryClient, _data, workspaceId) =>
+            queryClient.removeQueries({
+                queryKey: workspaceKeys.detail(workspaceId),
+            }),
+        invalidates: () => [workspaceKeys.list()],
+        ...options,
     });
 }

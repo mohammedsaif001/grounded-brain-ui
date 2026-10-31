@@ -62,7 +62,8 @@ const FEATURES = [
 export function DashboardHome({ userName }: DashboardHomeProps) {
     const router = useRouter();
     const { data: workspaces, isLoading, error } = useWorkspaces();
-    const createWorkspace = useCreateWorkspace();
+    // Form dialogs render their own errors inline.
+    const createWorkspace = useCreateWorkspace({ suppressErrorToast: true });
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebouncedValue(search, 200);
 
@@ -73,7 +74,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
     const [deletingWorkspace, setDeletingWorkspace] =
         useState<Workspace | null>(null);
 
-    const updateWorkspace = useUpdateWorkspace(editingWorkspace?.id ?? "");
+    const updateWorkspace = useUpdateWorkspace({ suppressErrorToast: true });
     const deleteWorkspace = useDeleteWorkspace();
 
     const filteredWorkspaces = useMemo(() => {
@@ -272,7 +273,13 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                 workspace={editingWorkspace}
                 isPending={updateWorkspace.isPending}
                 onSubmit={async (values) => {
-                    await updateWorkspace.mutateAsync(values);
+                    if (!editingWorkspace) {
+                        return;
+                    }
+                    await updateWorkspace.mutateAsync({
+                        workspaceId: editingWorkspace.id,
+                        input: values,
+                    });
                     setEditingWorkspace(null);
                 }}
             />

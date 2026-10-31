@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { signOut } from "../lib/auth-client";
@@ -9,6 +10,7 @@ import { routes } from "@/shared/config/routes";
 
 export function SignOutButton() {
     const router = useRouter();
+    const queryClient = useQueryClient();
     const [isLoading, setIsLoading] = useState(false);
 
     async function handleSignOut() {
@@ -17,7 +19,9 @@ export function SignOutButton() {
         await signOut({
             fetchOptions: {
                 onSuccess: () => {
-                    router.push(routes.login);
+                    // Drop every cached query so the next user on this device never sees this one's data.
+                    queryClient.clear();
+                    router.replace(routes.login);
                     router.refresh();
                 },
             },

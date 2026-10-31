@@ -209,19 +209,20 @@ export function WorkspaceChat({
         workspaceId,
     ]);
 
-    async function handleNewChat() {
+    function handleNewChat() {
         setConversationId(null);
         setMessages([]);
         setCitationsByMessageId({});
     }
 
-    async function handleDeleteConversation() {
+    function handleDeleteConversation() {
         if (!conversationId) {
             return;
         }
 
-        await deleteConversation.mutateAsync(conversationId);
-        await handleNewChat();
+        deleteConversation.mutate(conversationId, {
+            onSuccess: handleNewChat,
+        });
     }
 
     function handleExportChat() {
@@ -247,7 +248,7 @@ export function WorkspaceChat({
                     value={conversationId ?? "new"}
                     onValueChange={(value) => {
                         if (value === "new") {
-                            void handleNewChat();
+                            handleNewChat();
                             return;
                         }
                         setConversationId(value);
@@ -272,7 +273,7 @@ export function WorkspaceChat({
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => void handleNewChat()}
+                    onClick={handleNewChat}
                 >
                     <MessageSquarePlusIcon />
                     New
@@ -292,7 +293,7 @@ export function WorkspaceChat({
                     <Button
                         variant="ghost"
                         size="icon-sm"
-                        onClick={() => void handleDeleteConversation()}
+                        onClick={handleDeleteConversation}
                         disabled={deleteConversation.isPending}
                     >
                         <Trash2Icon />

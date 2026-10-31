@@ -35,7 +35,7 @@ export function GenerateArtifactDialog({
     const [type, setType] = useState<ArtifactType>("SUMMARY");
     const [title, setTitle] = useState("");
     const [error, setError] = useState<string | null>(null);
-    const createArtifact = useCreateArtifact(workspaceId);
+    const createArtifact = useCreateArtifact(workspaceId, { suppressErrorToast: true });
     const { data: sources } = useSources(workspaceId);
     const hasGithubSource =
         sources?.some(
