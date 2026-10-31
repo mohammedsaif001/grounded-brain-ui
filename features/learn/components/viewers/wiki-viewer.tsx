@@ -4,6 +4,21 @@ import { useEffect, useId, useState } from "react";
 import { StreamdownContent } from "@/shared/components/streamdown-content";
 import type { WikiContent } from "../../lib/types";
 
+type Mermaid = (typeof import("mermaid"))["default"];
+let mermaidPromise: Promise<Mermaid> | null = null;
+
+/**
+ * Loads mermaid (about 1MB) on first use and initializes it once. securityLevel "strict"
+ * sanitizes the LLM-authored diagram, so its SVG output is safe to inject.
+ */
+function loadMermaid() {
+    mermaidPromise ??= import("mermaid").then(({ default: mermaid }) => {
+        mermaid.initialize({ startOnLoad: false, securityLevel: "strict" });
+        return mermaid;
+    });
+    return mermaidPromise;
+}
+
 function MermaidDiagram({ code }: { code: string }) {
     const id = `mermaid-${useId().replace(/:/g, "")}`;
     const [svg, setSvg] = useState<string | null>(null);
@@ -14,8 +29,7 @@ function MermaidDiagram({ code }: { code: string }) {
 
         async function render() {
             try {
-                const { default: mermaid } = await import("mermaid");
-                mermaid.initialize({ startOnLoad: false, securityLevel: "strict" });
+                const mermaid = await loadMermaid();
                 const result = await mermaid.render(id, code);
                 if (!cancelled) {
                     setSvg(result.svg);

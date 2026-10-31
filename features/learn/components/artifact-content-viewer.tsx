@@ -1,6 +1,7 @@
 "use client";
 
-import type { LearningArtifact, WikiContent } from "../lib/types";
+import { parseArtifactContent } from "../lib/content";
+import type { LearningArtifact } from "../lib/types";
 import { FlashcardsViewer } from "./viewers/flashcards-viewer";
 import { MindMapViewer } from "./viewers/mindmap-viewer";
 import { QuizViewer } from "./viewers/quiz-viewer";
@@ -18,81 +19,47 @@ export function ArtifactContentViewer({
     artifact,
     workspaceId,
 }: ArtifactContentViewerProps) {
-    const content = artifact.content;
+    const parsed = parseArtifactContent(artifact);
+
+    if (!parsed) {
+        return (
+            <p className="py-10 text-center text-sm text-muted-foreground">
+                This artifact&apos;s content could not be displayed. Try
+                generating it again.
+            </p>
+        );
+    }
+
     // Stateful viewers (quiz, flashcards) restart when the artifact is regenerated.
     const versionKey = `${artifact.id}:${artifact.updatedAt}`;
 
-    if (!content) {
-        return null;
-    }
-
-    switch (artifact.type) {
+    switch (parsed.type) {
         case "SUMMARY":
-            return (
-                <SummaryViewer
-                    markdown={
-                        typeof content.markdown === "string"
-                            ? content.markdown
-                            : ""
-                    }
-                />
-            );
+            return <SummaryViewer markdown={parsed.content.markdown} />;
         case "TAKEAWAYS":
-            return (
-                <TakeawaysViewer
-                    items={Array.isArray(content.items)
-                        ? content.items.filter(
-                              (item): item is string => typeof item === "string",
-                          )
-                        : []}
-                />
-            );
+            return <TakeawaysViewer items={parsed.content.items} />;
         case "FLASHCARDS":
-            return (
-                <FlashcardsViewer
-                    key={versionKey}
-                    cards={Array.isArray(content.cards) ? content.cards : []}
-                />
-            );
+            return <FlashcardsViewer key={versionKey} cards={parsed.content.cards} />;
         case "QUIZ":
             return (
-                <QuizViewer
-                    key={versionKey}
-                    questions={
-                        Array.isArray(content.questions)
-                            ? content.questions
-                            : []
-                    }
-                />
+                <QuizViewer key={versionKey} questions={parsed.content.questions} />
             );
         case "MINDMAP":
             return (
                 <MindMapViewer
                     workspaceId={workspaceId}
-                    nodes={Array.isArray(content.nodes) ? content.nodes : []}
-                    edges={Array.isArray(content.edges) ? content.edges : []}
+                    nodes={parsed.content.nodes}
+                    edges={parsed.content.edges}
                 />
             );
         case "REPORT":
             return (
                 <ReportViewer
-                    markdown={
-                        typeof content.markdown === "string"
-                            ? content.markdown
-                            : ""
-                    }
-                    sections={
-                        Array.isArray(content.sections)
-                            ? content.sections
-                            : undefined
-                    }
+                    markdown={parsed.content.markdown}
+                    sections={parsed.content.sections}
                 />
             );
         case "WIKI":
-            return typeof content.overview === "string" ? (
-                <WikiViewer wiki={content as unknown as WikiContent} />
-            ) : null;
-        default:
-            return null;
+            return <WikiViewer wiki={parsed.content} />;
     }
 }

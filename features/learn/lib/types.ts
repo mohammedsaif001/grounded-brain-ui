@@ -1,8 +1,14 @@
 import type { z } from "zod";
 import type {
+    artifactContentSchemas,
     artifactStatusSchema,
     artifactTypeSchema,
+    flashcardSchema,
     learningArtifactSchema,
+    mindMapEdgeSchema,
+    mindMapNodeSchema,
+    quizQuestionSchema,
+    wikiContentSchema,
 } from "./schemas";
 
 export type ArtifactType = z.infer<typeof artifactTypeSchema>;
@@ -17,28 +23,16 @@ export type CreateArtifactInput = {
     sourceIds?: string[];
 };
 
-export type Flashcard = { front: string; back: string };
+export type Flashcard = z.infer<typeof flashcardSchema>;
+export type QuizQuestion = z.infer<typeof quizQuestionSchema>;
+export type MindMapNode = z.infer<typeof mindMapNodeSchema>;
+export type MindMapEdge = z.infer<typeof mindMapEdgeSchema>;
+export type WikiContent = z.infer<typeof wikiContentSchema>;
 
-export type QuizQuestion = {
-    question: string;
-    options: string[];
-    correctIndex: number;
-    explanation: string;
-};
-
-export type MindMapNode = { id: string; label: string };
-export type MindMapEdge = { id: string; source: string; target: string };
-
-export type WikiContent = {
-    overview: string;
-    techStack: { name: string; purpose: string }[];
-    architecture: string;
-    diagram: string;
-    modules: {
-        name: string;
-        path: string;
-        description: string;
-        keyFiles: string[];
-    }[];
-    gettingStarted: string;
-};
+/** Validated `content` for each artifact type. */
+export type ArtifactContent = {
+    [Type in ArtifactType]: {
+        type: Type;
+        content: z.infer<(typeof artifactContentSchemas)[Type]>;
+    };
+}[ArtifactType];
