@@ -1,7 +1,7 @@
 import "server-only";
 
 import { headers } from "next/headers";
-import { serverEnv } from "@/shared/config/env";
+import { getServerEnv } from "@/shared/config/env";
 import { parseApiResponse, type ParseOptions } from "@/shared/lib/api";
 
 /**
@@ -15,6 +15,7 @@ export async function backendFetch<T = void>(
     path: string,
     { schema, ...init }: RequestInit & Pick<ParseOptions<T>, "schema"> = {},
 ): Promise<T> {
+    const env = getServerEnv();
     const incoming = await headers();
     const outgoing = new Headers(init.headers);
     outgoing.set("accept", "application/json");
@@ -24,11 +25,11 @@ export async function backendFetch<T = void>(
         outgoing.set("cookie", cookie);
     }
 
-    const response = await fetch(new URL(path, serverEnv.API_URL), {
+    const response = await fetch(new URL(path, env.API_URL), {
         ...init,
         headers: outgoing,
         cache: "no-store",
-        signal: init.signal ?? AbortSignal.timeout(serverEnv.API_TIMEOUT_MS),
+        signal: init.signal ?? AbortSignal.timeout(env.API_TIMEOUT_MS),
     });
 
     return parseApiResponse(response, { schema });

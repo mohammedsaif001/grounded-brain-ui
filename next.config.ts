@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
-import { serverEnv } from "./shared/config/env";
+import {
+    PHASE_PRODUCTION_BUILD,
+    PHASE_PRODUCTION_SERVER,
+} from "next/constants";
+import { parseServerEnv } from "./shared/config/env";
 
-const isProduction = serverEnv.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "production";
 
 /**
  * Same-origin only: the browser talks to the API through the `/api` rewrite below,
@@ -41,33 +45,43 @@ const securityHeaders = [
         : []),
 ];
 
-const nextConfig: NextConfig = {
-    output: "standalone",
-    poweredByHeader: false,
+export default function nextConfig(phase: string): NextConfig {
+    // Rewrites are baked into the build output, so a real build or server must get
+    // API_URL explicitly. `next typegen` also loads this file with the build phase but
+    // only needs route types, and dev falls back to a local API.
+    const isTypegen = process.argv.includes("typegen");
+    const env = parseServerEnv(process.env, {
+        requireApiUrl:
+            !isTypegen &&
+            (phase === PHASE_PRODUCTION_BUILD || phase === PHASE_PRODUCTION_SERVER),
+    });
 
-    experimental: {
-        // Rewrites proxy through Next's HTTP proxy, whose idle timeout defaults to 30s.
-        // Chat streams can stay silent longer than that (retrieval, web search) before
-        // the first token, so give them room.
-        proxyTimeout: 120_000,
-        // Request bodies are buffered (default cap 10MB) before being proxied. The API
-        // accepts 10MB PDFs, so leave headroom for multipart overhead.
-        proxyClientMaxBodySize: "12mb",
-    },
+    return {
+        output: "standalone",
+        poweredByHeader: false,
 
-    async headers() {
-        return [{ source: "/:path*", headers: securityHeaders }];
-    },
+        experimental: {
+            // Rewrites proxy through Next's HTTP proxy, whose idle timeout defaults to 30s.
+            // Chat streams can stay silent longer than that (retrieval, web search) before
+            // the first token, so give them room.
+            proxyTimeout: 120_000,
+            // Request bodies are buffered (default cap 10MB) before being proxied. The API
+            // accepts 10MB PDFs, so leave headroom for multipart overhead.
+            proxyClientMaxBodySize: "12mb",
+        },
 
-    async rewrites() {
-        // The app has no API routes of its own; every /api call belongs to the backend.
-        return [
-            {
-                source: "/api/:path*",
-                destination: `${serverEnv.API_URL}/api/:path*`,
-            },
-        ];
-    },
-};
+        async headers() {
+            return [{ source: "/:path*", headers: securityHeaders }];
+        },
 
-export default nextConfig;
+        async rewrites() {
+            // The app has no API routes of its own; every /api call belongs to the backend.
+            return [
+                {
+                    source: "/api/:path*",
+                    destination: `${env.API_URL}/api/:path*`,
+                },
+            ];
+        },
+    };
+}

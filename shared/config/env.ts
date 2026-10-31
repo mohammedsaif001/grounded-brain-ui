@@ -1,15 +1,14 @@
 import { z } from "zod";
 
 /**
- * Server-side environment, validated once at startup.
+ * Server-side environment, validated with zod.
  *
  * Kept free of `server-only` so `next.config.ts` can import it too. Nothing here is
  * exposed to the browser: only `NEXT_PUBLIC_*` variables are inlined into client bundles.
  */
+const DEV_API_URL = "http://localhost:8080";
+
 const serverEnvSchema = z.object({
-    NODE_ENV: z
-        .enum(["development", "test", "production"])
-        .default("development"),
     /** Base URL of the grounded-brain API. Read at build time for rewrites and at runtime for server fetches. */
     API_URL: z.url(),
     /** Upper bound for a single upstream request made from the server. */
@@ -18,15 +17,22 @@ const serverEnvSchema = z.object({
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
-function loadServerEnv(): ServerEnv {
-    const nodeEnv = process.env.NODE_ENV ?? "development";
+type ParseOptions = {
+    /**
+     * Fail when API_URL is missing instead of falling back to a local API. Required
+     * whenever the app is built or served for real, where a silent localhost default
+     * would point production at nothing.
+     */
+    requireApiUrl: boolean;
+};
+
+export function parseServerEnv(
+    source: Record<string, string | undefined>,
+    { requireApiUrl }: ParseOptions,
+): ServerEnv {
     const parsed = serverEnvSchema.safeParse({
-        NODE_ENV: nodeEnv,
-        // Only fall back to a local API outside production; a missing URL in prod is a deploy bug.
-        API_URL:
-            process.env.API_URL ??
-            (nodeEnv === "production" ? undefined : "http://localhost:8080"),
-        API_TIMEOUT_MS: process.env.API_TIMEOUT_MS,
+        API_URL: source.API_URL ?? (requireApiUrl ? undefined : DEV_API_URL),
+        API_TIMEOUT_MS: source.API_TIMEOUT_MS,
     });
 
     if (!parsed.success) {
@@ -38,4 +44,12 @@ function loadServerEnv(): ServerEnv {
     return parsed.data;
 }
 
-export const serverEnv = loadServerEnv();
+let cached: ServerEnv | undefined;
+
+/** Runtime environment for server code; strict in production. */
+export function getServerEnv(): ServerEnv {
+    cached ??= parseServerEnv(process.env, {
+        requireApiUrl: process.env.NODE_ENV === "production",
+    });
+    return cached;
+}
