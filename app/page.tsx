@@ -1,15 +1,10 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { getSession } from "@/features/auth";
+import { redirectIfAuthenticated } from "@/features/auth/server";
 import { routes } from "@/shared/config/routes";
 
 export default async function HomePage() {
-    const session = await getSession();
-
-    if (session) {
-        redirect(routes.dashboard);
-    }
+    await redirectIfAuthenticated();
 
     return (
         <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6">

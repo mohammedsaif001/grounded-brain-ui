@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { requireAuth } from "@/features/auth";
+import { requireSession } from "@/features/auth/server";
 import { ArtifactDetail } from "@/features/learn";
-import { getWorkspaceOrNull } from "@/features/workspaces/lib/workspace-server";
+import { getWorkspace } from "@/features/workspaces/server";
 import { WorkspaceShell } from "@/features/workspaces";
 
 type ArtifactPageProps = {
@@ -9,9 +9,9 @@ type ArtifactPageProps = {
 };
 
 export default async function ArtifactPage({ params }: ArtifactPageProps) {
-    await requireAuth();
+    await requireSession();
     const { id, artifactId } = await params;
-    const workspace = await getWorkspaceOrNull(id);
+    const workspace = await getWorkspace(id);
 
     if (!workspace) {
         notFound();

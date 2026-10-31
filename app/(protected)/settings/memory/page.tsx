@@ -1,8 +1,8 @@
-import { requireAuth } from "@/features/auth";
+import { requireSession } from "@/features/auth/server";
 import { MemorySettings } from "@/features/memory";
 
 export default async function MemorySettingsPage() {
-    await requireAuth();
+    await requireSession();
 
     return <MemorySettings />;
 }

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { requireAuth } from "@/features/auth";
-import { getWorkspaceOrNull } from "@/features/workspaces/lib/workspace-server";
+import { requireSession } from "@/features/auth/server";
+import { getWorkspace } from "@/features/workspaces/server";
 import { WorkspaceShell } from "@/features/workspaces";
 import { WorkspaceSettingsForm } from "@/features/workspaces/components/workspace-settings-form";
 
@@ -11,9 +11,9 @@ type WorkspaceSettingsPageProps = {
 export default async function WorkspaceSettingsPage({
     params,
 }: WorkspaceSettingsPageProps) {
-    await requireAuth();
+    await requireSession();
     const { id } = await params;
-    const workspace = await getWorkspaceOrNull(id);
+    const workspace = await getWorkspace(id);
 
     if (!workspace) {
         notFound();

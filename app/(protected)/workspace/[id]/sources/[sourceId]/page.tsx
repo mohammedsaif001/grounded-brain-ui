@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { requireAuth } from "@/features/auth";
+import { requireSession } from "@/features/auth/server";
 import { SourceDetail } from "@/features/sources";
-import { getWorkspaceOrNull } from "@/features/workspaces/lib/workspace-server";
+import { getWorkspace } from "@/features/workspaces/server";
 import { WorkspaceShell } from "@/features/workspaces";
 
 type SourceDetailPageProps = {
@@ -11,9 +11,9 @@ type SourceDetailPageProps = {
 export default async function SourceDetailPage({
     params,
 }: SourceDetailPageProps) {
-    await requireAuth();
+    await requireSession();
     const { id, sourceId } = await params;
-    const workspace = await getWorkspaceOrNull(id);
+    const workspace = await getWorkspace(id);
 
     if (!workspace) {
         notFound();
