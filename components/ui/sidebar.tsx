@@ -600,6 +600,15 @@ function SidebarMenuBadge({
   )
 }
 
+/** Small stable string hash (djb2) used to vary skeleton widths deterministically. */
+function hashString(value: string) {
+  let hash = 5381
+  for (let i = 0; i < value.length; i++) {
+    hash = ((hash << 5) + hash + value.charCodeAt(i)) >>> 0
+  }
+  return hash
+}
+
 function SidebarMenuSkeleton({
   className,
   showIcon = false,
@@ -607,10 +616,11 @@ function SidebarMenuSkeleton({
 }: React.ComponentProps<"div"> & {
   showIcon?: boolean
 }) {
-  // Random width between 50 to 90%.
-  const [width] = React.useState(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`
-  })
+  // Width between 50 and 90%. Derived from useId() rather than Math.random(): the id is
+  // identical on the server and during hydration, so the markup matches (a random
+  // width differs between the two renders and fails hydration).
+  const id = React.useId()
+  const width = `${50 + (hashString(id) % 41)}%`
 
   return (
     <div
