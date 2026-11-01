@@ -24,6 +24,7 @@ export {
 
 export { CreateWorkspaceCard } from "./components/create-workspace-card";
 export { DashboardHome } from "./components/dashboard-home";
+export { DashboardSkeleton } from "./components/dashboard-skeleton";
 export { DeleteWorkspaceDialog } from "./components/delete-workspace-dialog";
 export { WorkspaceCard } from "./components/workspace-card";
 export { WorkspaceFormDialog } from "./components/workspace-form-dialog";
