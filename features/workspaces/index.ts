@@ -30,3 +30,4 @@ export { WorkspaceCard } from "./components/workspace-card";
 export { WorkspaceFormDialog } from "./components/workspace-form-dialog";
 export { WorkspaceSettingsForm } from "./components/workspace-settings-form";
 export { WorkspaceShell } from "./components/workspace-shell";
+export { WorkspaceShellSkeleton } from "./components/workspace-shell-skeleton";
