@@ -1,9 +1,6 @@
-import { Spinner } from "@/components/ui/spinner";
+import { CardGridPageSkeleton } from "@/shared/components/page-skeletons";
 
-export default function WorkspaceLoading() {
-    return (
-        <div className="flex flex-1 items-center justify-center p-6">
-            <Spinner className="size-6 text-muted-foreground" />
-        </div>
-    );
+/** Fallback for any workspace page; the shell (sidebar, header) stays mounted around it. */
+export default function WorkspacePageLoading() {
+    return <CardGridPageSkeleton />;
 }
