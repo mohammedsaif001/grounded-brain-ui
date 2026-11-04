@@ -109,8 +109,8 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                         href={routes.dashboard}
                         className="flex items-center gap-2.5 font-heading text-lg font-semibold tracking-tight"
                     >
-                        <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-base">
-                            📚
+                        <span className="flex size-8 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                            <BrainIcon aria-hidden="true" className="size-[18px]" />
                         </span>
                         Grounded Brain
                     </Link>
