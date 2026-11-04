@@ -25,7 +25,9 @@ import {
     useUpdateWorkspace,
 } from "../hooks/use-workspaces";
 import type { Workspace } from "../lib/types";
+import { resolveWorkspaceIcon } from "../lib/workspace-icons";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
+import { WorkspaceIconPicker } from "./workspace-icon-picker";
 import { routes } from "@/shared/config/routes";
 
 type WorkspaceSettingsFormProps = {
@@ -39,7 +41,7 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [title, setTitle] = useState(workspace.title);
     const [description, setDescription] = useState(workspace.description ?? "");
-    const [icon, setIcon] = useState(workspace.icon ?? "");
+    const [icon, setIcon] = useState(resolveWorkspaceIcon(workspace.icon));
     const [defaultModel, setDefaultModel] = useState<ChatModelId>(() =>
         resolveChatModel(workspace.defaultModel),
     );
@@ -54,7 +56,7 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                     title: title.trim(),
                     // Send "" (not undefined) so an emptied description is actually cleared.
                     description: description.trim(),
-                    icon: icon.trim() || undefined,
+                    icon,
                     defaultModel,
                 },
             });
@@ -105,13 +107,13 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="icon">Icon</Label>
-                    <Input
-                        id="icon"
+                    <p id="workspace-icon-label" className="text-sm font-medium">
+                        Icon
+                    </p>
+                    <WorkspaceIconPicker
                         value={icon}
-                        onChange={(event) => setIcon(event.target.value)}
-                        placeholder="📚"
-                        maxLength={8}
+                        onChange={setIcon}
+                        labelledBy="workspace-icon-label"
                     />
                 </div>
 
