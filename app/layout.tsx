@@ -1,18 +1,31 @@
 import type { Metadata } from "next";
-import { Geist, JetBrains_Mono, Figtree } from "next/font/google";
+import { Inter, JetBrains_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toast";
 import { QueryProvider } from "@/shared/components/providers/query-provider";
 import { ThemeProvider } from "@/shared/components/providers/theme-provider";
 
-const figtreeHeading = Figtree({ subsets: ['latin'], variable: '--font-heading' });
-
-const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+/** UI text: neutral, highly legible sans. */
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+/** Display serif for hero headlines and answer titles. */
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-lora",
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+/** Code only (inline code, code blocks, keyboard hints). */
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -31,7 +44,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", geistSans.variable, "font-mono", jetbrainsMono.variable, figtreeHeading.variable)}
+      className={cn(
+        "h-full antialiased",
+        inter.variable,
+        lora.variable,
+        jetbrainsMono.variable,
+      )}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
