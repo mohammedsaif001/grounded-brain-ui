@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getWorkspaceGradient } from "../lib/workspace-gradients";
 import type { Workspace } from "../lib/types";
+import { WorkspaceIcon } from "./workspace-icon";
 import { routes } from "@/shared/config/routes";
 
 type WorkspaceCardProps = {
@@ -51,8 +52,8 @@ export function WorkspaceCard({
 
             <div className="pointer-events-none relative flex h-full min-h-[196px] flex-col p-5">
                 <div className="flex items-start justify-between gap-2">
-                    <span className="flex size-11 items-center justify-center rounded-2xl bg-white/20 text-2xl backdrop-blur-sm">
-                        {workspace.icon ?? "📚"}
+                    <span className="flex size-11 items-center justify-center rounded-2xl bg-white/20 text-white backdrop-blur-sm">
+                        <WorkspaceIcon value={workspace.icon} className="size-6" />
                     </span>
 
                     <div
