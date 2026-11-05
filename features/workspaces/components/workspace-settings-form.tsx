@@ -28,6 +28,7 @@ import type { Workspace } from "../lib/types";
 import { resolveWorkspaceIcon } from "../lib/workspace-icons";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { WorkspaceIconPicker } from "./workspace-icon-picker";
+import { PageHeader } from "@/shared/components/page-header";
 import { routes } from "@/shared/config/routes";
 
 type WorkspaceSettingsFormProps = {
@@ -76,14 +77,11 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
 
     return (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 p-6">
-            <div>
-                <h2 className="font-heading text-xl font-semibold">
-                    Workspace settings
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                    Manage this workspace&apos;s details and defaults.
-                </p>
-            </div>
+            <PageHeader
+                eyebrow="Workspace"
+                title="Workspace settings"
+                description="Manage this workspace's details and defaults."
+            />
 
             <form onSubmit={(event) => void handleSave(event)} className="space-y-6">
                 <div className="space-y-2">
