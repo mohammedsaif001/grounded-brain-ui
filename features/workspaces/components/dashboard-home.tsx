@@ -35,6 +35,8 @@ import { CreateWorkspaceCard } from "./create-workspace-card";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { WorkspaceCard } from "./workspace-card";
 import { WorkspaceFormDialog } from "./workspace-form-dialog";
+import { PageHeader } from "@/shared/components/page-header";
+import { TypeTile } from "@/shared/components/type-tile";
 import { routes } from "@/shared/config/routes";
 
 type DashboardHomeProps = {
@@ -102,7 +104,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
     const greeting = userName?.split(" ")[0] ?? "there";
 
     return (
-        <div className="min-h-svh bg-muted/30">
+        <div className="bg-page min-h-svh">
             <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur-md">
                 <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 md:px-8">
                     <Link
@@ -134,26 +136,24 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
 
             <main className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-10">
                 <section className="mb-10 space-y-6">
-                    <div className="space-y-2">
-                        <p className="text-sm font-medium text-primary">
-                            Welcome back, {greeting}
-                        </p>
-                        <h1 className="font-heading text-3xl font-semibold tracking-tight md:text-4xl">
-                            Your notebooks
-                        </h1>
-                        <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
-                            Organize sources, chat with your materials, and
-                            generate learning tools — all in one workspace.
-                        </p>
-                    </div>
+                    <PageHeader
+                        eyebrow={`Welcome back, ${greeting}`}
+                        title="Your notebooks"
+                        description="Organize sources, chat with your materials, and generate learning tools, all in one workspace."
+                    />
 
                     <div className="grid gap-3 sm:grid-cols-3">
                         {FEATURES.map((feature) => (
                             <div
                                 key={feature.title}
-                                className="rounded-2xl border bg-card/70 p-4 shadow-sm"
+                                className="rounded-2xl border bg-card p-4 shadow-surface"
                             >
-                                <feature.icon className="mb-2 size-4 text-primary" />
+                                <TypeTile
+                                    icon={feature.icon}
+                                    tone="green"
+                                    size="sm"
+                                    className="mb-3"
+                                />
                                 <p className="text-sm font-medium">
                                     {feature.title}
                                 </p>
@@ -168,7 +168,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                 <section className="space-y-5">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 className="font-heading text-xl font-semibold">
+                            <h2 className="text-heading">
                                 Recent notebooks
                             </h2>
                             <p className="text-sm text-muted-foreground">
