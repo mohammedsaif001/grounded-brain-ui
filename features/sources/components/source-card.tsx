@@ -2,32 +2,22 @@
 
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { MoreHorizontalIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { SOURCE_TYPE_LABELS } from "../lib/constants";
-import type { Source } from "../lib/types";
-import { SourceStatusBadge } from "./source-status-badge";
-import { SourceTypeIcon } from "./source-type-icon";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { routes } from "@/shared/config/routes";
+import { SOURCE_TYPE_LABELS } from "../lib/constants";
+import type { Source } from "../lib/types";
+import { SourceRowActions } from "./source-row-actions";
+import { SourceStatusBadge } from "./source-status-badge";
+import { SourceTypeTile } from "./source-type-icon";
 
 type SourceCardProps = {
     source: Source;
     onDelete?: (source: Source) => void;
     onReprocess?: (source: Source) => void;
+    /** When provided, a selection checkbox is rendered. */
+    selected?: boolean;
+    onSelectedChange?: (selected: boolean) => void;
     className?: string;
 };
 
@@ -35,91 +25,69 @@ export function SourceCard({
     source,
     onDelete,
     onReprocess,
+    selected,
+    onSelectedChange,
     className,
 }: SourceCardProps) {
     const href = routes.workspace.source(source.workspaceId, source.id);
 
     return (
-        <Card className={cn("group/card relative transition-shadow hover:shadow-md", className)}>
+        <article
+            data-selected={selected || undefined}
+            className={cn(
+                "group/card relative flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-surface transition-shadow hover:shadow-raised",
+                selected && "border-ring bg-accent/30",
+                className,
+            )}
+        >
             <Link
                 href={href}
-                className="absolute inset-0 z-0 rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="absolute inset-0 z-0 rounded-[inherit] outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
                 aria-label={`Open ${source.title}`}
             />
 
-            <CardHeader className="relative">
-                <div className="flex items-start justify-between gap-3">
-                    <div className="flex min-w-0 items-start gap-3">
-                        <SourceTypeIcon type={source.type} className="mt-0.5" />
-                        <div className="min-w-0 space-y-1">
-                            <CardTitle className="truncate group-hover/card:underline">
-                                {source.title}
-                            </CardTitle>
-                            <CardDescription className="flex flex-wrap items-center gap-2">
-                                <span>{SOURCE_TYPE_LABELS[source.type]}</span>
-                                <span>·</span>
-                                <span>
-                                    {formatDistanceToNow(
-                                        new Date(source.createdAt),
-                                        { addSuffix: true },
-                                    )}
-                                </span>
-                            </CardDescription>
-                        </div>
+            <div className="relative flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                    <SourceTypeTile type={source.type} />
+                    <div className="min-w-0">
+                        <h3 className="text-heading truncate">
+                            {source.title}
+                        </h3>
+                        <p className="text-caption truncate">
+                            {SOURCE_TYPE_LABELS[source.type]} ·{" "}
+                            {formatDistanceToNow(new Date(source.createdAt), {
+                                addSuffix: true,
+                            })}
+                        </p>
                     </div>
-
-                    {onDelete || onReprocess ? (
-                        <div
-                            className="relative z-10"
-                            onClick={(event) => event.stopPropagation()}
-                            onKeyDown={(event) => event.stopPropagation()}
-                        >
-                            <DropdownMenu>
-                                <DropdownMenuTrigger
-                                    render={
-                                        <Button
-                                            variant="ghost"
-                                            size="icon-sm"
-                                            className="shrink-0"
-                                        />
-                                    }
-                                >
-                                    <MoreHorizontalIcon />
-                                    <span className="sr-only">Open menu</span>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    {onReprocess ? (
-                                        <DropdownMenuItem
-                                            onClick={() => onReprocess(source)}
-                                        >
-                                            <RefreshCwIcon />
-                                            Reprocess
-                                        </DropdownMenuItem>
-                                    ) : null}
-                                    {onDelete ? (
-                                        <DropdownMenuItem
-                                            variant="destructive"
-                                            onClick={() => onDelete(source)}
-                                        >
-                                            <Trash2Icon />
-                                            Delete
-                                        </DropdownMenuItem>
-                                    ) : null}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    ) : null}
                 </div>
-            </CardHeader>
 
-            <CardContent className="relative flex items-center justify-between gap-3">
+                <div className="relative z-10 flex shrink-0 items-center gap-1">
+                    {onSelectedChange ? (
+                        <Checkbox
+                            aria-label={`Select ${source.title}`}
+                            checked={Boolean(selected)}
+                            onCheckedChange={(checked) =>
+                                onSelectedChange(checked)
+                            }
+                        />
+                    ) : null}
+                    <SourceRowActions
+                        source={source}
+                        onDelete={onDelete}
+                        onReprocess={onReprocess}
+                    />
+                </div>
+            </div>
+
+            <div className="relative flex items-center justify-between gap-3">
                 <SourceStatusBadge status={source.status} />
                 {source.content ? (
-                    <p className="line-clamp-1 min-w-0 flex-1 text-right text-xs text-muted-foreground">
+                    <p className="text-caption line-clamp-1 min-w-0 flex-1 text-right">
                         {source.content.slice(0, 120)}
                     </p>
                 ) : null}
-            </CardContent>
-        </Card>
+            </div>
+        </article>
     );
 }
