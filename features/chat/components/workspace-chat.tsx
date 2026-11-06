@@ -5,19 +5,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-    BotIcon,
-    DownloadIcon,
-    MessageSquarePlusIcon,
-    Trash2Icon,
-} from "lucide-react";
-import {
-    Message,
-    MessageAvatar,
-    MessageContent,
-    MessageFooter,
-    MessageGroup,
-} from "@/components/ui/message";
+import { ShieldCheckIcon } from "lucide-react";
 import {
     MessageScroller,
     MessageScrollerButton,
@@ -26,16 +14,10 @@ import {
     MessageScrollerProvider,
     MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
-import { Bubble, BubbleContent } from "@/components/ui/bubble";
-import { Button } from "@/components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { MessageGroup } from "@/components/ui/message";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSources } from "@/features/sources/hooks/use-sources";
+import { PageHeader } from "@/shared/components/page-header";
 import {
     buildCitationMap,
     chatKeys,
@@ -43,9 +25,16 @@ import {
     useConversations,
     useDeleteConversation,
 } from "../hooks/use-conversations";
-import { ChatMessageBody } from "./chat-message-body";
-import { CitationSources } from "./citation-sources";
 import { ChatComposer } from "./chat-composer";
+import { ChatEmptyState } from "./chat-empty-state";
+import { ChatToolbar } from "./chat-toolbar";
+import { AssistantTurn, UserTurn } from "./chat-turns";
+import { CitationPanel } from "./citation-panel";
+import {
+    CitationSelectionProvider,
+    useCitationSelection,
+} from "./citation-selection";
+import { LearnPromptCard } from "./learn-prompt-card";
 import { useWorkspaceChatPrefs } from "../stores/chat-preferences";
 import { chatStreamPath } from "../lib/api";
 import {
@@ -84,6 +73,7 @@ export function WorkspaceChat({
     const { data: storedMessages, isLoading: messagesLoading } =
         useConversationMessages(workspaceId, conversationId);
     const deleteConversation = useDeleteConversation(workspaceId);
+    const { data: sources } = useSources(workspaceId);
 
     // Citations come from the persisted messages; derived, never copied into state.
     const citationsByMessageId = useMemo(
@@ -234,196 +224,156 @@ export function WorkspaceChat({
         downloadMarkdown(markdown, `${slug}-${Date.now()}.md`);
     }
 
+    const readySourceCount =
+        sources?.filter((source) => source.status === "READY").length ?? 0;
+    const isLoadingHistory = conversationsLoading || messagesLoading;
+
     return (
-        <div className="flex min-h-0 flex-1 flex-col">
-            <div className="flex items-center gap-2 border-b px-4 py-3">
-                <Select
-                    value={conversationId ?? "new"}
-                    onValueChange={(value) => {
-                        if (value === "new") {
-                            handleNewChat();
-                            return;
+        <CitationSelectionProvider>
+            <div className="mx-auto grid min-h-0 w-full max-w-7xl flex-1 gap-6 p-6 md:p-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
+                <div className="flex min-h-0 flex-col gap-5">
+                    <PageHeader
+                        title={activeConversation?.title ?? "Chat"}
+                        description="Chat with your sources. Follow every thought back to its roots."
+                        actions={
+                            <ChatToolbar
+                                conversations={conversations}
+                                conversationId={conversationId}
+                                onSelectConversation={(id) =>
+                                    id ? setConversationId(id) : handleNewChat()
+                                }
+                                onNewChat={handleNewChat}
+                                onExport={handleExportChat}
+                                onDelete={handleDeleteConversation}
+                                canExport={messages.length > 0}
+                                isDeleting={deleteConversation.isPending}
+                            />
                         }
-                        setConversationId(value);
-                    }}
-                >
-                    <SelectTrigger className="max-w-sm flex-1">
-                        <SelectValue placeholder="Select conversation" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="new">New chat</SelectItem>
-                        {conversations.map((conversation) => (
-                            <SelectItem
-                                key={conversation.id}
-                                value={conversation.id}
-                            >
-                                {conversation.title ?? "Untitled chat"}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                    />
 
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleNewChat}
-                >
-                    <MessageSquarePlusIcon />
-                    New
-                </Button>
+                    <p className="text-caption flex items-center gap-2">
+                        <ShieldCheckIcon
+                            aria-hidden="true"
+                            className="size-4"
+                        />
+                        {readySourceCount} ready source
+                        {readySourceCount === 1 ? "" : "s"} selected ·
+                        Source-grounded answers
+                    </p>
 
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={messages.length === 0}
-                    onClick={handleExportChat}
-                >
-                    <DownloadIcon />
-                    Export
-                </Button>
+                    <MessageScrollerProvider>
+                        <MessageScroller className="min-h-0 flex-1">
+                            <MessageScrollerViewport>
+                                <MessageScrollerContent className="w-full pb-2">
+                                    {isLoadingHistory ? (
+                                        <div
+                                            aria-busy="true"
+                                            className="space-y-4"
+                                        >
+                                            <Skeleton className="h-14 rounded-2xl" />
+                                            <Skeleton className="h-56 rounded-2xl" />
+                                        </div>
+                                    ) : messages.length === 0 ? (
+                                        <ChatEmptyState
+                                            disabled={isStreaming}
+                                            onPick={(prompt) =>
+                                                void sendMessage({
+                                                    text: prompt,
+                                                })
+                                            }
+                                        />
+                                    ) : (
+                                        <MessageGroup className="gap-5">
+                                            {messages.map(
+                                                (message, messageIndex) => {
+                                                    const isUser =
+                                                        message.role === "user";
+                                                    const text =
+                                                        getMessageText(message);
+                                                    const isAnimating =
+                                                        !isUser &&
+                                                        isStreaming &&
+                                                        messageIndex ===
+                                                            messages.length - 1;
 
-                {conversationId ? (
-                    <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={handleDeleteConversation}
-                        disabled={deleteConversation.isPending}
-                    >
-                        <Trash2Icon />
-                    </Button>
-                ) : null}
-            </div>
-
-            <MessageScrollerProvider>
-                <MessageScroller className="min-h-0 flex-1">
-                    <MessageScrollerViewport>
-                        <MessageScrollerContent className="mx-auto w-full max-w-3xl px-4 py-6">
-                            {conversationsLoading || messagesLoading ? (
-                                <div className="space-y-4">
-                                    <Skeleton className="h-16 w-2/3 rounded-3xl" />
-                                    <Skeleton className="ml-auto h-16 w-1/2 rounded-3xl" />
-                                </div>
-                            ) : messages.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-                                    <div className="rounded-full bg-muted p-3">
-                                        <BotIcon className="size-6" />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="font-medium">
-                                            Chat with your sources
-                                        </p>
-                                        <p className="max-w-sm text-sm text-muted-foreground">
-                                            Ask questions about the materials
-                                            in this workspace. Answers include
-                                            citations when relevant context is
-                                            found.
-                                        </p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <MessageGroup className="gap-6">
-                                    {messages.map((message, messageIndex) => {
-                                        const isUser = message.role === "user";
-                                        const citations =
-                                            citationsByMessageId[message.id];
-                                        const isLastMessage =
-                                            messageIndex === messages.length - 1;
-                                        const isAnimatingMessage =
-                                            !isUser &&
-                                            isStreaming &&
-                                            isLastMessage;
-
-                                        return (
-                                            <MessageScrollerItem
-                                                key={message.id}
-                                                scrollAnchor
-                                            >
-                                                <Message
-                                                    align={
-                                                        isUser ? "end" : "start"
-                                                    }
-                                                >
-                                                    {!isUser ? (
-                                                        <MessageAvatar className="size-8">
-                                                            <BotIcon className="size-4" />
-                                                        </MessageAvatar>
-                                                    ) : null}
-                                                    <MessageContent>
-                                                        <Bubble
-                                                            align={
-                                                                isUser
-                                                                    ? "end"
-                                                                    : "start"
-                                                            }
-                                                            variant={
-                                                                isUser
-                                                                    ? "default"
-                                                                    : "ghost"
-                                                            }
+                                                    return (
+                                                        <MessageScrollerItem
+                                                            key={message.id}
+                                                            scrollAnchor
                                                         >
-                                                            <BubbleContent className="leading-relaxed">
-                                                                {isUser ? (
-                                                                    getMessageText(
-                                                                        message,
-                                                                    )
-                                                                ) : (
-                                                                    <ChatMessageBody
-                                                                        text={getMessageText(
-                                                                            message,
-                                                                        )}
-                                                                        citations={
-                                                                            citations
-                                                                        }
-                                                                        workspaceId={
-                                                                            workspaceId
-                                                                        }
-                                                                        isAnimating={
-                                                                            isAnimatingMessage
-                                                                        }
-                                                                    />
-                                                                )}
-                                                            </BubbleContent>
-                                                        </Bubble>
-                                                        {!isUser &&
-                                                        citations?.length ? (
-                                                            <MessageFooter className="mt-1 w-full max-w-full flex-col items-start gap-0 px-0">
-                                                                <CitationSources
+                                                            {isUser ? (
+                                                                <UserTurn
+                                                                    text={text}
+                                                                />
+                                                            ) : (
+                                                                <AssistantTurn
+                                                                    text={text}
                                                                     workspaceId={
                                                                         workspaceId
                                                                     }
                                                                     citations={
-                                                                        citations
+                                                                        citationsByMessageId[
+                                                                            message
+                                                                                .id
+                                                                        ]
+                                                                    }
+                                                                    isAnimating={
+                                                                        isAnimating
                                                                     }
                                                                 />
-                                                            </MessageFooter>
-                                                        ) : null}
-                                                    </MessageContent>
-                                                </Message>
-                                            </MessageScrollerItem>
-                                        );
-                                    })}
-                                </MessageGroup>
-                            )}
-                        </MessageScrollerContent>
-                    </MessageScrollerViewport>
-                    <MessageScrollerButton direction="end" />
-                </MessageScroller>
-            </MessageScrollerProvider>
+                                                            )}
+                                                        </MessageScrollerItem>
+                                                    );
+                                                },
+                                            )}
+                                        </MessageGroup>
+                                    )}
+                                </MessageScrollerContent>
+                            </MessageScrollerViewport>
+                            <MessageScrollerButton direction="end" />
+                        </MessageScroller>
+                    </MessageScrollerProvider>
 
-            {error ? (
-                <div className="border-t bg-destructive/5 px-4 py-2 text-sm text-destructive">
-                    {error.message}
+                    {error ? (
+                        <p
+                            role="alert"
+                            className="rounded-xl bg-tint-rose px-4 py-2.5 text-sm text-tint-rose-foreground"
+                        >
+                            {error.message}
+                        </p>
+                    ) : null}
+
+                    <ChatComposer
+                        isStreaming={isStreaming}
+                        webSearchEnabled={chatPrefs.webSearch}
+                        onWebSearchChange={chatPrefs.setWebSearch}
+                        sourceCount={readySourceCount}
+                        onSubmit={(text) => {
+                            void sendMessage({ text });
+                        }}
+                    />
                 </div>
-            ) : null}
 
-            <ChatComposer
-                isStreaming={isStreaming}
-                webSearchEnabled={chatPrefs.webSearch}
-                onWebSearchChange={chatPrefs.setWebSearch}
-                onSubmit={(text) => {
-                    void sendMessage({ text });
-                }}
-            />
-        </div>
+                <ChatSidePanel workspaceId={workspaceId} />
+            </div>
+        </CitationSelectionProvider>
+    );
+}
+
+/** Right column: the opened citation passage (when any) and the Learn prompt. */
+function ChatSidePanel({ workspaceId }: { workspaceId: string }) {
+    const selection = useCitationSelection();
+
+    return (
+        <aside className="hidden min-h-0 flex-col gap-4 overflow-y-auto xl:flex">
+            {selection?.selected ? (
+                <CitationPanel
+                    workspaceId={workspaceId}
+                    selection={selection.selected}
+                    onClose={selection.clear}
+                />
+            ) : null}
+            <LearnPromptCard workspaceId={workspaceId} />
+        </aside>
     );
 }
