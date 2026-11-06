@@ -57,14 +57,3 @@ export function exportConversationMarkdown(input: {
 
     return lines.join("\n");
 }
-
-export function downloadMarkdown(content: string, filename: string) {
-    const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = filename;
-    anchor.click();
-    // Revoking synchronously can cancel the download in some browsers.
-    setTimeout(() => URL.revokeObjectURL(url), 0);
-}

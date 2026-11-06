@@ -37,10 +37,8 @@ import {
 import { LearnPromptCard } from "./learn-prompt-card";
 import { useWorkspaceChatPrefs } from "../stores/chat-preferences";
 import { chatStreamPath } from "../lib/api";
-import {
-    downloadMarkdown,
-    exportConversationMarkdown,
-} from "../lib/export-chat";
+import { exportConversationMarkdown } from "../lib/export-chat";
+import { downloadMarkdown } from "@/shared/lib/download";
 import { routes } from "@/shared/config/routes";
 
 type WorkspaceChatProps = {
