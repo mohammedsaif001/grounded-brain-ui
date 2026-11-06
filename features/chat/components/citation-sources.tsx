@@ -1,57 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import {
-    BookOpenIcon,
-    FileTextIcon,
-    GlobeIcon,
-    VideoIcon,
-} from "lucide-react";
-import {
-    Attachment,
-    AttachmentContent,
-    AttachmentDescription,
-    AttachmentGroup,
-    AttachmentMedia,
-    AttachmentTitle,
-    AttachmentTrigger,
-} from "@/components/ui/attachment";
+import { SOURCE_TYPE_LABELS } from "@/features/sources/lib/constants";
+import type { SourceType } from "@/features/sources/lib/types";
 import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import {
-    Marker,
-    MarkerContent,
-    MarkerIcon,
-} from "@/components/ui/marker";
-import { SOURCE_TYPE_LABELS } from "@/features/sources/lib/constants";
-import type { SourceType } from "@/features/sources/lib/types";
+import { cn } from "@/lib/utils";
+import { routes } from "@/shared/config/routes";
+import { toneClasses, type Tone } from "@/shared/components/tint";
 import { uniqueCitationsBySource } from "../lib/citations";
 import type { ChatCitation } from "../lib/types";
 import { CitationPreview } from "./citation-preview";
-import { routes } from "@/shared/config/routes";
 
 type CitationSourcesProps = {
     workspaceId: string;
     citations: ChatCitation[];
 };
 
-function SourceTypeIcon({ type }: { type: string }) {
-    switch (type) {
-        case "PDF":
-            return <FileTextIcon />;
-        case "WEBSITE":
-            return <GlobeIcon />;
-        case "YOUTUBE":
-            return <VideoIcon />;
-        default:
-            return <BookOpenIcon />;
-    }
-}
+/** Chips cycle through tints so each source stays recognisable across an answer. */
+const CHIP_TONES: readonly Tone[] = ["green", "blue", "violet"];
 
 function sourceTypeLabel(type: string) {
+    if (type === "WEB") return "Web";
     return type in SOURCE_TYPE_LABELS
         ? SOURCE_TYPE_LABELS[type as SourceType]
         : type;
@@ -68,83 +41,59 @@ export function CitationSources({
     }
 
     return (
-        <div className="flex w-full min-w-0 flex-col gap-2">
-            <Marker variant="separator" className="text-xs">
-                <MarkerIcon aria-hidden="true">
-                    <BookOpenIcon />
-                </MarkerIcon>
-                <MarkerContent>Sources</MarkerContent>
-            </Marker>
+        <ul
+            aria-label="Sources used in this answer"
+            className="flex flex-wrap gap-2 border-t border-border pt-4"
+        >
+            {unique.map((citation, index) => {
+                const key =
+                    citation.sourceId ?? citation.url ?? citation.sourceTitle;
+                const label = [
+                    `[${index + 1}] ${citation.sourceTitle}`,
+                    citation.page ? `p. ${citation.page}` : null,
+                ]
+                    .filter(Boolean)
+                    .join(" · ");
+                const chipClass = cn(
+                    "inline-flex max-w-full items-center rounded-lg px-2.5 py-1 text-xs font-medium outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring/40",
+                    toneClasses[CHIP_TONES[index % CHIP_TONES.length]],
+                );
+                const isWeb = citation.sourceType === "WEB" && citation.url;
 
-            <AttachmentGroup className="px-0.5">
-                {unique.map((citation) => {
-                    const description = [
-                        citation.sourceType === "WEB"
-                            ? "Web"
-                            : sourceTypeLabel(citation.sourceType),
-                        citation.page ? `p.${citation.page}` : null,
-                    ]
-                        .filter(Boolean)
-                        .join(" · ");
-                    const citationKey =
-                        citation.sourceId ??
-                        citation.url ??
-                        citation.sourceTitle;
-                    const isWeb = citation.sourceType === "WEB" && citation.url;
-
-                    return (
-                        <HoverCard key={citationKey}>
+                return (
+                    <li key={key} className="min-w-0">
+                        <HoverCard>
                             <HoverCardTrigger
                                 delay={150}
                                 closeDelay={100}
-                                className="rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
-                            >
-                                <Attachment
-                                    size="xs"
-                                    className="cursor-default transition-shadow hover:shadow-sm"
-                                >
-                                    <AttachmentMedia variant="icon">
-                                        <SourceTypeIcon
-                                            type={
-                                                citation.sourceType === "WEB"
-                                                    ? "WEBSITE"
-                                                    : citation.sourceType
-                                            }
-                                        />
-                                    </AttachmentMedia>
-                                    <AttachmentContent>
-                                        <AttachmentTitle>
-                                            {citation.sourceTitle}
-                                        </AttachmentTitle>
-                                        {description ? (
-                                            <AttachmentDescription>
-                                                {description}
-                                            </AttachmentDescription>
-                                        ) : null}
-                                    </AttachmentContent>
-                                    {isWeb ? (
-                                        <AttachmentTrigger
-                                            render={
-                                                <a
-                                                    href={citation.url}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                />
-                                            }
+                                render={
+                                    isWeb ? (
+                                        <a
+                                            href={citation.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className={chipClass}
+                                            title={sourceTypeLabel(
+                                                citation.sourceType,
+                                            )}
                                         />
                                     ) : citation.sourceId ? (
-                                        <AttachmentTrigger
-                                            render={
-                                                <Link
-                                                    href={routes.workspace.source(
-                                                        workspaceId,
-                                                        citation.sourceId,
-                                                    )}
-                                                />
-                                            }
+                                        <Link
+                                            href={routes.workspace.source(
+                                                workspaceId,
+                                                citation.sourceId,
+                                            )}
+                                            className={chipClass}
+                                            title={sourceTypeLabel(
+                                                citation.sourceType,
+                                            )}
                                         />
-                                    ) : null}
-                                </Attachment>
+                                    ) : (
+                                        <span className={chipClass} />
+                                    )
+                                }
+                            >
+                                <span className="truncate">{label}</span>
                             </HoverCardTrigger>
                             <HoverCardContent
                                 side="top"
@@ -157,9 +106,9 @@ export function CitationSources({
                                 />
                             </HoverCardContent>
                         </HoverCard>
-                    );
-                })}
-            </AttachmentGroup>
-        </div>
+                    </li>
+                );
+            })}
+        </ul>
     );
 }
