@@ -15,10 +15,10 @@ export function ReportViewer({
         <div className="space-y-8">
             <StreamdownContent content={markdown} mode="static" />
             {sections && sections.length > 0 ? (
-                <div className="space-y-6 border-t pt-6">
+                <div className="space-y-8 border-t border-border pt-8">
                     {sections.map((section, index) => (
                         <section key={index} className="space-y-2">
-                            <h3 className="font-heading text-lg font-semibold">
+                            <h3 className="text-headline">
                                 {section.title}
                             </h3>
                             <StreamdownContent

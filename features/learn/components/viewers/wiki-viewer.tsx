@@ -63,7 +63,7 @@ function MermaidDiagram({ code }: { code: string }) {
 
     return (
         <div
-            className="overflow-x-auto rounded-2xl border bg-background p-4 [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-full"
+            className="overflow-x-auto rounded-xl border border-border bg-card p-4 [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-full"
             dangerouslySetInnerHTML={{ __html: svg }}
         />
     );
@@ -78,7 +78,7 @@ function Section({
 }) {
     return (
         <section className="space-y-3">
-            <h3 className="font-heading text-lg font-semibold">{title}</h3>
+            <h3 className="text-heading">{title}</h3>
             {children}
         </section>
     );
@@ -97,7 +97,7 @@ export function WikiViewer({ wiki }: { wiki: WikiContent }) {
                         {wiki.techStack.map((tech) => (
                             <li
                                 key={tech.name}
-                                className="rounded-2xl border p-3 text-sm"
+                                className="rounded-xl border border-border bg-card p-3 text-sm"
                             >
                                 <p className="font-medium">{tech.name}</p>
                                 <p className="text-muted-foreground">
@@ -119,7 +119,7 @@ export function WikiViewer({ wiki }: { wiki: WikiContent }) {
                     {wiki.modules.map((module) => (
                         <div
                             key={`${module.path}-${module.name}`}
-                            className="space-y-2 rounded-2xl border p-4 text-sm"
+                            className="space-y-2 rounded-xl border border-border bg-card p-4 text-sm"
                         >
                             <div className="flex flex-wrap items-baseline gap-2">
                                 <p className="font-medium">{module.name}</p>
