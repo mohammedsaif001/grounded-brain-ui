@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import {
+    LibraryBigIcon,
+    QuoteIcon,
+    ShieldCheckIcon,
+    SparklesIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,12 +17,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-    FieldSeparator,
-} from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { signIn } from "../lib/auth-client";
 import { safeRedirectPath } from "@/shared/config/routes";
@@ -47,6 +47,12 @@ function GoogleIcon({ className }: { className?: string }) {
         </svg>
     );
 }
+
+const HIGHLIGHTS = [
+    { icon: LibraryBigIcon, label: "All your sources in one place" },
+    { icon: QuoteIcon, label: "Answers you can trace and trust" },
+    { icon: SparklesIcon, label: "Study material made for your mind" },
+] as const;
 
 export function LoginForm({
     className,
@@ -82,49 +88,74 @@ export function LoginForm({
     }
 
     return (
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card>
-                <CardHeader className="text-center">
-                    <CardTitle className="text-xl">Welcome back</CardTitle>
-                    <CardDescription>
-                        Sign in with Google to continue to Grounded Brain
+        <div className={cn("w-full max-w-lg lg:justify-self-end", className)} {...props}>
+            <Card className="rounded-3xl shadow-raised [--card-spacing:--spacing(8)]">
+                <CardHeader className="gap-2">
+                    <CardTitle className="text-title">
+                        Welcome to your studio
+                    </CardTitle>
+                    <CardDescription className="text-body">
+                        Sign in to connect the dots between your sources, your
+                        questions and your next idea.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                     <form
                         onSubmit={(event) => {
                             event.preventDefault();
                             void handleGoogleSignIn();
                         }}
+                        className="space-y-3"
                     >
-                        <FieldGroup>
-                            <Field>
-                                <Button
-                                    type="submit"
-                                    variant="outline"
-                                    className="w-full"
-                                    disabled={isLoading}
-                                >
-                                    {isLoading ? (
-                                        <Spinner />
-                                    ) : (
-                                        <GoogleIcon />
-                                    )}
-                                    Continue with Google
-                                </Button>
-                                <FieldDescription className="text-center">
-                                    By continuing, you agree to our terms of
-                                    service and privacy policy.
-                                </FieldDescription>
-                            </Field>
-                            <FieldSeparator>Secure sign-in</FieldSeparator>
-                            {error ? (
-                                <p className="text-center text-sm text-destructive">
-                                    {error}
-                                </p>
-                            ) : null}
-                        </FieldGroup>
+                        <Button
+                            type="submit"
+                            variant="outline"
+                            size="lg"
+                            className="w-full"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? <Spinner /> : <GoogleIcon />}
+                            Continue with Google
+                        </Button>
+                        {error ? (
+                            <p
+                                role="alert"
+                                className="text-center text-sm text-destructive"
+                            >
+                                {error}
+                            </p>
+                        ) : null}
                     </form>
+
+                    <ul className="space-y-3">
+                        {HIGHLIGHTS.map(({ icon: Icon, label }) => (
+                            <li
+                                key={label}
+                                className="flex items-center gap-3 text-sm"
+                            >
+                                <Icon
+                                    aria-hidden="true"
+                                    className="size-4 shrink-0 text-muted-foreground"
+                                />
+                                {label}
+                            </li>
+                        ))}
+                    </ul>
+
+                    <div className="space-y-4 border-t pt-5">
+                        <p className="text-caption">
+                            By continuing, you agree to our Terms of service
+                            and Privacy policy. Your notebooks stay private to
+                            you.
+                        </p>
+                        <p className="text-caption flex items-center gap-2">
+                            <ShieldCheckIcon
+                                aria-hidden="true"
+                                className="size-4"
+                            />
+                            Secure sign-in. No password to remember.
+                        </p>
+                    </div>
                 </CardContent>
             </Card>
         </div>
