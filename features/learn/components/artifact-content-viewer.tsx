@@ -35,7 +35,12 @@ export function ArtifactContentViewer({
 
     switch (parsed.type) {
         case "SUMMARY":
-            return <SummaryViewer markdown={parsed.content.markdown} />;
+            return (
+                <SummaryViewer
+                    markdown={parsed.content.markdown}
+                    workspaceId={workspaceId}
+                />
+            );
         case "TAKEAWAYS":
             return <TakeawaysViewer items={parsed.content.items} />;
         case "FLASHCARDS":
