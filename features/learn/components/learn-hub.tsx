@@ -1,126 +1,192 @@
 "use client";
 
-import Link from "next/link";
-import { formatDistanceToNow } from "date-fns";
-import { GraduationCapIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { useMemo, useState } from "react";
+import { LightbulbIcon, SparklesIcon, GraduationCapIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
+import { useSources } from "@/features/sources/hooks/use-sources";
+import { Callout } from "@/shared/components/callout";
+import { ConfirmDialog } from "@/shared/components/confirm-dialog";
+import { EmptyState } from "@/shared/components/empty-state";
+import { PageHeader } from "@/shared/components/page-header";
+import { cn } from "@/lib/utils";
 import { useArtifacts, useDeleteArtifact } from "../hooks/use-artifacts";
-import {
-    ArtifactStatusBadge,
-    ArtifactTypeBadge,
-} from "./artifact-status-badge";
+import { filterArtifacts, type ArtifactFilter } from "../lib/filter-artifacts";
+import type { ArtifactType, LearningArtifact } from "../lib/types";
+import { ArtifactCard } from "./artifact-card";
+import { ArtifactMaker } from "./artifact-maker";
 import { GenerateArtifactDialog } from "./generate-artifact-dialog";
-import { useState } from "react";
-import { routes } from "@/shared/config/routes";
 
 type LearnHubProps = {
     workspaceId: string;
 };
 
+const FILTERS: readonly { value: ArtifactFilter; label: string }[] = [
+    { value: "all", label: "All material" },
+    { value: "recent", label: "Recent" },
+];
+
 export function LearnHub({ workspaceId }: LearnHubProps) {
-    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialog, setDialog] = useState<{ type: ArtifactType } | null>(null);
+    const [filter, setFilter] = useState<ArtifactFilter>("all");
+    const [pendingDelete, setPendingDelete] =
+        useState<LearningArtifact | null>(null);
+
     const { data: artifacts = [], isLoading, error } = useArtifacts(workspaceId);
+    const { data: sources } = useSources(workspaceId);
     const deleteArtifact = useDeleteArtifact(workspaceId);
 
-    return (
-        <div className="flex flex-1 flex-col gap-6 p-6">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <GraduationCapIcon className="size-5" />
-                        <h2 className="font-heading text-xl font-semibold">
-                            Learning tools
-                        </h2>
-                    </div>
-                    <p className="max-w-xl text-sm text-muted-foreground">
-                        Generate summaries, flashcards, quizzes, mind maps, and
-                        reports from your indexed sources.
-                    </p>
-                </div>
-                <Button onClick={() => setDialogOpen(true)}>
-                    <PlusIcon />
-                    Generate
-                </Button>
-            </div>
+    const readySourceCount =
+        sources?.filter((source) => source.status === "READY").length ?? 0;
 
-            {isLoading ? (
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                    <Skeleton className="h-32 rounded-3xl" />
-                    <Skeleton className="h-32 rounded-3xl" />
-                    <Skeleton className="h-32 rounded-3xl" />
-                </div>
-            ) : error ? (
-                <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-                    Could not load learning tools.
-                </div>
-            ) : artifacts.length === 0 ? (
-                <div className="rounded-2xl border border-dashed p-10 text-center">
-                    <p className="font-medium">No learning tools yet</p>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Generate your first summary, quiz, or flashcard deck
-                        from workspace sources.
-                    </p>
-                    <Button
-                        className="mt-4"
-                        onClick={() => setDialogOpen(true)}
-                    >
-                        <PlusIcon />
+    // Captured once per mount so the "recent" window is stable across re-renders.
+    const [now] = useState(() => Date.now());
+    const visible = useMemo(
+        () => filterArtifacts(artifacts, filter, now),
+        [artifacts, filter, now],
+    );
+
+    function openDialog(type: ArtifactType = "SUMMARY") {
+        setDialog({ type });
+    }
+
+    return (
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-8">
+            <PageHeader
+                eyebrow="Knowledge, made yours"
+                title="Learn something that lasts."
+                description="Go beyond the answer. Shape your sources into tools for understanding."
+                actions={
+                    <Button size="lg" onClick={() => openDialog()}>
+                        <SparklesIcon aria-hidden="true" />
                         Generate
                     </Button>
-                </div>
-            ) : (
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                    {artifacts.map((artifact) => (
-                        <div
-                            key={artifact.id}
-                            className="group relative rounded-3xl border bg-card p-4 transition-colors hover:bg-muted/20"
-                        >
-                            <Link
-                                href={routes.workspace.artifact(
-                                    workspaceId,
-                                    artifact.id,
+                }
+            />
+
+            <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
+                <div className="space-y-5">
+                    <div
+                        role="group"
+                        aria-label="Filter learning material"
+                        className="flex items-center gap-5 text-sm"
+                    >
+                        {FILTERS.map(({ value, label }) => (
+                            <button
+                                key={value}
+                                type="button"
+                                aria-pressed={filter === value}
+                                onClick={() => setFilter(value)}
+                                className={cn(
+                                    "rounded-md py-1 outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
+                                    filter === value
+                                        ? "font-semibold text-foreground"
+                                        : "text-muted-foreground hover:text-foreground",
                                 )}
-                                className="block space-y-3"
                             >
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <ArtifactTypeBadge type={artifact.type} />
-                                    <ArtifactStatusBadge
-                                        status={artifact.status}
-                                    />
-                                </div>
-                                <div>
-                                    <p className="font-medium">{artifact.title}</p>
-                                    <p className="mt-1 text-xs text-muted-foreground">
-                                        {ARTIFACT_TYPE_LABELS[artifact.type]} ·{" "}
-                                        {formatDistanceToNow(
-                                            new Date(artifact.createdAt),
-                                            { addSuffix: true },
-                                        )}
-                                    </p>
-                                </div>
-                            </Link>
-                            <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                className="absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100"
-                                onClick={() =>
-                                    deleteArtifact.mutate(artifact.id)
-                                }
-                                disabled={deleteArtifact.isPending}
-                            >
-                                <Trash2Icon />
-                            </Button>
+                                {label}
+                                {value === "all" ? (
+                                    <span className="ml-1.5 tabular-nums">
+                                        {artifacts.length}
+                                    </span>
+                                ) : null}
+                            </button>
+                        ))}
+                    </div>
+
+                    {isLoading ? (
+                        <div
+                            aria-busy="true"
+                            className="grid gap-4 md:grid-cols-2"
+                        >
+                            {Array.from({ length: 4 }).map((_, index) => (
+                                <Skeleton
+                                    key={index}
+                                    className="h-44 rounded-2xl"
+                                />
+                            ))}
                         </div>
-                    ))}
+                    ) : error ? (
+                        <EmptyState
+                            icon={GraduationCapIcon}
+                            title="Could not load learning tools"
+                            description="Please try again in a moment."
+                        />
+                    ) : visible.length === 0 ? (
+                        <EmptyState
+                            icon={GraduationCapIcon}
+                            title={
+                                artifacts.length === 0
+                                    ? "No learning tools yet"
+                                    : "Nothing generated recently"
+                            }
+                            description="Generate your first summary, quiz or flashcard deck from your ready sources."
+                        >
+                            <Button onClick={() => openDialog()}>
+                                <SparklesIcon aria-hidden="true" />
+                                Generate
+                            </Button>
+                        </EmptyState>
+                    ) : (
+                        <div className="grid gap-4 md:grid-cols-2">
+                            {visible.map((artifact) => (
+                                <ArtifactCard
+                                    key={artifact.id}
+                                    artifact={artifact}
+                                    workspaceId={workspaceId}
+                                    onDelete={setPendingDelete}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    <Callout tone="green" className="flex items-center gap-3">
+                        <LightbulbIcon
+                            aria-hidden="true"
+                            className="size-5 shrink-0"
+                        />
+                        <span>
+                            A little effort goes a long way. Try a quiz before
+                            rereading your summary.
+                        </span>
+                    </Callout>
                 </div>
-            )}
+
+                <ArtifactMaker
+                    readySourceCount={readySourceCount}
+                    onPick={openDialog}
+                />
+            </div>
 
             <GenerateArtifactDialog
                 workspaceId={workspaceId}
-                open={dialogOpen}
-                onOpenChange={setDialogOpen}
+                open={dialog !== null}
+                initialType={dialog?.type}
+                onOpenChange={(open) => {
+                    if (!open) setDialog(null);
+                }}
+            />
+
+            <ConfirmDialog
+                open={pendingDelete !== null}
+                title="Delete learning tool?"
+                description={
+                    <>
+                        This permanently deletes{" "}
+                        <span className="font-medium text-foreground">
+                            {pendingDelete?.title}
+                        </span>
+                        .
+                    </>
+                }
+                isPending={deleteArtifact.isPending}
+                onConfirm={() => {
+                    if (!pendingDelete) return;
+                    deleteArtifact.mutate(pendingDelete.id, {
+                        onSuccess: () => setPendingDelete(null),
+                    });
+                }}
+                onCancel={() => setPendingDelete(null)}
             />
         </div>
     );
