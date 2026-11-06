@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { ARTIFACT_META } from "../lib/artifact-meta";
 import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
 import { useArtifact } from "../hooks/use-artifacts";
+import { ArtifactActions } from "./artifact-actions";
 import { ArtifactContentViewer } from "./artifact-content-viewer";
 
 type ArtifactDetailProps = {
@@ -122,6 +123,10 @@ export function ArtifactDetail({
                         })}
                     </p>
                 </div>
+                <ArtifactActions
+                    artifact={artifact}
+                    workspaceId={workspaceId}
+                />
             </header>
 
             {isProcessing ? (
