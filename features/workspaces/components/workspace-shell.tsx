@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/sidebar";
 import type { Workspace } from "../lib/types";
 import { WorkspaceHeaderActions } from "./workspace-header-actions";
+import { WorkspaceIcon } from "./workspace-icon";
 import { routes } from "@/shared/config/routes";
 
 type WorkspaceShellProps = {
@@ -56,7 +57,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
             <Sidebar>
                 <SidebarHeader className="border-b border-sidebar-border">
                     <div className="flex items-center gap-2 px-2 py-1">
-                        <span className="text-xl">{workspace.icon ?? "📚"}</span>
+                        <WorkspaceIcon value={workspace.icon} className="size-5" />
                         <div className="min-w-0 flex-1">
                             <p className="truncate font-medium">
                                 {workspace.title}
