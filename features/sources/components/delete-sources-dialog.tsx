@@ -1,16 +1,6 @@
 "use client";
 
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Spinner } from "@/components/ui/spinner";
+import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 
 type DeleteSourcesDialogProps = {
     open: boolean;
@@ -30,40 +20,21 @@ export function DeleteSourcesDialog({
     onCancel,
 }: DeleteSourcesDialogProps) {
     return (
-        <AlertDialog
+        <ConfirmDialog
             open={open}
-            onOpenChange={(next) => {
-                if (!next) onCancel();
-            }}
-        >
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Delete {subject}?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        This permanently removes{" "}
-                        <span className="font-medium text-foreground">
-                            {subject}
-                        </span>{" "}
-                        and its indexed content. This can&apos;t be undone.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isPending}>
-                        Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                        variant="destructive"
-                        disabled={isPending}
-                        onClick={(event) => {
-                            event.preventDefault();
-                            onConfirm();
-                        }}
-                    >
-                        {isPending ? <Spinner /> : null}
-                        Delete
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+            title={`Delete ${subject}?`}
+            description={
+                <>
+                    This permanently removes{" "}
+                    <span className="font-medium text-foreground">
+                        {subject}
+                    </span>{" "}
+                    and its indexed content. This can&apos;t be undone.
+                </>
+            }
+            isPending={isPending}
+            onConfirm={onConfirm}
+            onCancel={onCancel}
+        />
     );
 }
