@@ -91,7 +91,7 @@ export function ChatMessageBody({
             allowedTags={{ cite: ["index", "web"] }}
             literalTagContent={["cite"]}
             components={components}
-            className="min-w-0 text-sm leading-relaxed"
+            className="text-body min-w-0"
         >
             {markdown}
         </Streamdown>
