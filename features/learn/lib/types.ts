@@ -22,6 +22,13 @@ export type CreateArtifactInput = {
     type: ArtifactType;
     title?: string;
     sourceIds?: string[];
+    /**
+     * Generate from a conversation instead of the workspace's sources. The API rejects
+     * it together with `sourceIds` and for WIKI artifacts.
+     */
+    conversationId?: string;
+    /** Limits `conversationId` to some of its messages; needs `conversationId`. */
+    messageIds?: string[];
 };
 
 /** READY and not yet opened: shown with a "New" marker. */
