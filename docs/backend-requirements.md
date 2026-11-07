@@ -4,6 +4,12 @@ The UI revamp is built entirely on existing endpoints. Nothing below blocks it. 
 changes that unlock the remaining mockup details and make the product more robust.
 Priority: **P1** visible in the mockups, **P2** quality and scale.
 
+> **Status:** items 1-6 and 8-10 are implemented in the backend and wired into the UI
+> (see `grounded-brain-notebook-llm/docs/UI_HANDOVER.md`). Item 7a (multi-file PDF upload) is
+> not part of that handover. Artifact lists are not paged in the UI yet; the Learn hub still
+> loads everything. The backend never produces `pageEnd` or page numbers inside artifact
+> citations, so the UI shows `Page n` and source labels only.
+
 ## P1: needed to match the mockups
 
 ### 1. Notebook counts on the workspace list
