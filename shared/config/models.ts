@@ -11,9 +11,12 @@ export type ChatModelId = (typeof CHAT_MODELS)[number];
 export const DEFAULT_CHAT_MODEL: ChatModelId = "gpt-4o-mini";
 
 export const CHAT_MODEL_LABELS: Record<ChatModelId, string> = {
-    "gpt-4o-mini": "GPT-4o mini",
+    "gpt-4o-mini": "GPT-4o Mini",
     "gpt-4o": "GPT-4o",
 };
+
+/** `items` for a Select, so its trigger shows the label instead of the raw model id. */
+export const CHAT_MODEL_ITEMS: Record<string, string> = CHAT_MODEL_LABELS;
 
 export function isChatModel(value: unknown): value is ChatModelId {
     return (

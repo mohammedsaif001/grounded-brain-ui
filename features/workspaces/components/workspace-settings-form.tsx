@@ -16,6 +16,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import {
+    CHAT_MODEL_ITEMS,
     CHAT_MODEL_LABELS,
     CHAT_MODELS,
     resolveChatModel,
@@ -119,6 +120,7 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                 <div className="space-y-2">
                     <Label htmlFor="defaultModel">Default chat model</Label>
                     <Select
+                        items={CHAT_MODEL_ITEMS}
                         value={defaultModel}
                         onValueChange={(value) =>
                             setDefaultModel(value as ChatModelId)
