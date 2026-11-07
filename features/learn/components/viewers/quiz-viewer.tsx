@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StreamdownContent } from "@/shared/components/streamdown-content";
 import type { QuizQuestion } from "../../lib/types";
+import { ArtifactSources } from "../artifact-sources";
 
 const questionVariants = {
     enter: { opacity: 0, x: 40 },
@@ -15,7 +16,13 @@ const questionVariants = {
 };
 
 /** Progress resets when the parent remounts it (keyed by artifact version). */
-export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
+export function QuizViewer({
+    questions,
+    workspaceId,
+}: {
+    questions: QuizQuestion[];
+    workspaceId: string;
+}) {
     const [index, setIndex] = useState(0);
     const [selected, setSelected] = useState<number | null>(null);
     const [score, setScore] = useState(0);
@@ -228,6 +235,10 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
                             <StreamdownContent
                                 content={question.explanation}
                                 className="text-body max-w-none [&_p]:my-0 [&_p+p]:mt-2"
+                            />
+                            <ArtifactSources
+                                workspaceId={workspaceId}
+                                citations={question.citations}
                             />
                             <Button onClick={nextQuestion}>
                                 {index + 1 >= questions.length

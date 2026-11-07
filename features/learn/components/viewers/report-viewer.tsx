@@ -1,15 +1,23 @@
 "use client";
 
 import { StreamdownContent } from "@/shared/components/streamdown-content";
+import type { ArtifactCitation } from "../../lib/types";
+import { ArtifactSources } from "../artifact-sources";
 
-type ReportSection = { title: string; content: string };
+type ReportSection = {
+    title: string;
+    content: string;
+    citations: ArtifactCitation[];
+};
 
 export function ReportViewer({
     markdown,
     sections,
+    workspaceId,
 }: {
     markdown: string;
     sections?: ReportSection[];
+    workspaceId: string;
 }) {
     return (
         <div className="space-y-8">
@@ -24,6 +32,11 @@ export function ReportViewer({
                             <StreamdownContent
                                 content={section.content}
                                 mode="static"
+                            />
+                            <ArtifactSources
+                                workspaceId={workspaceId}
+                                citations={section.citations}
+                                className="pt-1"
                             />
                         </section>
                     ))}

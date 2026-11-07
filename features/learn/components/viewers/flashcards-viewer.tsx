@@ -14,7 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
 import { StreamdownContent } from "@/shared/components/streamdown-content";
-import type { Flashcard } from "../../lib/types";
+import type { ArtifactCitation, Flashcard } from "../../lib/types";
+import { ArtifactSources } from "../artifact-sources";
 
 const SWIPE_THRESHOLD = 90;
 const SWIPE_VELOCITY = 400;
@@ -47,7 +48,13 @@ function shuffleOrder(length: number) {
 }
 
 /** Progress resets when the parent remounts it (keyed by artifact version). */
-export function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
+export function FlashcardsViewer({
+    cards,
+    workspaceId,
+}: {
+    cards: Flashcard[];
+    workspaceId: string;
+}) {
     const [order, setOrder] = useState(() =>
         Array.from({ length: cards.length }, (_, index) => index),
     );
@@ -258,6 +265,8 @@ export function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
                                 content={card.back}
                                 isKnown={isKnown}
                                 back
+                                workspaceId={workspaceId}
+                                citations={card.citations}
                             />
                         </motion.div>
                     </motion.div>
@@ -359,11 +368,16 @@ function CardFace({
     content,
     isKnown,
     back = false,
+    workspaceId,
+    citations,
 }: {
     side: string;
     content: string;
     isKnown: boolean;
     back?: boolean;
+    /** Only the back shows where the answer comes from. */
+    workspaceId?: string;
+    citations?: readonly ArtifactCitation[];
 }) {
     return (
         <div
@@ -397,6 +411,14 @@ function CardFace({
                     }
                 />
             </div>
+
+            {back && workspaceId && citations ? (
+                <ArtifactSources
+                    workspaceId={workspaceId}
+                    citations={citations}
+                    className="border-t border-border/60 pt-3"
+                />
+            ) : null}
         </div>
     );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ComponentProps } from "react";
 import { Streamdown } from "streamdown";
 import { code } from "@streamdown/code";
 
@@ -9,6 +9,10 @@ type StreamdownContentProps = {
     mode?: "static" | "streaming";
     isAnimating?: boolean;
     className?: string;
+    /** Custom tags to allow (e.g. `{ cite: ["index"] }`) and the components that render them. */
+    allowedTags?: Record<string, string[]>;
+    literalTagContent?: string[];
+    components?: ComponentProps<typeof Streamdown>["components"];
 };
 
 export function StreamdownContent({
@@ -16,6 +20,9 @@ export function StreamdownContent({
     mode = "static",
     isAnimating = false,
     className,
+    allowedTags,
+    literalTagContent,
+    components,
 }: StreamdownContentProps) {
     const plugins = useMemo(() => ({ code }), []);
 
@@ -25,6 +32,9 @@ export function StreamdownContent({
             isAnimating={isAnimating}
             plugins={plugins}
             className={className}
+            allowedTags={allowedTags}
+            literalTagContent={literalTagContent}
+            components={components}
         >
             {content}
         </Streamdown>
