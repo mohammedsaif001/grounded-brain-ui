@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { RefreshCwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { useGithubFiles, useSyncGithubSource } from "../hooks/use-sources";
@@ -45,7 +46,7 @@ export function GithubSourcePanel({
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-muted/30 p-4 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 text-sm shadow-surface">
                 <div className="space-y-1">
                     <p className="font-medium">{data?.repo ?? source.title}</p>
                     <p className="text-muted-foreground">
@@ -79,13 +80,14 @@ export function GithubSourcePanel({
                     <Skeleton className="h-48 w-full rounded-2xl" />
                 ) : (
                     <div className="space-y-2">
-                        <input
+                        <Input
+                            type="search"
+                            aria-label="Filter files"
                             value={filter}
                             onChange={(event) => setFilter(event.target.value)}
                             placeholder="Filter files…"
-                            className="w-full rounded-xl border bg-background px-3 py-2 text-sm"
                         />
-                        <ul className="max-h-96 divide-y overflow-y-auto rounded-2xl border text-sm">
+                        <ul className="max-h-96 divide-y divide-border overflow-y-auto rounded-xl border border-border bg-card text-sm">
                             {files.map((file) => (
                                 <li
                                     key={file.path}
