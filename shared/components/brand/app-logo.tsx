@@ -20,7 +20,7 @@ export function AppLogo({ markOnly = false, className }: AppLogoProps) {
       {markOnly ? (
         <span className="sr-only">Grounded Brain</span>
       ) : (
-        <span className="text-heading tracking-tight">grounded brain</span>
+        <span className="text-heading tracking-tight">Grounded Brain</span>
       )}
     </span>
   );
