@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowUpRightIcon, Trash2Icon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/shared/components/status-badge";
 import { TypeTile } from "@/shared/components/type-tile";
 import { routes } from "@/shared/config/routes";
 import { ARTIFACT_META } from "../lib/artifact-meta";
 import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
-import type { LearningArtifact } from "../lib/types";
+import { isUnseenArtifact, type LearningArtifact } from "../lib/types";
 
 type ArtifactCardProps = {
     artifact: LearningArtifact;
@@ -41,7 +42,12 @@ export function ArtifactCard({
                             {ARTIFACT_TYPE_LABELS[artifact.type]}
                         </span>
                     </div>
-                    <StatusBadge status={artifact.status} />
+                    <div className="flex items-center gap-2">
+                        {isUnseenArtifact(artifact) ? (
+                            <Badge variant="green">New</Badge>
+                        ) : null}
+                        <StatusBadge status={artifact.status} />
+                    </div>
                 </div>
                 <h3 className="text-heading line-clamp-2">{artifact.title}</h3>
             </div>

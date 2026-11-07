@@ -11,6 +11,7 @@ import {
     deleteArtifact,
     getArtifact,
     listArtifacts,
+    markArtifactViewed,
 } from "../lib/api";
 import type { CreateArtifactInput, LearningArtifact } from "../lib/types";
 
@@ -61,6 +62,19 @@ export function useCreateArtifact(
             workspaceKeys.lists(),
         ],
         ...options,
+    });
+}
+
+/** Clears the "new" state. Failing is harmless, so it never raises a toast. */
+export function useMarkArtifactViewed(workspaceId: string) {
+    return useInvalidatingMutation({
+        mutationFn: (artifactId: string) =>
+            markArtifactViewed(workspaceId, artifactId),
+        invalidates: () => [
+            artifactKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+        ],
+        suppressErrorToast: true,
     });
 }
 

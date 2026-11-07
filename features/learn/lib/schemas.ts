@@ -27,6 +27,8 @@ export const learningArtifactSchema = z.object({
     sourceIds: z.array(z.string()),
     status: artifactStatusSchema,
     metadata: z.record(z.string(), z.unknown()).nullable(),
+    /** When the user first opened it; `null` while it is still "new". */
+    viewedAt: z.string().nullable(),
     createdAt: z.string(),
     updatedAt: z.string(),
 });

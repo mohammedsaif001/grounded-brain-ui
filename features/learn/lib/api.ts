@@ -26,6 +26,14 @@ export function createArtifact(
     });
 }
 
+/** Idempotent. Call when the user actually opens the artifact, not when it is fetched. */
+export function markArtifactViewed(workspaceId: string, artifactId: string) {
+    return apiFetch(
+        apiPath`/api/workspaces/${workspaceId}/artifacts/${artifactId}/viewed`,
+        { method: "POST" },
+    );
+}
+
 export function deleteArtifact(workspaceId: string, artifactId: string) {
     return apiFetch(
         apiPath`/api/workspaces/${workspaceId}/artifacts/${artifactId}`,

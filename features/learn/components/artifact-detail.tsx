@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowLeftIcon, GraduationCapIcon, ShieldCheckIcon } from "lucide-react";
@@ -15,7 +16,8 @@ import { routes } from "@/shared/config/routes";
 import { cn } from "@/lib/utils";
 import { ARTIFACT_META } from "../lib/artifact-meta";
 import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
-import { useArtifact } from "../hooks/use-artifacts";
+import { useArtifact, useMarkArtifactViewed } from "../hooks/use-artifacts";
+import { isUnseenArtifact } from "../lib/types";
 import { ArtifactActions } from "./artifact-actions";
 import { ArtifactContentViewer } from "./artifact-content-viewer";
 
@@ -32,6 +34,18 @@ export function ArtifactDetail({
         workspaceId,
         artifactId,
     );
+    const { mutate: markViewed } = useMarkArtifactViewed(workspaceId);
+    const markedViewed = useRef(false);
+
+    // Opening a finished artifact is what clears its "new" state; fetching it is not.
+    const shouldMarkViewed = artifact ? isUnseenArtifact(artifact) : false;
+    useEffect(() => {
+        if (shouldMarkViewed && !markedViewed.current) {
+            markedViewed.current = true;
+            markViewed(artifactId);
+        }
+    }, [shouldMarkViewed, markViewed, artifactId]);
+
     const backToLearn = (
         <Button
             nativeButton={false}

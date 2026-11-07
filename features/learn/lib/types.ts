@@ -23,6 +23,13 @@ export type CreateArtifactInput = {
     sourceIds?: string[];
 };
 
+/** READY and not yet opened: shown with a "New" marker. */
+export function isUnseenArtifact(
+    artifact: Pick<LearningArtifact, "status" | "viewedAt">,
+) {
+    return artifact.status === "READY" && artifact.viewedAt === null;
+}
+
 export type Flashcard = z.infer<typeof flashcardSchema>;
 export type QuizQuestion = z.infer<typeof quizQuestionSchema>;
 export type MindMapNode = z.infer<typeof mindMapNodeSchema>;
