@@ -10,17 +10,32 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { routes } from "@/shared/config/routes";
-import type { Source } from "../lib/types";
+import { SOURCE_TYPE_LABELS } from "../lib/constants";
+import type { Source, SourceType } from "../lib/types";
+import { SourceFormProvider } from "./add-source/form-fields";
 import { GithubSourceForm } from "./add-source/github-source-form";
 import { PdfSourceForm } from "./add-source/pdf-source-form";
 import { TextSourceForm } from "./add-source/text-source-form";
 import { UrlSourceForm } from "./add-source/url-source-form";
+import { SOURCE_TYPE_ICONS } from "./source-type-icon";
 
 type AddSourceDialogProps = {
     workspaceId: string;
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    /** Shown in the subtitle; falls back to a generic phrase when omitted. */
+    workspaceTitle?: string;
 };
+
+/** Tab order follows the design: file first, then links, then pasted content. */
+const TAB_ORDER: readonly SourceType[] = [
+    "PDF",
+    "WEBSITE",
+    "YOUTUBE",
+    "GITHUB",
+    "TEXT",
+    "MARKDOWN",
+];
 
 /**
  * Tabbed dialog for adding a source. Each tab is its own form with its own state;
@@ -30,6 +45,7 @@ export function AddSourceDialog({
     workspaceId,
     open,
     onOpenChange,
+    workspaceTitle,
 }: AddSourceDialogProps) {
     const router = useRouter();
 
@@ -42,45 +58,56 @@ export function AddSourceDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
-                <DialogHeader>
-                    <DialogTitle>Add source</DialogTitle>
-                    <DialogDescription>
-                        Add knowledge to this workspace from text, files, or the
-                        web.
+            <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-2xl">
+                <DialogHeader className="gap-2 pr-10">
+                    <DialogTitle className="text-title">
+                        Give your ideas a starting point.
+                    </DialogTitle>
+                    <DialogDescription className="text-body">
+                        Add a source to{" "}
+                        {workspaceTitle ? workspaceTitle : "this notebook"}.
                     </DialogDescription>
                 </DialogHeader>
 
-                {/* keepMounted: switching tabs must not discard what was typed. */}
-                <Tabs defaultValue="text">
-                    <TabsList className="w-full">
-                        <TabsTrigger value="text">Text</TabsTrigger>
-                        <TabsTrigger value="markdown">Markdown</TabsTrigger>
-                        <TabsTrigger value="pdf">PDF</TabsTrigger>
-                        <TabsTrigger value="website">Website</TabsTrigger>
-                        <TabsTrigger value="youtube">YouTube</TabsTrigger>
-                        <TabsTrigger value="github">GitHub</TabsTrigger>
-                    </TabsList>
+                <SourceFormProvider value={{ onCancel: () => onOpenChange(false) }}>
+                    {/* keepMounted: switching tabs must not discard what was typed. */}
+                    <Tabs defaultValue="PDF">
+                        <TabsList className="grid h-auto w-full grid-cols-3 gap-1 p-1 group-data-horizontal/tabs:h-auto sm:grid-cols-6">
+                            {TAB_ORDER.map((type) => {
+                                const Icon = SOURCE_TYPE_ICONS[type];
+                                return (
+                                    <TabsTrigger
+                                        key={type}
+                                        value={type}
+                                        className="h-auto flex-col gap-1.5 px-2 py-3 text-xs"
+                                    >
+                                        <Icon aria-hidden="true" className="size-5" />
+                                        {SOURCE_TYPE_LABELS[type]}
+                                    </TabsTrigger>
+                                );
+                            })}
+                        </TabsList>
 
-                    <TabsContent value="text" keepMounted>
-                        <TextSourceForm kind="TEXT" {...formProps} />
-                    </TabsContent>
-                    <TabsContent value="markdown" keepMounted>
-                        <TextSourceForm kind="MARKDOWN" {...formProps} />
-                    </TabsContent>
-                    <TabsContent value="pdf" keepMounted>
-                        <PdfSourceForm {...formProps} />
-                    </TabsContent>
-                    <TabsContent value="website" keepMounted>
-                        <UrlSourceForm kind="WEBSITE" {...formProps} />
-                    </TabsContent>
-                    <TabsContent value="youtube" keepMounted>
-                        <UrlSourceForm kind="YOUTUBE" {...formProps} />
-                    </TabsContent>
-                    <TabsContent value="github" keepMounted>
-                        <GithubSourceForm {...formProps} />
-                    </TabsContent>
-                </Tabs>
+                        <TabsContent value="PDF" keepMounted>
+                            <PdfSourceForm {...formProps} />
+                        </TabsContent>
+                        <TabsContent value="WEBSITE" keepMounted>
+                            <UrlSourceForm kind="WEBSITE" {...formProps} />
+                        </TabsContent>
+                        <TabsContent value="YOUTUBE" keepMounted>
+                            <UrlSourceForm kind="YOUTUBE" {...formProps} />
+                        </TabsContent>
+                        <TabsContent value="GITHUB" keepMounted>
+                            <GithubSourceForm {...formProps} />
+                        </TabsContent>
+                        <TabsContent value="TEXT" keepMounted>
+                            <TextSourceForm kind="TEXT" {...formProps} />
+                        </TabsContent>
+                        <TabsContent value="MARKDOWN" keepMounted>
+                            <TextSourceForm kind="MARKDOWN" {...formProps} />
+                        </TabsContent>
+                    </Tabs>
+                </SourceFormProvider>
             </DialogContent>
         </Dialog>
     );
