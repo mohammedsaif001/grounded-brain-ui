@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/shared/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
+import { cn } from "@/lib/utils";
 import { ApiError } from "@/shared/lib/api";
 import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import {
@@ -29,6 +30,12 @@ import { CreateWorkspaceCard } from "./create-workspace-card";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { WorkspaceCard } from "./workspace-card";
 import { WorkspaceFormDialog } from "./workspace-form-dialog";
+import { WorkspaceSortSelect } from "./workspace-sort-select";
+import {
+    DEFAULT_WORKSPACE_SORT,
+    getWorkspaceSortOption,
+    type WorkspaceSortKey,
+} from "../lib/workspace-sort";
 import { AppLogo } from "@/shared/components/brand/app-logo";
 import { PageHeader } from "@/shared/components/page-header";
 import { TypeTile } from "@/shared/components/type-tile";
@@ -58,11 +65,19 @@ const FEATURES = [
 
 export function DashboardHome({ userName }: DashboardHomeProps) {
     const router = useRouter();
-    const { data: workspaces, isLoading, error } = useWorkspaces();
+    const [search, setSearch] = useState("");
+    const [sortKey, setSortKey] =
+        useState<WorkspaceSortKey>(DEFAULT_WORKSPACE_SORT);
+    const debouncedSearch = useDebouncedValue(search, 250).trim();
+    const { sort, order } = getWorkspaceSortOption(sortKey);
+    const {
+        data: workspaces,
+        isLoading,
+        isPlaceholderData,
+        error,
+    } = useWorkspaces({ q: debouncedSearch || undefined, sort, order });
     // Form dialogs render their own errors inline.
     const createWorkspace = useCreateWorkspace({ suppressErrorToast: true });
-    const [search, setSearch] = useState("");
-    const debouncedSearch = useDebouncedValue(search, 200);
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(
@@ -73,28 +88,6 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
 
     const updateWorkspace = useUpdateWorkspace({ suppressErrorToast: true });
     const deleteWorkspace = useDeleteWorkspace();
-
-    const filteredWorkspaces = useMemo(() => {
-        if (!workspaces) {
-            return [];
-        }
-
-        const query = debouncedSearch.trim().toLowerCase();
-        if (!query) {
-            return workspaces;
-        }
-
-        return workspaces.filter((workspace) => {
-            const haystack = [
-                workspace.title,
-                workspace.description ?? "",
-            ]
-                .join(" ")
-                .toLowerCase();
-
-            return haystack.includes(query);
-        });
-    }, [workspaces, debouncedSearch]);
 
     const greeting = userName?.split(" ")[0] ?? "there";
 
@@ -165,20 +158,34 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             </h2>
                             <p className="text-sm text-muted-foreground">
                                 {workspaces?.length
-                                    ? `${workspaces.length} notebook${workspaces.length === 1 ? "" : "s"}`
-                                    : "Start with your first notebook"}
+                                    ? `${workspaces.length} notebook${workspaces.length === 1 ? "" : "s"}${debouncedSearch ? " found" : ""}`
+                                    : debouncedSearch
+                                      ? "No matches"
+                                      : "Start with your first notebook"}
                             </p>
                         </div>
 
-                        <div className="relative w-full sm:max-w-xs">
-                            <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                                value={search}
-                                onChange={(event) =>
-                                    setSearch(event.target.value)
-                                }
-                                placeholder="Search notebooks..."
-                                className="pl-9"
+                        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                            <div className="relative w-full sm:w-64">
+                                <SearchIcon
+                                    aria-hidden="true"
+                                    className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                                />
+                                <Input
+                                    type="search"
+                                    aria-label="Search notebooks"
+                                    value={search}
+                                    maxLength={120}
+                                    onChange={(event) =>
+                                        setSearch(event.target.value)
+                                    }
+                                    placeholder="Search notebooks..."
+                                    className="pl-9"
+                                />
+                            </div>
+                            <WorkspaceSortSelect
+                                value={sortKey}
+                                onChange={setSortKey}
                             />
                         </div>
                     </div>
@@ -203,12 +210,18 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             }
                         />
                     ) : (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div
+                            aria-busy={isPlaceholderData}
+                            className={cn(
+                                "grid gap-4 transition-opacity sm:grid-cols-2 lg:grid-cols-3",
+                                isPlaceholderData && "opacity-60",
+                            )}
+                        >
                             <CreateWorkspaceCard
                                 onClick={() => setCreateOpen(true)}
                             />
 
-                            {filteredWorkspaces.map((workspace) => (
+                            {workspaces?.map((workspace) => (
                                 <WorkspaceCard
                                     key={workspace.id}
                                     workspace={workspace}
@@ -221,9 +234,9 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
 
                     {!isLoading &&
                     !error &&
-                    workspaces &&
-                    workspaces.length > 0 &&
-                    filteredWorkspaces.length === 0 ? (
+                    !isPlaceholderData &&
+                    debouncedSearch &&
+                    workspaces?.length === 0 ? (
                         <EmptyState
                             icon={SearchIcon}
                             title="No notebooks found"
