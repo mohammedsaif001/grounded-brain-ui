@@ -34,11 +34,12 @@ function SkeletonRoot({
 function PageTitleSkeleton({ withAction = true }: { withAction?: boolean }) {
     return (
         <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="space-y-2">
-                <Skeleton className="h-7 w-48" />
+            <div className="space-y-3">
+                <Skeleton className="h-3 w-32" />
+                <Skeleton className="h-8 w-56" />
                 <Skeleton className="h-4 w-72 max-w-full" />
             </div>
-            {withAction ? <Skeleton className="h-8 w-28 rounded-2xl" /> : null}
+            {withAction ? <Skeleton className="h-11 w-32 rounded-xl" /> : null}
         </div>
     );
 }
@@ -53,12 +54,15 @@ export function CardGridPageSkeleton({
 }) {
     return (
         <SkeletonRoot
-            className={cn("flex flex-1 flex-col gap-6 p-6", className)}
+            className={cn(
+                "mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-8",
+                className,
+            )}
         >
             <PageTitleSkeleton />
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {Array.from({ length: cards }).map((_, index) => (
-                    <Skeleton key={index} className="h-32 rounded-3xl" />
+                    <Skeleton key={index} className="h-44 rounded-2xl" />
                 ))}
             </div>
         </SkeletonRoot>
@@ -75,19 +79,22 @@ export function ListPageSkeleton({
 }) {
     return (
         <SkeletonRoot
-            className={cn("flex flex-1 flex-col gap-6 p-6 md:p-8", className)}
+            className={cn(
+                "mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-8",
+                className,
+            )}
         >
             <PageTitleSkeleton />
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-                <Skeleton className="h-9 min-w-0 flex-1 rounded-full" />
+                <Skeleton className="h-11 min-w-0 flex-1 rounded-xl" />
                 <div className="flex gap-2">
-                    <Skeleton className="h-9 w-[130px] rounded-full" />
-                    <Skeleton className="h-9 w-[130px] rounded-full" />
+                    <Skeleton className="h-11 w-[130px] rounded-xl" />
+                    <Skeleton className="h-11 w-[130px] rounded-xl" />
                 </div>
             </div>
             <div className="space-y-3">
                 {Array.from({ length: rows }).map((_, index) => (
-                    <Skeleton key={index} className="h-16 rounded-2xl" />
+                    <Skeleton key={index} className="h-16 rounded-xl" />
                 ))}
             </div>
         </SkeletonRoot>
@@ -98,17 +105,20 @@ export function ListPageSkeleton({
 export function FormPageSkeleton({ className }: { className?: string }) {
     return (
         <SkeletonRoot
-            className={cn("flex flex-1 flex-col gap-6 p-6 md:p-8", className)}
+            className={cn(
+                "mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-8",
+                className,
+            )}
         >
             <PageTitleSkeleton withAction={false} />
             <div className="max-w-xl space-y-5">
                 {Array.from({ length: 4 }).map((_, index) => (
                     <div key={index} className="space-y-2">
                         <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-9 w-full" />
+                        <Skeleton className="h-10 w-full rounded-xl" />
                     </div>
                 ))}
-                <Skeleton className="h-8 w-28 rounded-2xl" />
+                <Skeleton className="h-9 w-32 rounded-xl" />
             </div>
         </SkeletonRoot>
     );
