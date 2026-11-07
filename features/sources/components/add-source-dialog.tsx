@@ -72,14 +72,14 @@ export function AddSourceDialog({
                 <SourceFormProvider value={{ onCancel: () => onOpenChange(false) }}>
                     {/* keepMounted: switching tabs must not discard what was typed. */}
                     <Tabs defaultValue="PDF">
-                        <TabsList className="grid h-auto w-full grid-cols-3 gap-1 p-1 group-data-horizontal/tabs:h-auto sm:grid-cols-6">
+                        <TabsList className="grid h-auto w-full grid-cols-3 gap-1 overflow-visible p-1 group-data-horizontal/tabs:h-auto sm:grid-cols-6">
                             {TAB_ORDER.map((type) => {
                                 const Icon = SOURCE_TYPE_ICONS[type];
                                 return (
                                     <TabsTrigger
                                         key={type}
                                         value={type}
-                                        className="h-auto flex-col gap-1.5 px-2 py-3 text-xs short:py-2"
+                                        className="h-auto min-w-0 flex-col gap-1.5 px-1 py-3 text-xs short:py-2"
                                     >
                                         <Icon aria-hidden="true" className="size-5" />
                                         {SOURCE_TYPE_LABELS[type]}
