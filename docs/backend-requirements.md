@@ -36,6 +36,11 @@ Priority: **P1** visible in the mockups, **P2** quality and scale.
 - **Standardise keys:** `author` (or channel), `pageCount`, `wordCount`, `durationSeconds` (video), `fileCount` and `repo` (GitHub).
 - **Why:** Source rows show "Brown, Roediger & McDaniel · 24 pages", "Barbara Oakley · 18:42", "46 files". Today the row can only show the host or "Added X ago".
 
+### 7a. Multi-file and larger PDF upload
+- **Where:** the PDF upload endpoint (multer `fileSize` limit and single-file handling).
+- **Change:** accept several PDFs per request (the design says up to 10 files) and raise the limit if 25 MB per file is intended; the UI currently allows one file up to 10 MB, matching the API.
+- **Why:** The add-source mockup reads "Up to 10 files · 25 MB per file".
+
 ## P2: quality and scale
 
 ### 7. Workspace `icon` contract
