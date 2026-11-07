@@ -13,13 +13,7 @@ import {
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-    Empty,
-    EmptyContent,
-    EmptyDescription,
-    EmptyHeader,
-    EmptyTitle,
-} from "@/components/ui/empty";
+import { EmptyState } from "@/shared/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
 import { ApiError } from "@/shared/lib/api";
@@ -186,7 +180,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                                     setSearch(event.target.value)
                                 }
                                 placeholder="Search notebooks..."
-                                className="rounded-full bg-background pl-9"
+                                className="pl-9"
                             />
                         </div>
                     </div>
@@ -196,23 +190,20 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             {Array.from({ length: 6 }).map((_, index) => (
                                 <Skeleton
                                     key={index}
-                                    className="min-h-[196px] rounded-3xl"
+                                    className="min-h-56 rounded-2xl"
                                 />
                             ))}
                         </div>
                     ) : error ? (
-                        <Empty className="rounded-3xl border bg-card">
-                            <EmptyHeader>
-                                <EmptyTitle>
-                                    Could not load notebooks
-                                </EmptyTitle>
-                                <EmptyDescription>
-                                    {error instanceof ApiError
-                                        ? error.message
-                                        : "Please try again in a moment."}
-                                </EmptyDescription>
-                            </EmptyHeader>
-                        </Empty>
+                        <EmptyState
+                            icon={BookOpenIcon}
+                            title="Could not load notebooks"
+                            description={
+                                error instanceof ApiError
+                                    ? error.message
+                                    : "Please try again in a moment."
+                            }
+                        />
                     ) : (
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             <CreateWorkspaceCard
@@ -235,20 +226,15 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                     workspaces &&
                     workspaces.length > 0 &&
                     filteredWorkspaces.length === 0 ? (
-                        <Empty className="rounded-3xl border bg-card">
-                            <EmptyHeader>
-                                <EmptyTitle>No notebooks found</EmptyTitle>
-                                <EmptyDescription>
-                                    Try a different search term or create a new
-                                    notebook.
-                                </EmptyDescription>
-                            </EmptyHeader>
-                            <EmptyContent>
-                                <Button onClick={() => setSearch("")}>
-                                    Clear search
-                                </Button>
-                            </EmptyContent>
-                        </Empty>
+                        <EmptyState
+                            icon={SearchIcon}
+                            title="No notebooks found"
+                            description="Try a different search term or create a new notebook."
+                        >
+                            <Button onClick={() => setSearch("")}>
+                                Clear search
+                            </Button>
+                        </EmptyState>
                     ) : null}
                 </section>
             </main>
