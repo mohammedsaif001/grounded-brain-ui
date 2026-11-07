@@ -50,7 +50,7 @@ export function UrlSourceForm({ workspaceId, kind, onCreated }: UrlSourceFormPro
 
     return (
         <form
-            className="grid gap-4 pt-2"
+            className="grid gap-4 pt-4"
             onSubmit={(event) => {
                 event.preventDefault();
                 void submit(
