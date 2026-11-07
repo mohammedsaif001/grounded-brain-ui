@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeftIcon, GraduationCapIcon } from "lucide-react";
+import { ArrowLeftIcon, GraduationCapIcon, ShieldCheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
@@ -116,11 +116,24 @@ export function ArtifactDetail({
                         <h1 className="text-title">{artifact.title}</h1>
                         <StatusBadge status={artifact.status} />
                     </div>
-                    <p className="text-caption">
-                        Generated{" "}
-                        {formatDistanceToNow(new Date(artifact.createdAt), {
-                            addSuffix: true,
-                        })}
+                    <p className="text-caption flex flex-wrap items-center gap-x-2">
+                        {artifact.sourceIds.length > 0 ? (
+                            <span className="inline-flex items-center gap-1.5">
+                                <ShieldCheckIcon
+                                    aria-hidden="true"
+                                    className="size-3.5"
+                                />
+                                Grounded in {artifact.sourceIds.length} source
+                                {artifact.sourceIds.length === 1 ? "" : "s"}
+                                <span aria-hidden="true">·</span>
+                            </span>
+                        ) : null}
+                        <span>
+                            Generated{" "}
+                            {formatDistanceToNow(new Date(artifact.createdAt), {
+                                addSuffix: true,
+                            })}
+                        </span>
                     </p>
                 </div>
                 <ArtifactActions
