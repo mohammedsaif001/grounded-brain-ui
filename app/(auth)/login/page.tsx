@@ -24,7 +24,7 @@ export default async function LoginPage() {
 
                 <figure className="relative hidden aspect-[2/1] max-w-xl overflow-hidden rounded-3xl shadow-raised md:block">
                     <Image
-                        src="/images/login-hero.jpg"
+                        src="/images/login-hero.svg"
                         alt="A glass book with leaves growing from its pages"
                         fill
                         priority
