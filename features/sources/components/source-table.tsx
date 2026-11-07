@@ -73,7 +73,10 @@ export function SourceTable({
                         >
                             Type
                         </th>
-                        <th scope="col" className="py-3 pr-4 font-semibold">
+                        <th
+                            scope="col"
+                            className="hidden py-3 pr-4 font-semibold md:table-cell"
+                        >
                             Status
                         </th>
                         <th scope="col" className="w-28 py-3 pr-4 text-right font-semibold">
@@ -119,13 +122,17 @@ export function SourceTable({
                                             <p className="text-caption truncate">
                                                 {describeSource(source)}
                                             </p>
+                                            <SourceStatusBadge
+                                                status={source.status}
+                                                className="mt-1.5 md:hidden"
+                                            />
                                         </div>
                                     </div>
                                 </td>
                                 <td className="hidden py-3 pr-4 align-middle text-muted-foreground md:table-cell">
                                     {SOURCE_TYPE_LABELS[source.type]}
                                 </td>
-                                <td className="py-3 pr-4 align-middle">
+                                <td className="hidden py-3 pr-4 align-middle md:table-cell">
                                     <SourceStatusBadge status={source.status} />
                                 </td>
                                 <td className="py-3 pr-3 align-middle">
@@ -148,6 +155,7 @@ export function SourceTable({
                                                 nativeButton={false}
                                                 variant="ghost"
                                                 size="icon-sm"
+                                                className="hidden sm:inline-flex"
                                                 render={<Link href={href} />}
                                             >
                                                 <ArrowUpRightIcon aria-hidden="true" />
