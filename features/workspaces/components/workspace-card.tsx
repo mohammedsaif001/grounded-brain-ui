@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { toneClasses } from "@/shared/components/tint";
 import { routes } from "@/shared/config/routes";
 import type { Workspace } from "../lib/types";
+import { formatWorkspaceCounts } from "../lib/workspace-counts";
 import { getWorkspaceTone } from "../lib/workspace-tone";
 import { WorkspaceIcon } from "./workspace-icon";
 
@@ -81,12 +82,17 @@ export function WorkspaceCard({
                 ) : null}
             </div>
 
-            <p className="text-caption pointer-events-none relative mt-auto">
-                Updated{" "}
-                {formatDistanceToNow(new Date(workspace.updatedAt), {
-                    addSuffix: true,
-                })}
-            </p>
+            <div className="pointer-events-none relative mt-auto space-y-1">
+                <p className="text-sm font-medium tabular-nums">
+                    {formatWorkspaceCounts(workspace)}
+                </p>
+                <p className="text-caption">
+                    Updated{" "}
+                    {formatDistanceToNow(new Date(workspace.updatedAt), {
+                        addSuffix: true,
+                    })}
+                </p>
+            </div>
         </article>
     );
 }
