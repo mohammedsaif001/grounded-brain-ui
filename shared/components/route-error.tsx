@@ -2,7 +2,11 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { TriangleAlertIcon } from "lucide-react";
+import {
+    LayoutDashboardIcon,
+    RefreshCwIcon,
+    TriangleAlertIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/shared/config/routes";
 import { StatusScreen } from "./status-screen";
@@ -37,12 +41,16 @@ export function RouteError({ error, retry }: RouteErrorProps) {
             }
             actions={
                 <div className="flex gap-2">
-                    <Button onClick={retry}>Try again</Button>
+                    <Button onClick={retry}>
+                        <RefreshCwIcon aria-hidden="true" />
+                        Try again
+                    </Button>
                     <Button
                         variant="outline"
                         nativeButton={false}
                         render={<Link href={routes.dashboard} />}
                     >
+                        <LayoutDashboardIcon aria-hidden="true" />
                         Go to dashboard
                     </Button>
                 </div>

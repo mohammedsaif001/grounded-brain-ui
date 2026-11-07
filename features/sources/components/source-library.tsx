@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
+    ChevronDownIcon,
     LibraryBigIcon,
     MoreHorizontalIcon,
     PlusIcon,
@@ -402,6 +403,7 @@ export function SourceLibrary({
                 >
                     {hasActiveFilters ? (
                         <Button variant="outline" onClick={() => setFilters({})}>
+                            <XIcon aria-hidden="true" />
                             Clear filters
                         </Button>
                     ) : null}
@@ -419,7 +421,11 @@ export function SourceLibrary({
                         disabled={isFetchingNextPage}
                         onClick={() => void fetchNextPage()}
                     >
-                        {isFetchingNextPage ? <Spinner /> : null}
+                        {isFetchingNextPage ? (
+                            <Spinner />
+                        ) : (
+                            <ChevronDownIcon aria-hidden="true" />
+                        )}
                         Load more
                     </Button>
                 </div>

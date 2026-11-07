@@ -25,6 +25,7 @@ import {
     ARTIFACT_TYPES,
 } from "../lib/constants";
 import type { ArtifactType } from "../lib/types";
+import { XIcon, SparklesIcon } from "lucide-react";
 
 type GenerateArtifactDialogProps = {
     workspaceId: string;
@@ -171,13 +172,18 @@ function GenerateForm({ workspaceId, initialType, onClose }: GenerateFormProps) 
 
             <DialogFooter>
                 <Button type="button" variant="outline" onClick={onClose}>
+                    <XIcon aria-hidden="true" />
                     Cancel
                 </Button>
                 <Button
                     type="submit"
                     disabled={createArtifact.isPending || wikiBlocked}
                 >
-                    {createArtifact.isPending ? <Spinner /> : null}
+                    {createArtifact.isPending ? (
+                        <Spinner />
+                    ) : (
+                        <SparklesIcon aria-hidden="true" />
+                    )}
                     Generate
                 </Button>
             </DialogFooter>

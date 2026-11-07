@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { redirectIfAuthenticated } from "@/features/auth/server";
 import { AppLogo } from "@/shared/components/brand/app-logo";
 import { routes } from "@/shared/config/routes";
+import { ArrowRightIcon } from "lucide-react";
 
 export default async function HomePage() {
     await redirectIfAuthenticated();
@@ -21,6 +22,7 @@ export default async function HomePage() {
                     render={<Link href={routes.login} />}
                 >
                     Get started
+                    <ArrowRightIcon aria-hidden="true" />
                 </Button>
             </div>
         </div>

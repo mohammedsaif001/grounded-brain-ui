@@ -32,6 +32,7 @@ import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { WorkspaceIconPicker } from "./workspace-icon-picker";
 import { PageHeader } from "@/shared/components/page-header";
 import { routes } from "@/shared/config/routes";
+import { CheckIcon, Trash2Icon } from "lucide-react";
 
 type WorkspaceSettingsFormProps = {
     workspace: Workspace;
@@ -140,7 +141,11 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                 </div>
 
                 <Button type="submit" size="lg" disabled={updateWorkspace.isPending}>
-                    {updateWorkspace.isPending ? <Spinner /> : null}
+                    {updateWorkspace.isPending ? (
+                        <Spinner />
+                    ) : (
+                        <CheckIcon aria-hidden="true" />
+                    )}
                     Save changes
                 </Button>
             </form>
@@ -165,6 +170,7 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                     className="mt-4"
                     onClick={() => setDeleteOpen(true)}
                 >
+                    <Trash2Icon aria-hidden="true" />
                     Delete workspace
                 </Button>
             </section>

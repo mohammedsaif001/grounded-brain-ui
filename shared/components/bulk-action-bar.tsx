@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { XIcon } from "lucide-react";
 
 type BulkActionBarProps = {
   count: number;
@@ -40,6 +41,7 @@ export function BulkActionBar({
           className="text-muted-foreground"
           onClick={onClear}
         >
+          <XIcon aria-hidden="true" />
           Clear selection
         </Button>
       </div>

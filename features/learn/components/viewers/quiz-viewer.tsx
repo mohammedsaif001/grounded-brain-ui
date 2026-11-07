@@ -2,7 +2,13 @@
 
 import { useCallback, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { CheckIcon, RotateCcwIcon, TrophyIcon, XIcon } from "lucide-react";
+import {
+    ArrowRightIcon,
+    CheckIcon,
+    RotateCcwIcon,
+    TrophyIcon,
+    XIcon,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StreamdownContent } from "@/shared/components/streamdown-content";
@@ -241,9 +247,15 @@ export function QuizViewer({
                                 citations={question.citations}
                             />
                             <Button onClick={nextQuestion}>
+                                {index + 1 >= questions.length ? (
+                                    <TrophyIcon aria-hidden="true" />
+                                ) : null}
                                 {index + 1 >= questions.length
                                     ? "See score"
                                     : "Next question"}
+                                {index + 1 < questions.length ? (
+                                    <ArrowRightIcon aria-hidden="true" />
+                                ) : null}
                             </Button>
                         </div>
                     </motion.div>

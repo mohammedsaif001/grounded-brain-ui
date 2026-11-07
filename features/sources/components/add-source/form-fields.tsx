@@ -7,7 +7,11 @@ import {
     type ComponentProps,
     type ReactNode,
 } from "react";
-import { PlusIcon, ShieldCheckIcon } from "lucide-react";
+import {
+    PlusIcon,
+    ShieldCheckIcon,
+    XIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -133,6 +137,7 @@ export function SubmitFooter({
                         disabled={pending}
                         onClick={onCancel}
                     >
+                        <XIcon aria-hidden="true" />
                         Cancel
                     </Button>
                     <Button

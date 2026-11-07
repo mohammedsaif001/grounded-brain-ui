@@ -9,6 +9,7 @@ import {
     MessageSquareIcon,
     SearchIcon,
     SparklesIcon,
+    XIcon,
 } from "lucide-react";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Button } from "@/components/ui/button";
@@ -243,6 +244,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             description="Try a different search term or create a new notebook."
                         >
                             <Button onClick={() => setSearch("")}>
+                                <XIcon aria-hidden="true" />
                                 Clear search
                             </Button>
                         </EmptyState>

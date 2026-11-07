@@ -18,6 +18,7 @@ import { getErrorMessage } from "@/shared/lib/errors";
 import type { Workspace } from "../lib/types";
 import { resolveWorkspaceIcon } from "../lib/workspace-icons";
 import { WorkspaceIconPicker } from "./workspace-icon-picker";
+import { XIcon, CheckIcon, PlusIcon } from "lucide-react";
 
 export type WorkspaceFormValues = {
     title: string;
@@ -166,10 +167,17 @@ function WorkspaceForm({
                     onClick={onClose}
                     disabled={isPending}
                 >
+                    <XIcon aria-hidden="true" />
                     Cancel
                 </Button>
                 <Button type="submit" disabled={isPending}>
-                    {isPending ? <Spinner /> : null}
+                    {isPending ? (
+                        <Spinner />
+                    ) : isEditing ? (
+                        <CheckIcon aria-hidden="true" />
+                    ) : (
+                        <PlusIcon aria-hidden="true" />
+                    )}
                     {isEditing ? "Save changes" : "Create workspace"}
                 </Button>
             </DialogFooter>

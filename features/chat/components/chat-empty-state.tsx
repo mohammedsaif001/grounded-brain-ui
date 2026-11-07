@@ -1,6 +1,9 @@
 "use client";
 
-import { MessageSquareTextIcon } from "lucide-react";
+import {
+    MessageSquareIcon,
+    MessageSquareTextIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const STARTER_PROMPTS = [
@@ -39,6 +42,7 @@ export function ChatEmptyState({ onPick, disabled }: ChatEmptyStateProps) {
                             disabled={disabled}
                             onClick={() => onPick(prompt)}
                         >
+                            <MessageSquareIcon aria-hidden="true" />
                             {prompt}
                         </Button>
                     </li>
