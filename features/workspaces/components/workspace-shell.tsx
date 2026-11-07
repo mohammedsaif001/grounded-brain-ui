@@ -39,6 +39,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
 
             <AddSourceDialog
                 workspaceId={workspace.id}
+                workspaceTitle={workspace.title}
                 open={addSourceOpen}
                 onOpenChange={setAddSourceOpen}
             />
