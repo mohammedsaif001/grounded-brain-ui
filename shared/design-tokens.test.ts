@@ -16,6 +16,8 @@ const SCAN_DIRS = ["app", "components", "features", "shared"];
 const ALLOWED_HEX = new Set([
     // Brand-mandated Google "G" logo colours.
     "features/auth/components/login-form.tsx",
+    // Replaces the whole document, so it cannot use stylesheet tokens.
+    "app/global-error.tsx",
 ]);
 
 const RULES: { name: string; pattern: RegExp; allow?: Set<string> }[] = [
