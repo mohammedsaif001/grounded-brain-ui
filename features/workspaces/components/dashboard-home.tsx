@@ -29,6 +29,7 @@ import { CreateWorkspaceCard } from "./create-workspace-card";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { WorkspaceCard } from "./workspace-card";
 import { WorkspaceFormDialog } from "./workspace-form-dialog";
+import { AppLogo } from "@/shared/components/brand/app-logo";
 import { PageHeader } from "@/shared/components/page-header";
 import { TypeTile } from "@/shared/components/type-tile";
 import { routes } from "@/shared/config/routes";
@@ -103,12 +104,9 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                 <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 md:px-8">
                     <Link
                         href={routes.dashboard}
-                        className="flex items-center gap-2.5 font-heading text-lg font-semibold tracking-tight"
+                        className="rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
                     >
-                        <span className="flex size-8 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                            <BrainIcon aria-hidden="true" className="size-[18px]" />
-                        </span>
-                        Grounded Brain
+                        <AppLogo />
                     </Link>
 
                     <div className="flex items-center gap-1.5 sm:gap-2">
