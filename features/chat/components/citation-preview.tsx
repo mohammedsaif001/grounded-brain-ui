@@ -15,6 +15,7 @@ import { toast } from "@/components/ui/toast";
 import { useImportWebSearchSource } from "@/features/sources/hooks/use-sources";
 import { SOURCE_TYPE_LABELS } from "@/features/sources/lib/constants";
 import type { SourceType } from "@/features/sources/lib/types";
+import { describeCitationLocation } from "../lib/citations";
 import type { ChatCitation } from "../lib/types";
 import { routes } from "@/shared/config/routes";
 
@@ -69,9 +70,9 @@ export function CitationPreview({
                         </p>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                        {sourceType}
-                        {citation.page ? ` · Page ${citation.page}` : null}
-                        {citation.path ? ` · ${citation.path}` : null}
+                        {[sourceType, ...describeCitationLocation(citation)].join(
+                            " · ",
+                        )}
                     </p>
                 </div>
             </div>

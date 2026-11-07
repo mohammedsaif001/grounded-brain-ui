@@ -9,6 +9,7 @@ import { SOURCE_TYPE_LABELS } from "@/features/sources/lib/constants";
 import { useImportWebSearchSource } from "@/features/sources/hooks/use-sources";
 import type { SourceType } from "@/features/sources/lib/types";
 import { routes } from "@/shared/config/routes";
+import { describeCitationLocation } from "../lib/citations";
 import type { SelectedCitation } from "./citation-selection";
 
 type CitationPanelProps = {
@@ -32,13 +33,7 @@ export function CitationPanel({
             : isWeb
               ? "Web"
               : citation.sourceType;
-    const meta = [
-        typeLabel,
-        citation.page ? `Page ${citation.page}` : null,
-        citation.path ?? null,
-    ]
-        .filter(Boolean)
-        .join(" · ");
+    const meta = [typeLabel, ...describeCitationLocation(citation)].join(" · ");
 
     return (
         <section
