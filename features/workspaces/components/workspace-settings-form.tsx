@@ -12,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import {
@@ -136,14 +137,23 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                     </Select>
                 </div>
 
-                <Button type="submit" disabled={updateWorkspace.isPending}>
+                <Button type="submit" size="lg" disabled={updateWorkspace.isPending}>
+                    {updateWorkspace.isPending ? <Spinner /> : null}
                     Save changes
                 </Button>
             </form>
 
-            <div className="rounded-xl border border-destructive/30 p-4">
-                <h3 className="font-medium text-destructive">Danger zone</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
+            <section
+                aria-labelledby="danger-zone-title"
+                className="rounded-2xl border border-destructive/30 bg-tint-rose/50 p-5"
+            >
+                <h2
+                    id="danger-zone-title"
+                    className="text-heading text-destructive"
+                >
+                    Danger zone
+                </h2>
+                <p className="text-body mt-1 text-muted-foreground">
                     Deleting this workspace removes all sources, conversations,
                     and indexed vectors permanently.
                 </p>
@@ -155,7 +165,7 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                 >
                     Delete workspace
                 </Button>
-            </div>
+            </section>
 
             <DeleteWorkspaceDialog
                 workspace={workspace}
