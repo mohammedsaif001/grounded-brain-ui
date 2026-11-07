@@ -6,7 +6,7 @@ import { StatusScreen } from "@/shared/components/status-screen";
 
 export default function NotFound() {
     return (
-        <div className="flex min-h-svh flex-col">
+        <div className="bg-page flex min-h-svh flex-col">
             <StatusScreen
                 icon={<SearchXIcon />}
                 title="Page not found"

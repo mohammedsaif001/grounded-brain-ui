@@ -10,7 +10,7 @@ export default function AppError({
     unstable_retry: () => void;
 }) {
     return (
-        <div className="flex min-h-svh flex-col">
+        <div className="bg-page flex min-h-svh flex-col">
             <RouteError error={error} retry={unstable_retry} />
         </div>
     );
