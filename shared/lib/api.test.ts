@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { ApiError, apiPath, parseApiResponse } from "./api";
+import {
+    ApiError,
+    apiPath,
+    parseApiResponse,
+    parsePageResponse,
+} from "./api";
 
 function jsonResponse(body: unknown, status = 200) {
     return new Response(JSON.stringify(body), {
@@ -83,5 +88,55 @@ describe("parseApiResponse", () => {
         ).catch((e) => e);
         expect(error).toBeInstanceOf(ApiError);
         expect(error.status).toBe(502);
+    });
+});
+
+describe("parsePageResponse", () => {
+    const item = z.object({ id: z.string() });
+
+    it("returns the rows together with the pagination meta", async () => {
+        const page = await parsePageResponse(
+            jsonResponse({
+                success: true,
+                data: [{ id: "1" }, { id: "2" }],
+                meta: { total: 9, nextCursor: "2" },
+            }),
+            item,
+        );
+
+        expect(page.items).toEqual([{ id: "1" }, { id: "2" }]);
+        expect(page.meta).toEqual({ total: 9, nextCursor: "2" });
+    });
+
+    it("falls back to a single page when meta is missing", async () => {
+        const page = await parsePageResponse(
+            jsonResponse({ success: true, data: [{ id: "1" }] }),
+            item,
+        );
+
+        expect(page.meta).toEqual({ total: 1, nextCursor: null });
+    });
+
+    it("rejects rows that do not match the schema", async () => {
+        const error = await parsePageResponse(
+            jsonResponse({ success: true, data: [{ nope: true }] }),
+            item,
+        ).catch((e) => e);
+
+        expect(error).toBeInstanceOf(ApiError);
+        expect(error.status).toBe(502);
+    });
+
+    it("throws ApiError for failed requests", async () => {
+        const error = await parsePageResponse(
+            jsonResponse(
+                { success: false, error: { message: "Bad cursor" } },
+                400,
+            ),
+            item,
+        ).catch((e) => e);
+
+        expect(error).toBeInstanceOf(ApiError);
+        expect(error.message).toBe("Bad cursor");
     });
 });

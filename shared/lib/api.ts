@@ -1,4 +1,4 @@
-import type { z } from "zod";
+import { z } from "zod";
 
 export class ApiError extends Error {
     constructor(
@@ -20,6 +20,7 @@ export class ApiError extends Error {
 type Envelope = {
     success?: boolean;
     data?: unknown;
+    meta?: unknown;
     error?: { code?: string; message?: string; details?: unknown } | string;
 };
 
@@ -29,39 +30,28 @@ export type ParseOptions<T> = {
     fallbackMessage?: string;
 };
 
-/**
- * Reads a fetch response, unwraps the API envelope and validates it.
- *
- * Throws {@link ApiError} for non-2xx responses and for payloads that do not match
- * `schema`, so contract drift fails loudly at the boundary instead of deep in the UI.
- */
-export async function parseApiResponse<T = void>(
+function throwForFailure(
     response: Response,
-    { schema, fallbackMessage = "Request failed" }: ParseOptions<T> = {},
-): Promise<T> {
-    if (response.status === 204) {
-        return undefined as T;
+    body: Envelope | null,
+    fallbackMessage: string,
+): void {
+    if (response.ok) {
+        return;
     }
 
-    const body = (await response.json().catch(() => null)) as Envelope | null;
+    const error = body?.error;
+    throw new ApiError(
+        response.status,
+        (typeof error === "string" ? error : error?.message) ?? fallbackMessage,
+        typeof error === "object" ? error?.details : undefined,
+    );
+}
 
-    if (!response.ok) {
-        const error = body?.error;
-        throw new ApiError(
-            response.status,
-            (typeof error === "string" ? error : error?.message) ??
-                fallbackMessage,
-            typeof error === "object" ? error?.details : undefined,
-        );
-    }
-
-    const payload =
-        body && typeof body === "object" && "data" in body ? body.data : body;
-
-    if (!schema) {
-        return payload as T;
-    }
-
+function validate<T>(
+    response: Response,
+    payload: unknown,
+    schema: z.ZodType<T>,
+): T {
     const result = schema.safeParse(payload);
     if (!result.success) {
         if (process.env.NODE_ENV !== "production") {
@@ -78,6 +68,62 @@ export async function parseApiResponse<T = void>(
     }
 
     return result.data;
+}
+
+/**
+ * Reads a fetch response, unwraps the API envelope and validates it.
+ *
+ * Throws {@link ApiError} for non-2xx responses and for payloads that do not match
+ * `schema`, so contract drift fails loudly at the boundary instead of deep in the UI.
+ */
+export async function parseApiResponse<T = void>(
+    response: Response,
+    { schema, fallbackMessage = "Request failed" }: ParseOptions<T> = {},
+): Promise<T> {
+    if (response.status === 204) {
+        return undefined as T;
+    }
+
+    const body = (await response.json().catch(() => null)) as Envelope | null;
+    throwForFailure(response, body, fallbackMessage);
+
+    const payload =
+        body && typeof body === "object" && "data" in body ? body.data : body;
+
+    return schema ? validate(response, payload, schema) : (payload as T);
+}
+
+/** The `meta` block the API adds to paginated lists. */
+export const pageMetaSchema = z.object({
+    /** Rows matching the filters across every page. */
+    total: z.number(),
+    /** Id to pass as `cursor` for the next page; `null` on the last page. */
+    nextCursor: z.string().nullable(),
+});
+
+export type PageMeta = z.infer<typeof pageMetaSchema>;
+
+export type Page<T> = { items: T[]; meta: PageMeta };
+
+/** Like {@link parseApiResponse} for list endpoints that return `{ data: [], meta }`. */
+export async function parsePageResponse<T>(
+    response: Response,
+    itemSchema: z.ZodType<T>,
+    fallbackMessage = "Request failed",
+): Promise<Page<T>> {
+    const body = (await response.json().catch(() => null)) as Envelope | null;
+    throwForFailure(response, body, fallbackMessage);
+
+    const items = validate(response, body?.data, z.array(itemSchema));
+    // Without `limit` the API still sends `meta`, but tolerate its absence.
+    const meta = pageMetaSchema.safeParse(body?.meta);
+
+    return {
+        items,
+        meta: meta.success
+            ? meta.data
+            : { total: items.length, nextCursor: null },
+    };
 }
 
 export type ApiFetchOptions<T> = Omit<RequestInit, "body"> & {
@@ -110,6 +156,19 @@ export async function apiFetch<T = void>(
     });
 
     return parseApiResponse(response, { schema });
+}
+
+/** Browser-side call to a paginated list endpoint; returns the rows with their `meta`. */
+export async function apiFetchPage<T>(
+    path: string,
+    itemSchema: z.ZodType<T>,
+): Promise<Page<T>> {
+    const response = await fetch(path, {
+        credentials: "include",
+        headers: { accept: "application/json" },
+    });
+
+    return parsePageResponse(response, itemSchema);
 }
 
 /**
