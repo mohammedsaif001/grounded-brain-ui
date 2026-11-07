@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { SearchXIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandedPage } from "@/shared/components/branded-page";
 import { routes } from "@/shared/config/routes";
 import { StatusScreen } from "@/shared/components/status-screen";
 
 export default function NotFound() {
     return (
-        <div className="bg-page flex min-h-svh flex-col">
+        <BrandedPage>
             <StatusScreen
                 icon={<SearchXIcon />}
                 title="Page not found"
@@ -20,6 +21,6 @@ export default function NotFound() {
                     </Button>
                 }
             />
-        </div>
+        </BrandedPage>
     );
 }
