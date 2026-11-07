@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { workspaceKeys } from "@/features/workspaces/hooks/use-workspaces";
 import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import {
     useInvalidatingMutation,
@@ -94,7 +95,12 @@ function useAddSourceMutation<TInput>(
 ) {
     return useInvalidatingMutation({
         mutationFn,
-        invalidates: () => [sourceKeys(workspaceId).all],
+        invalidates: () => [
+            sourceKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+            // Notebook cards show these counts.
+            workspaceKeys.lists(),
+        ],
         ...options,
     });
 }
@@ -177,7 +183,12 @@ export function useDeleteSource(
             queryClient.removeQueries({
                 queryKey: sourceKeys(workspaceId).detail(sourceId),
             }),
-        invalidates: () => [sourceKeys(workspaceId).all],
+        invalidates: () => [
+            sourceKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+            // Notebook cards show these counts.
+            workspaceKeys.lists(),
+        ],
         ...options,
     });
 }
@@ -189,7 +200,12 @@ export function useBulkDeleteSources(
     return useInvalidatingMutation({
         mutationFn: (sourceIds: string[]) =>
             bulkDeleteSources(workspaceId, sourceIds),
-        invalidates: () => [sourceKeys(workspaceId).all],
+        invalidates: () => [
+            sourceKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+            // Notebook cards show these counts.
+            workspaceKeys.lists(),
+        ],
         ...options,
     });
 }
@@ -201,7 +217,12 @@ export function useReprocessSources(
     return useInvalidatingMutation({
         mutationFn: (sourceIds?: string[]) =>
             reprocessSources(workspaceId, sourceIds),
-        invalidates: () => [sourceKeys(workspaceId).all],
+        invalidates: () => [
+            sourceKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+            // Notebook cards show these counts.
+            workspaceKeys.lists(),
+        ],
         ...options,
     });
 }
@@ -212,7 +233,12 @@ export function useReprocessSource(
 ) {
     return useInvalidatingMutation({
         mutationFn: (sourceId: string) => reprocessSource(workspaceId, sourceId),
-        invalidates: () => [sourceKeys(workspaceId).all],
+        invalidates: () => [
+            sourceKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+            // Notebook cards show these counts.
+            workspaceKeys.lists(),
+        ],
         ...options,
     });
 }
@@ -224,7 +250,12 @@ export function useSyncGithubSource(
     return useInvalidatingMutation({
         mutationFn: (sourceId: string) =>
             syncGithubSource(workspaceId, sourceId),
-        invalidates: () => [sourceKeys(workspaceId).all],
+        invalidates: () => [
+            sourceKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+            // Notebook cards show these counts.
+            workspaceKeys.lists(),
+        ],
         ...options,
     });
 }

@@ -10,7 +10,7 @@ import {
     SparklesIcon,
     type LucideIcon,
 } from "lucide-react";
-import { SourceSidebarList, useSources } from "@/features/sources";
+import { SourceSidebarList } from "@/features/sources";
 import { Button } from "@/components/ui/button";
 import {
     Sidebar,
@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AppLogo } from "@/shared/components/brand/app-logo";
 import { routes } from "@/shared/config/routes";
+import { useWorkspaceSummary } from "../hooks/use-workspaces";
 import type { Workspace } from "../lib/types";
 import type { WorkspaceSection } from "../lib/workspace-sections";
 import { WorkspaceIcon } from "./workspace-icon";
@@ -76,9 +77,9 @@ export function WorkspaceSidebar({
     activeSection,
     onAddSource,
 }: WorkspaceSidebarProps) {
-    // Same query key as SourceSidebarList, so this costs no extra request.
-    const { data: sources } = useSources(workspace.id);
-    const sourceCount = sources?.length;
+    const { data: summary } = useWorkspaceSummary(workspace.id);
+    const sourceCount = summary?.sourceCount;
+    const hasUnseenLearning = (summary?.unseenArtifactCount ?? 0) > 0;
 
     return (
         <Sidebar>
@@ -140,6 +141,18 @@ export function WorkspaceSidebar({
                                             sourceCount ? (
                                                 <span className="text-caption ml-auto tabular-nums">
                                                     {sourceCount}
+                                                </span>
+                                            ) : null}
+                                            {item.section === "learn" &&
+                                            hasUnseenLearning ? (
+                                                <span className="ml-auto flex items-center">
+                                                    <span
+                                                        aria-hidden="true"
+                                                        className="size-2 rounded-full bg-primary"
+                                                    />
+                                                    <span className="sr-only">
+                                                        New study material
+                                                    </span>
                                                 </span>
                                             ) : null}
                                         </SidebarMenuButton>

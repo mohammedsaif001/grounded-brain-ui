@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { workspaceKeys } from "@/features/workspaces/hooks/use-workspaces";
 import {
     useInvalidatingMutation,
     type MutationHookOptions,
@@ -53,7 +54,12 @@ export function useCreateArtifact(
     return useInvalidatingMutation({
         mutationFn: (input: CreateArtifactInput) =>
             createArtifact(workspaceId, input),
-        invalidates: () => [artifactKeys(workspaceId).all],
+        invalidates: () => [
+            artifactKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+            // Notebook cards show these counts.
+            workspaceKeys.lists(),
+        ],
         ...options,
     });
 }
@@ -69,7 +75,12 @@ export function useDeleteArtifact(
             queryClient.removeQueries({
                 queryKey: artifactKeys(workspaceId).detail(artifactId),
             }),
-        invalidates: () => [artifactKeys(workspaceId).all],
+        invalidates: () => [
+            artifactKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+            // Notebook cards show these counts.
+            workspaceKeys.lists(),
+        ],
         ...options,
     });
 }

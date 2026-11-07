@@ -40,6 +40,25 @@ export function useWorkspaces(params: WorkspaceListParams = {}) {
     });
 }
 
+const SUMMARY_POLL_INTERVAL_MS = 5_000;
+
+/**
+ * Sidebar counts and the Learn activity dot. Four cheap COUNT queries server-side.
+ * It polls only while an artifact is generating, so the dot appears on its own.
+ * Source and artifact mutations invalidate it. It does not poll for unfinished
+ * sources: a FAILED source never becomes READY and would poll forever.
+ */
+export function useWorkspaceSummary(workspaceId: string) {
+    return useQuery({
+        queryKey: workspaceKeys.summary(workspaceId),
+        queryFn: () => getWorkspaceSummary(workspaceId),
+        refetchInterval: (query) =>
+            (query.state.data?.processingArtifactCount ?? 0) > 0
+                ? SUMMARY_POLL_INTERVAL_MS
+                : false,
+    });
+}
+
 export function useWorkspace(workspaceId: string) {
     return useQuery({
         queryKey: workspaceKeys.detail(workspaceId),
