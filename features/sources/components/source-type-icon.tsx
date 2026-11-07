@@ -12,7 +12,8 @@ import { TypeTile } from "@/shared/components/type-tile";
 import type { Tone } from "@/shared/components/tint";
 import type { SourceType } from "../lib/types";
 
-const iconMap: Record<SourceType, LucideIcon> = {
+/** Single source of truth for which icon represents each source type. */
+export const SOURCE_TYPE_ICONS: Record<SourceType, LucideIcon> = {
     PDF: FileTextIcon,
     WEBSITE: GlobeIcon,
     YOUTUBE: VideoIcon,
@@ -37,7 +38,7 @@ type SourceTypeIconProps = {
 
 /** Bare icon, for inline use next to text. */
 export function SourceTypeIcon({ type, className }: SourceTypeIconProps) {
-    const Icon = iconMap[type];
+    const Icon = SOURCE_TYPE_ICONS[type];
     return <Icon className={cn("size-4 shrink-0", className)} />;
 }
 
@@ -51,7 +52,7 @@ type SourceTypeTileProps = {
 export function SourceTypeTile({ type, size, className }: SourceTypeTileProps) {
     return (
         <TypeTile
-            icon={iconMap[type]}
+            icon={SOURCE_TYPE_ICONS[type]}
             tone={toneMap[type]}
             size={size}
             className={className}
