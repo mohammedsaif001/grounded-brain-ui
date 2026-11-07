@@ -1,9 +1,31 @@
 import { apiFetch, apiPath } from "@/shared/lib/api";
-import { workspaceListSchema, workspaceSchema } from "./schemas";
-import type { CreateWorkspaceInput, UpdateWorkspaceInput } from "./types";
+import {
+    workspaceListSchema,
+    workspaceSchema,
+    workspaceSummarySchema,
+} from "./schemas";
+import type {
+    CreateWorkspaceInput,
+    UpdateWorkspaceInput,
+    WorkspaceListParams,
+} from "./types";
 
-export function listWorkspaces() {
-    return apiFetch("/api/workspaces", { schema: workspaceListSchema });
+export function listWorkspaces({ q, sort, order }: WorkspaceListParams = {}) {
+    const params = new URLSearchParams();
+    if (q?.trim()) params.set("q", q.trim());
+    if (sort) params.set("sort", sort);
+    if (order) params.set("order", order);
+    const query = params.toString();
+
+    return apiFetch(`/api/workspaces${query ? `?${query}` : ""}`, {
+        schema: workspaceListSchema,
+    });
+}
+
+export function getWorkspaceSummary(workspaceId: string) {
+    return apiFetch(apiPath`/api/workspaces/${workspaceId}/summary`, {
+        schema: workspaceSummarySchema,
+    });
 }
 
 export function getWorkspace(workspaceId: string) {
