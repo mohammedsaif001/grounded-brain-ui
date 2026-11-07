@@ -1,7 +1,9 @@
 import type { z } from "zod";
 import type {
+    bulkDeleteResultSchema,
     githubFilesResponseSchema,
     githubSyncResultSchema,
+    reprocessManyResultSchema,
     sourceChunkSchema,
     sourceChunksResponseSchema,
     sourceSchema,
@@ -17,6 +19,16 @@ export type SourceChunksResponse = z.infer<typeof sourceChunksResponseSchema>;
 export type GithubFilesResponse = z.infer<typeof githubFilesResponseSchema>;
 export type GithubFile = GithubFilesResponse["files"][number];
 export type GithubSyncResult = z.infer<typeof githubSyncResultSchema>;
+
+export type BulkDeleteResult = z.infer<typeof bulkDeleteResultSchema>;
+export type ReprocessManyResult = z.infer<typeof reprocessManyResultSchema>;
+
+export type SourcePageParams = {
+    /** 1-100. */
+    limit: number;
+    /** The previous page's `meta.nextCursor`. */
+    cursor?: string;
+};
 
 export type SourceFilters = {
     q?: string;
