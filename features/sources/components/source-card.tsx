@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { formatDistanceToNow } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { routes } from "@/shared/config/routes";
 import { SOURCE_TYPE_LABELS } from "../lib/constants";
+import { describeSource } from "../lib/source-metadata";
 import type { Source } from "../lib/types";
 import { SourceRowActions } from "./source-row-actions";
 import { SourceStatusBadge } from "./source-status-badge";
@@ -55,9 +55,7 @@ export function SourceCard({
                         </h3>
                         <p className="text-caption truncate">
                             {SOURCE_TYPE_LABELS[source.type]} ·{" "}
-                            {formatDistanceToNow(new Date(source.createdAt), {
-                                addSuffix: true,
-                            })}
+                            {describeSource(source)}
                         </p>
                     </div>
                 </div>

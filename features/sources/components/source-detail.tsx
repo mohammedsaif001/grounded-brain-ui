@@ -12,6 +12,7 @@ import { ApiError } from "@/shared/lib/api";
 import { routes } from "@/shared/config/routes";
 import { useSource } from "../hooks/use-sources";
 import { SOURCE_TYPE_LABELS } from "../lib/constants";
+import { describeSourceFacts } from "../lib/source-metadata";
 import { GithubSourcePanel } from "./github-source-panel";
 import { MarkdownPreview } from "./markdown-preview";
 import { SourceStatusBadge } from "./source-status-badge";
@@ -73,6 +74,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
     }
 
     const metadata = source.metadata ?? {};
+    const factsLine = describeSourceFacts(source);
     const fileUrl =
         typeof metadata.fileUrl === "string" ? metadata.fileUrl : null;
     const fileName =
@@ -119,6 +121,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
                         {chunkCount != null
                             ? ` · ${chunkCount} chunks indexed`
                             : null}
+                        {factsLine ? ` · ${factsLine}` : null}
                     </p>
                 </div>
             </header>
