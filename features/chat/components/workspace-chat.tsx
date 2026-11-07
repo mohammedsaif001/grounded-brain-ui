@@ -352,14 +352,29 @@ export function WorkspaceChat({
                     />
                 </div>
 
-                <ChatSidePanel workspaceId={workspaceId} />
+                <ChatSidePanel
+                    workspaceId={workspaceId}
+                    conversationId={conversationId}
+                    hasMessages={messages.length > 0}
+                    isStreaming={isStreaming}
+                />
             </div>
         </CitationSelectionProvider>
     );
 }
 
 /** Right column: the opened citation passage (when any) and the Learn prompt. */
-function ChatSidePanel({ workspaceId }: { workspaceId: string }) {
+function ChatSidePanel({
+    workspaceId,
+    conversationId,
+    hasMessages,
+    isStreaming,
+}: {
+    workspaceId: string;
+    conversationId: string | null;
+    hasMessages: boolean;
+    isStreaming: boolean;
+}) {
     const selection = useCitationSelection();
 
     return (
@@ -371,7 +386,12 @@ function ChatSidePanel({ workspaceId }: { workspaceId: string }) {
                     onClose={selection.clear}
                 />
             ) : null}
-            <LearnPromptCard workspaceId={workspaceId} />
+            <LearnPromptCard
+                workspaceId={workspaceId}
+                conversationId={conversationId}
+                hasMessages={hasMessages}
+                isStreaming={isStreaming}
+            />
         </aside>
     );
 }
