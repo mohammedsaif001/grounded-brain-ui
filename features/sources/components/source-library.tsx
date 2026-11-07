@@ -46,6 +46,8 @@ import { SourceTable } from "./source-table";
 
 type SourceLibraryProps = {
     workspaceId: string;
+    /** Named in the add-source dialog subtitle. */
+    workspaceTitle?: string;
 };
 
 const TYPE_OPTIONS = SOURCE_TYPES.map((value) => ({
@@ -76,7 +78,10 @@ function summarize(sources: readonly Source[]): string {
     return parts.join(" · ");
 }
 
-export function SourceLibrary({ workspaceId }: SourceLibraryProps) {
+export function SourceLibrary({
+    workspaceId,
+    workspaceTitle,
+}: SourceLibraryProps) {
     const [view, setView] = useState<ViewMode>("list");
     const [addOpen, setAddOpen] = useState(false);
     const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(
@@ -386,6 +391,7 @@ export function SourceLibrary({ workspaceId }: SourceLibraryProps) {
 
             <AddSourceDialog
                 workspaceId={workspaceId}
+                workspaceTitle={workspaceTitle}
                 open={addOpen}
                 onOpenChange={setAddOpen}
             />
