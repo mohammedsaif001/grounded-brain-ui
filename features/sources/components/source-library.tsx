@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/components/ui/toast";
 import { BulkActionBar } from "@/shared/components/bulk-action-bar";
 import { EmptyState } from "@/shared/components/empty-state";
 import { FilterSelect } from "@/shared/components/filter-select";
@@ -30,8 +31,13 @@ import {
     useBulkDeleteSources,
     useDeleteSource,
     useReprocessSources,
-    useSources,
+    useSourcesPage,
 } from "../hooks/use-sources";
+import {
+    summarizeBulkDelete,
+    summarizeReprocess,
+    type BulkOutcome,
+} from "../lib/bulk-results";
 import {
     SOURCE_STATUS_LABELS,
     SOURCE_STATUSES,
@@ -65,11 +71,18 @@ type PendingDelete =
     | { kind: "one"; source: Source }
     | { kind: "many"; ids: string[] };
 
-function summarize(sources: readonly Source[]): string {
+function showOutcome({ tone, title, description }: BulkOutcome) {
+    toast.add({ type: tone, title, description });
+}
+
+/** Status breakdown of the loaded rows, prefixed with how many of the total are loaded. */
+function summarize(sources: readonly Source[], total: number): string {
     const count = (status: Source["status"]) =>
         sources.filter((source) => source.status === status).length;
     const parts = [
-        `${sources.length} source${sources.length === 1 ? "" : "s"}`,
+        sources.length < total
+            ? `Showing ${sources.length} of ${total}`
+            : `${total} source${total === 1 ? "" : "s"}`,
         `${count("READY")} ready`,
     ];
     if (count("PROCESSING")) parts.push(`${count("PROCESSING")} processing`);
@@ -92,7 +105,15 @@ export function SourceLibrary({
         () => new Set(),
     );
 
-    const { data: sources, isLoading, error } = useSources(workspaceId, filters);
+    const {
+        sources,
+        total = 0,
+        isLoading,
+        error,
+        hasNextPage,
+        isFetchingNextPage,
+        fetchNextPage,
+    } = useSourcesPage(workspaceId, filters);
     const deleteSource = useDeleteSource(workspaceId);
     const bulkDelete = useBulkDeleteSources(workspaceId);
     const reprocess = useReprocessSources(workspaceId);
@@ -142,9 +163,20 @@ export function SourceLibrary({
             return;
         }
         bulkDelete.mutate(pendingDelete.ids, {
-            onSuccess: () => {
+            onSuccess: (result) => {
                 setPendingDelete(null);
                 clearSelection();
+                showOutcome(summarizeBulkDelete(result));
+            },
+        });
+    }
+
+    /** Reprocess some ids (or every failed source when none are given) and report per-id results. */
+    function reprocessSources(ids?: string[], onDone?: () => void) {
+        reprocess.mutate(ids, {
+            onSuccess: (result) => {
+                onDone?.();
+                showOutcome(summarizeReprocess(result));
             },
         });
     }
@@ -161,7 +193,7 @@ export function SourceLibrary({
                 title="Your source library"
                 description={
                     sources
-                        ? `${sources.length} source${sources.length === 1 ? "" : "s"} in this workspace`
+                        ? `${total} source${total === 1 ? "" : "s"}${hasActiveFilters ? " match" : " in this workspace"}`
                         : "All knowledge sources in this workspace"
                 }
                 actions={
@@ -229,7 +261,7 @@ export function SourceLibrary({
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem
                                     disabled={reprocess.isPending}
-                                    onClick={() => reprocess.mutate(undefined)}
+                                    onClick={() => reprocessSources()}
                                 >
                                     <RefreshCwIcon />
                                     Reprocess failed ({failedCount})
@@ -265,9 +297,7 @@ export function SourceLibrary({
                         variant="ghost"
                         disabled={reprocess.isPending}
                         onClick={() =>
-                            reprocess.mutate([...visibleSelected], {
-                                onSuccess: clearSelection,
-                            })
+                            reprocessSources([...visibleSelected], clearSelection)
                         }
                     >
                         {reprocess.isPending ? (
@@ -332,7 +362,7 @@ export function SourceLibrary({
                         onDelete={(source) =>
                             setPendingDelete({ kind: "one", source })
                         }
-                        onReprocess={(source) => reprocess.mutate([source.id])}
+                        onReprocess={(source) => reprocessSources([source.id])}
                     />
                 ) : (
                     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -353,7 +383,7 @@ export function SourceLibrary({
                                 onReprocess={
                                     source.status === "FAILED"
                                         ? (target) =>
-                                              reprocess.mutate([target.id])
+                                              reprocessSources([target.id])
                                         : undefined
                                 }
                             />
@@ -382,9 +412,22 @@ export function SourceLibrary({
                 </EmptyState>
             )}
 
+            {hasNextPage ? (
+                <div className="flex justify-center">
+                    <Button
+                        variant="outline"
+                        disabled={isFetchingNextPage}
+                        onClick={() => void fetchNextPage()}
+                    >
+                        {isFetchingNextPage ? <Spinner /> : null}
+                        Load more
+                    </Button>
+                </div>
+            ) : null}
+
             {sources && sources.length > 0 ? (
                 <footer className="text-caption flex flex-wrap items-center justify-between gap-2">
-                    <span>{summarize(sources)}</span>
+                    <span>{summarize(sources, total)}</span>
                     <span>Ready sources are available in Chat &amp; Learn</span>
                 </footer>
             ) : null}
