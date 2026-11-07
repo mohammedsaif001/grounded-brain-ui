@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { workspaceKeys } from "@/features/workspaces/hooks/use-workspaces";
 import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import {
@@ -18,6 +18,7 @@ import {
     importWebsiteSource,
     importYoutubeSource,
     listSources,
+    listSourcesPage,
     reprocessSource,
     reprocessSources,
     syncGithubSource,
@@ -40,6 +41,8 @@ export function sourceKeys(workspaceId: string) {
     return {
         all,
         list: (filters: SourceFilters = {}) => [...all, "list", filters] as const,
+        pages: (filters: SourceFilters = {}) =>
+            [...all, "pages", filters] as const,
         detail: (sourceId: string) => [...all, "detail", sourceId] as const,
         githubFiles: (sourceId: string) =>
             [...all, "detail", sourceId, "github-files"] as const,
@@ -64,6 +67,47 @@ export function useSources(workspaceId: string, filters: SourceFilters = {}) {
         refetchInterval: (query) =>
             query.state.data?.some(isIngesting) ? POLL_INTERVAL_MS : false,
     });
+}
+
+/** Rows per request in the library; "Load more" fetches the next page. */
+export const SOURCE_PAGE_SIZE = 25;
+
+/**
+ * The library's paged list. `total` counts every row matching the filters across all
+ * pages; `sources` is what has been loaded so far.
+ */
+export function useSourcesPage(
+    workspaceId: string,
+    filters: SourceFilters = {},
+) {
+    const debouncedQuery = useDebouncedValue(filters.q ?? "", 300);
+    const queryFilters: SourceFilters = {
+        ...filters,
+        q: debouncedQuery || undefined,
+    };
+
+    const query = useInfiniteQuery({
+        queryKey: sourceKeys(workspaceId).pages(queryFilters),
+        queryFn: ({ pageParam }) =>
+            listSourcesPage(workspaceId, queryFilters, {
+                limit: SOURCE_PAGE_SIZE,
+                cursor: pageParam,
+            }),
+        initialPageParam: undefined as string | undefined,
+        // A null cursor marks the last page.
+        getNextPageParam: (lastPage) => lastPage.meta.nextCursor ?? undefined,
+        refetchInterval: (state) =>
+            state.state.data?.pages.some((page) => page.items.some(isIngesting))
+                ? POLL_INTERVAL_MS
+                : false,
+    });
+
+    const pages = query.data?.pages;
+    return {
+        ...query,
+        sources: pages?.flatMap((page) => page.items),
+        total: pages?.at(-1)?.meta.total,
+    };
 }
 
 export function useSource(workspaceId: string, sourceId: string) {
