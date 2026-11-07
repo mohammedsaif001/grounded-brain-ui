@@ -116,7 +116,7 @@ export function SubmitFooter({
     const { onCancel } = useContext(SourceFormContext);
 
     return (
-        <div className="space-y-4 pt-1">
+        <div className="space-y-4 pt-1 short:space-y-3">
             <p className="text-caption flex items-center gap-2">
                 <ShieldCheckIcon aria-hidden="true" className="size-4 shrink-0" />
                 Sources are private. We extract passages so you can verify every

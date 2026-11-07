@@ -12,7 +12,7 @@ export default async function LoginPage() {
 
     return (
         <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
-            <section className="space-y-6">
+            <section className="space-y-6 short:space-y-4">
                 <p className="text-eyebrow">A quieter space for big ideas</p>
                 <h1 className="text-display text-foreground">
                     Collect knowledge. Grow understanding.
@@ -22,7 +22,7 @@ export default async function LoginPage() {
                     that stay with you. Always rooted in your sources.
                 </p>
 
-                <figure className="relative hidden aspect-[2/1] max-w-xl overflow-hidden rounded-3xl shadow-raised md:block">
+                <figure className="relative hidden h-[clamp(9rem,28svh,18rem)] max-w-xl overflow-hidden rounded-3xl shadow-raised md:block">
                     <Image
                         src="/images/login-hero.svg"
                         alt="A glass book with leaves growing from its pages"

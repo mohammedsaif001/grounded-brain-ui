@@ -7,6 +7,9 @@
 @source "../node_modules/@streamdown/code/dist/*.js";
 
 @custom-variant dark (&:is(.dark *));
+/* Laptop-height viewports (e.g. 1366x768, or 1080p at 125-150% scaling): tighten vertical
+   spacing so single-screen pages and dialogs fit without scrolling. */
+@custom-variant short (@media (max-height: 820px));
 
 @theme inline {
   /* Typography — families are loaded in app/layout.tsx via next/font. */

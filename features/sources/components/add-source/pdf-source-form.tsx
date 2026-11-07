@@ -55,7 +55,7 @@ export function PdfSourceForm({
 
     return (
         <form
-            className="grid gap-4 pt-4"
+            className="grid gap-4 pt-4 short:gap-3 short:pt-3"
             onSubmit={(event) => {
                 event.preventDefault();
                 if (!file) {
@@ -89,7 +89,7 @@ export function PdfSourceForm({
                     if (!isPending) pick(event.dataTransfer.files?.[0] ?? null);
                 }}
                 className={cn(
-                    "flex flex-col items-center gap-3 rounded-2xl border border-dashed px-6 py-10 text-center transition-colors",
+                    "flex flex-col items-center gap-3 rounded-2xl border border-dashed px-6 py-10 short:py-6 text-center transition-colors",
                     dragging
                         ? "border-ring bg-accent/50"
                         : "border-border bg-card/40",

@@ -58,7 +58,7 @@ export function AddSourceDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-2xl">
+            <DialogContent className="max-h-[calc(100svh-2rem)] overflow-y-auto short:gap-4 short:p-5 sm:max-w-2xl">
                 <DialogHeader className="gap-2 pr-10">
                     <DialogTitle className="text-title">
                         Give your ideas a starting point.
@@ -79,7 +79,7 @@ export function AddSourceDialog({
                                     <TabsTrigger
                                         key={type}
                                         value={type}
-                                        className="h-auto flex-col gap-1.5 px-2 py-3 text-xs"
+                                        className="h-auto flex-col gap-1.5 px-2 py-3 text-xs short:py-2"
                                     >
                                         <Icon aria-hidden="true" className="size-5" />
                                         {SOURCE_TYPE_LABELS[type]}

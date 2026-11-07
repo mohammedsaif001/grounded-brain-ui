@@ -89,7 +89,7 @@ export function LoginForm({
 
     return (
         <div className={cn("w-full max-w-lg lg:justify-self-end", className)} {...props}>
-            <Card className="rounded-3xl shadow-raised [--card-spacing:--spacing(8)]">
+            <Card className="rounded-3xl shadow-raised [--card-spacing:--spacing(8)] short:[--card-spacing:--spacing(6)]">
                 <CardHeader className="gap-2">
                     <CardTitle className="text-title">
                         Welcome to your studio
@@ -99,7 +99,7 @@ export function LoginForm({
                         questions and your next idea.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 short:space-y-4">
                     <form
                         onSubmit={(event) => {
                             event.preventDefault();
@@ -127,7 +127,7 @@ export function LoginForm({
                         ) : null}
                     </form>
 
-                    <ul className="space-y-3">
+                    <ul className="space-y-3 short:space-y-2">
                         {HIGHLIGHTS.map(({ icon: Icon, label }) => (
                             <li
                                 key={label}
@@ -142,7 +142,7 @@ export function LoginForm({
                         ))}
                     </ul>
 
-                    <div className="space-y-4 border-t pt-5">
+                    <div className="space-y-4 border-t pt-5 short:space-y-2 short:pt-3">
                         <p className="text-caption">
                             By continuing, you agree to our Terms of service
                             and Privacy policy. Your notebooks stay private to
