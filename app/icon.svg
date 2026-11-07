@@ -1,14 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
   <title>Grounded Brain</title>
-  <rect width="32" height="32" rx="8" fill="#d4ed9a"/>
-  <g transform="translate(4 4)" stroke="#1f3a12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 18V5"/>
-    <path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"/>
-    <path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"/>
-    <path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"/>
-    <path d="M18 18a4 4 0 0 0 2-7.464"/>
-    <path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"/>
-    <path d="M6 18a4 4 0 0 1-2-7.464"/>
-    <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"/>
+  <defs>
+    <linearGradient id="bg" x1="4" y1="2" x2="36" y2="38" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e9f7bf"/>
+      <stop offset="1" stop-color="#a9d65a"/>
+    </linearGradient>
+  </defs>
+  <rect width="40" height="40" rx="11" fill="url(#bg)"/>
+  <g stroke="#1f3a12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+    <path d="M11 21 16 13 24 12 29 20 25 29 15 30 11 21Z"/>
+    <path d="M20 21 16 13M20 21 29 20M20 21 15 30M20 21 25 29M20 21 11 21M20 21 24 12"/>
   </g>
+  <g fill="#1f3a12">
+    <circle cx="11" cy="21" r="2"/>
+    <circle cx="16" cy="13" r="2"/>
+    <circle cx="24" cy="12" r="2"/>
+    <circle cx="29" cy="20" r="2"/>
+    <circle cx="25" cy="29" r="2"/>
+    <circle cx="15" cy="30" r="2"/>
+    <circle cx="20" cy="21" r="3.6"/>
+  </g>
+  <circle cx="20" cy="21" r="1.4" fill="#e9f7bf"/>
+  <path d="M32.5 4.5c.4 2.2 1.3 3.1 3.5 3.5-2.2.4-3.1 1.3-3.5 3.5-.4-2.2-1.3-3.1-3.5-3.5 2.2-.4 3.1-1.3 3.5-3.5Z" fill="#1f3a12"/>
 </svg>
