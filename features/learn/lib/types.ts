@@ -1,6 +1,7 @@
 import type { z } from "zod";
 import type {
     artifactContentSchemas,
+    artifactCitationSchema,
     artifactStatusSchema,
     artifactTypeSchema,
     flashcardSchema,
@@ -30,6 +31,7 @@ export function isUnseenArtifact(
     return artifact.status === "READY" && artifact.viewedAt === null;
 }
 
+export type ArtifactCitation = z.infer<typeof artifactCitationSchema>;
 export type Flashcard = z.infer<typeof flashcardSchema>;
 export type QuizQuestion = z.infer<typeof quizQuestionSchema>;
 export type MindMapNode = z.infer<typeof mindMapNodeSchema>;

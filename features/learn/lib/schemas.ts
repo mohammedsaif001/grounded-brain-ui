@@ -54,9 +54,23 @@ function lenientList<T extends z.ZodType>(item: T) {
 
 const text = z.string().catch("");
 
+/**
+ * Which source an item is based on. `marker` is the source's number in the generation
+ * context (the `[n]` in a summary). The model picks these, so treat them as "based on",
+ * and expect `[]`: older artifacts and conversation-based ones have none.
+ */
+export const artifactCitationSchema = z.object({
+    marker: z.number().int(),
+    sourceId: z.string(),
+    label: z.string(),
+});
+
+const citations = lenientList(artifactCitationSchema);
+
 export const flashcardSchema = z.object({
     front: z.string(),
     back: z.string(),
+    citations,
 });
 
 export const quizQuestionSchema = z
@@ -65,6 +79,7 @@ export const quizQuestionSchema = z
         options: z.array(z.string()).min(2),
         correctIndex: z.number().int().nonnegative(),
         explanation: z.string().catch(""),
+        citations,
     })
     .refine((question) => question.correctIndex < question.options.length, {
         message: "correctIndex out of range",
@@ -95,7 +110,8 @@ export const wikiContentSchema = z.object({
 });
 
 export const artifactContentSchemas = {
-    SUMMARY: z.object({ markdown: text }),
+    // `markdown` carries inline [n] markers that point at `citations`.
+    SUMMARY: z.object({ markdown: text, citations }),
     TAKEAWAYS: z.object({ items: lenientList(z.string()) }),
     FLASHCARDS: z.object({ cards: lenientList(flashcardSchema) }),
     QUIZ: z.object({ questions: lenientList(quizQuestionSchema) }),
@@ -106,7 +122,7 @@ export const artifactContentSchemas = {
     REPORT: z.object({
         markdown: text,
         sections: lenientList(
-            z.object({ title: z.string(), content: z.string() }),
+            z.object({ title: z.string(), content: z.string(), citations }),
         ),
     }),
     WIKI: wikiContentSchema,

@@ -23,8 +23,8 @@ describe("parseArtifactContent", () => {
             type: "FLASHCARDS",
             content: {
                 cards: [
-                    { front: "Q1", back: "A1" },
-                    { front: "Q2", back: "A2" },
+                    { front: "Q1", back: "A1", citations: [] },
+                    { front: "Q2", back: "A2", citations: [] },
                 ],
             },
         });

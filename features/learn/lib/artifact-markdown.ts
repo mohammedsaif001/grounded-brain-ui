@@ -1,4 +1,11 @@
-import type { ArtifactContent } from "./types";
+import { formatSourceLabels } from "./citations";
+import type { ArtifactCitation, ArtifactContent } from "./types";
+
+/** `_Source: A, B_` under an item, or nothing when it cites no source. */
+function sourceLine(citations: readonly ArtifactCitation[]): string {
+    const labels = formatSourceLabels(citations);
+    return labels ? `\n_Source: ${labels}_\n` : "";
+}
 
 /**
  * Serialises a validated artifact to portable Markdown for export. Pure: no DOM, no clock.
@@ -10,8 +17,15 @@ export function artifactToMarkdown(
     const heading = `# ${title}\n`;
 
     switch (parsed.type) {
-        case "SUMMARY":
-            return `${heading}\n${parsed.content.markdown.trim()}\n`;
+        case "SUMMARY": {
+            // The body keeps its [n] markers, so the export needs the list they point at.
+            const notes = parsed.content.citations
+                .map((citation) => `${citation.marker}. ${citation.label}`)
+                .join("\n");
+            return `${heading}\n${parsed.content.markdown.trim()}\n${
+                notes ? `\n## Sources\n\n${notes}\n` : ""
+            }`;
+        }
 
         case "TAKEAWAYS":
             return `${heading}\n${parsed.content.items
@@ -22,7 +36,7 @@ export function artifactToMarkdown(
             return `${heading}\n${parsed.content.cards
                 .map(
                     (card, index) =>
-                        `## Card ${index + 1}\n\n**Q:** ${card.front}\n\n**A:** ${card.back}\n`,
+                        `## Card ${index + 1}\n\n**Q:** ${card.front}\n\n**A:** ${card.back}\n${sourceLine(card.citations)}`,
                 )
                 .join("\n")}`;
 
@@ -42,13 +56,16 @@ export function artifactToMarkdown(
                     const explanation = question.explanation
                         ? `\n\n_${question.explanation}_`
                         : "";
-                    return `## Question ${index + 1}\n\n${question.question}\n\n${options}${explanation}\n`;
+                    return `## Question ${index + 1}\n\n${question.question}\n\n${options}${explanation}\n${sourceLine(question.citations)}`;
                 })
                 .join("\n")}`;
 
         case "REPORT": {
             const sections = parsed.content.sections
-                .map((section) => `## ${section.title}\n\n${section.content}\n`)
+                .map(
+                    (section) =>
+                        `## ${section.title}\n\n${section.content}\n${sourceLine(section.citations)}`,
+                )
                 .join("\n");
             return `${heading}\n${parsed.content.markdown.trim()}\n${
                 sections ? `\n${sections}` : ""
