@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { BookOpenTextIcon, ShieldCheckIcon } from "lucide-react";
-import Link from "next/link";
+import {
+    LibraryBigIcon,
+    QuoteIcon,
+    ShieldCheckIcon,
+    SparklesIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +19,8 @@ import {
 } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { signIn } from "../lib/auth-client";
-import { routes, safeRedirectPath } from "@/shared/config/routes";
+import { TypeTile } from "@/shared/components/type-tile";
+import { safeRedirectPath } from "@/shared/config/routes";
 
 function GoogleIcon({ className }: { className?: string }) {
     return (
@@ -44,11 +49,10 @@ function GoogleIcon({ className }: { className?: string }) {
     );
 }
 
-/** What a first-time visitor does after signing in; the full tour lives at /docs. */
-const NEXT_STEPS = [
-    "Sign in with your Google account",
-    "Create a notebook and add your sources",
-    "Chat with citations, then turn it into study material",
+const HIGHLIGHTS = [
+    { icon: LibraryBigIcon, tone: "green", label: "All your sources in one place" },
+    { icon: QuoteIcon, tone: "violet", label: "Answers you can trace and trust" },
+    { icon: SparklesIcon, tone: "amber", label: "Study material made for your mind" },
 ] as const;
 
 export function LoginForm({
@@ -124,35 +128,17 @@ export function LoginForm({
                         ) : null}
                     </form>
 
-                    <div className="space-y-3 short:space-y-2">
-                        <p className="text-eyebrow">What happens next</p>
-                        <ol className="space-y-2.5 short:space-y-1.5">
-                            {NEXT_STEPS.map((label, index) => (
-                                <li
-                                    key={label}
-                                    className="flex items-center gap-3 text-sm"
-                                >
-                                    <span
-                                        aria-hidden="true"
-                                        className="flex size-6 shrink-0 items-center justify-center rounded-full bg-tint-green text-xs font-semibold tabular-nums text-tint-green-foreground"
-                                    >
-                                        {index + 1}
-                                    </span>
-                                    {label}
-                                </li>
-                            ))}
-                        </ol>
-                        <Button
-                            nativeButton={false}
-                            variant="ghost"
-                            size="sm"
-                            className="-ml-2"
-                            render={<Link href={routes.docs} />}
-                        >
-                            <BookOpenTextIcon aria-hidden="true" />
-                            New here? See how it works
-                        </Button>
-                    </div>
+                    <ul className="space-y-3 short:space-y-2">
+                        {HIGHLIGHTS.map(({ icon, tone, label }) => (
+                            <li
+                                key={label}
+                                className="flex items-center gap-3 text-sm font-medium"
+                            >
+                                <TypeTile icon={icon} tone={tone} size="sm" />
+                                {label}
+                            </li>
+                        ))}
+                    </ul>
 
                     <div className="space-y-4 border-t pt-5 short:space-y-2 short:pt-3">
                         <p className="text-caption">

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { QuoteIcon } from "lucide-react";
 import { LoginForm } from "@/features/auth";
+import { GettingStarted } from "@/features/auth/components/getting-started";
 import { redirectIfAuthenticated } from "@/features/auth/server";
 
 export const metadata: Metadata = { title: "Sign in" };
@@ -11,7 +12,8 @@ export default async function LoginPage() {
     await redirectIfAuthenticated();
 
     return (
-        <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 short:gap-4">
+        <div className="grid w-full items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
             <section className="space-y-6 short:space-y-4">
                 <p className="text-eyebrow">A quieter space for big ideas</p>
                 <h1 className="text-display text-foreground">
@@ -41,6 +43,8 @@ export default async function LoginPage() {
             <Suspense>
                 <LoginForm />
             </Suspense>
+        </div>
+        <GettingStarted />
         </div>
     );
 }
