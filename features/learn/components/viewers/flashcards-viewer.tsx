@@ -190,7 +190,7 @@ export function FlashcardsViewer({
     const allKnown = known.size === cards.length;
 
     return (
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-5">
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 short:gap-3">
             <div className="space-y-3">
                 <div className="flex items-center justify-between gap-3">
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-tint-violet px-3 py-1 text-xs font-semibold tabular-nums text-tint-violet-foreground">
@@ -218,7 +218,7 @@ export function FlashcardsViewer({
                 </div>
             </div>
 
-            <div className="relative h-[21rem] perspective-[1600px] sm:h-96">
+            <div className="relative h-[clamp(12rem,calc(100svh-37rem),24rem)] perspective-[1600px] short:h-[clamp(12rem,calc(100svh-31rem),24rem)]">
                 <div
                     aria-hidden
                     className="absolute inset-x-8 top-4 h-full rounded-3xl border border-border/60 bg-tint-violet/40"

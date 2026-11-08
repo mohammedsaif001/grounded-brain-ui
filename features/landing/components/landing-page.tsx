@@ -21,6 +21,7 @@ import { CtaBanner } from "@/shared/components/cta-banner";
 import { TypeTile } from "@/shared/components/type-tile";
 import type { Tone } from "@/shared/components/tint";
 import { routes } from "@/shared/config/routes";
+import { FAQS } from "../lib/faq";
 
 type Feature = {
     icon: LucideIcon;
@@ -316,6 +317,34 @@ export function LandingPage() {
                                 </li>
                             ))}
                         </ol>
+                    </div>
+                </section>
+
+                <section
+                    id="faq"
+                    aria-labelledby="faq-heading"
+                    className="mx-auto max-w-3xl scroll-mt-20 px-4 py-12 md:px-8 md:py-16"
+                >
+                    <div className="space-y-3 text-center">
+                        <p className="text-eyebrow">Questions, answered</p>
+                        <h2 id="faq-heading" className="text-title">
+                            Frequently asked questions
+                        </h2>
+                    </div>
+                    <div className="mt-8 space-y-3">
+                        {FAQS.map((faq) => (
+                            <details
+                                key={faq.question}
+                                className="group rounded-2xl border border-border bg-card px-5 py-4 shadow-surface"
+                            >
+                                <summary className="text-heading cursor-pointer list-none rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/40">
+                                    {faq.question}
+                                </summary>
+                                <p className="text-body mt-3 text-muted-foreground">
+                                    {faq.answer}
+                                </p>
+                            </details>
+                        ))}
                     </div>
                 </section>
 

@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toast";
 import { QueryProvider } from "@/shared/components/providers/query-provider";
 import { ThemeProvider } from "@/shared/components/providers/theme-provider";
+import { getSiteUrl, siteConfig } from "@/shared/config/site";
 
 /** UI text: neutral, highly legible sans. */
 const inter = Inter({
@@ -29,11 +30,51 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: getSiteUrl(),
   title: {
-    default: "Grounded Brain",
-    template: "%s · Grounded Brain",
+    default: `${siteConfig.name}: ${siteConfig.tagline}`,
+    template: `%s · ${siteConfig.name}`,
   },
-  description: "Chat with your sources, grounded in citations.",
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
+  keywords: [...siteConfig.keywords],
+  authors: [{ name: siteConfig.name }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "education",
+  formatDetection: { email: false, address: false, telephone: false },
+  openGraph: {
+    type: "website",
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    title: `${siteConfig.name}: ${siteConfig.tagline}`,
+    description: siteConfig.shortDescription,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${siteConfig.name}: ${siteConfig.tagline}`,
+    description: siteConfig.shortDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: siteConfig.themeColor.light },
+    { media: "(prefers-color-scheme: dark)", color: siteConfig.themeColor.dark },
+  ],
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({
