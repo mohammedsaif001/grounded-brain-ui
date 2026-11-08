@@ -23,7 +23,7 @@ export const sourceSchema = z.object({
     workspaceId: z.string(),
     type: sourceTypeSchema,
     title: z.string(),
-    /** Omitted by list endpoints (it can be megabytes per source); present on a single source. */
+    /** Omitted from list responses (paged or not); only the single-source GET carries it. */
     content: z.string().nullish(),
     url: z.string().nullable(),
     status: sourceStatusSchema,

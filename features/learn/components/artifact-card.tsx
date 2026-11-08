@@ -63,7 +63,7 @@ export function ArtifactCard({
                     <Button
                         variant="ghost"
                         size="icon-sm"
-                        className="pointer-events-auto relative z-10 opacity-100 transition-opacity focus-visible:opacity-100 md:opacity-0 md:group-hover/card:opacity-100"
+                        className="pointer-events-auto relative z-10 hover:bg-destructive/10 hover:text-destructive focus-visible:bg-destructive/10 focus-visible:text-destructive dark:hover:bg-destructive/20 opacity-100 transition-opacity focus-visible:opacity-100 md:opacity-0 md:group-hover/card:opacity-100"
                         onClick={() => onDelete(artifact)}
                     >
                         <Trash2Icon aria-hidden="true" />

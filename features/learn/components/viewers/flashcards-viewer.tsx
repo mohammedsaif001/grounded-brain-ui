@@ -6,6 +6,9 @@ import {
     CheckIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
+    CircleHelpIcon,
+    LayersIcon,
+    LightbulbIcon,
     RefreshCwIcon,
     RotateCcwIcon,
     ShuffleIcon,
@@ -187,34 +190,42 @@ export function FlashcardsViewer({
     const allKnown = known.size === cards.length;
 
     return (
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-5">
-            <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground tabular-nums">
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 short:gap-3">
+            <div className="space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-tint-violet px-3 py-1 text-xs font-semibold tabular-nums text-tint-violet-foreground">
+                        <LayersIcon aria-hidden="true" className="size-3.5" />
                         Card {position + 1} of {cards.length}
                     </span>
-                    <span className="flex items-center gap-1.5 text-muted-foreground tabular-nums">
-                        <SparklesIcon className="size-3.5" />
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-tint-green px-3 py-1 text-xs font-semibold tabular-nums text-tint-green-foreground">
+                        <SparklesIcon aria-hidden="true" className="size-3.5" />
                         {known.size} learned
                     </span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
+                <div
+                    role="progressbar"
+                    aria-label="Cards learned"
+                    aria-valuemin={0}
+                    aria-valuemax={cards.length}
+                    aria-valuenow={known.size}
+                    className="h-2 w-full overflow-hidden rounded-full bg-muted"
+                >
                     <motion.div
-                        className="h-full rounded-full bg-ring"
+                        className="h-full rounded-full bg-linear-to-r from-primary to-[color-mix(in_oklab,var(--primary),black_18%)]"
                         animate={{ width: `${progress}%` }}
                         transition={{ type: "spring", stiffness: 220, damping: 30 }}
                     />
                 </div>
             </div>
 
-            <div className="relative h-80 perspective-[1600px]">
+            <div className="relative h-[clamp(12rem,calc(100svh-37rem),24rem)] perspective-[1600px] short:h-[clamp(12rem,calc(100svh-31rem),24rem)]">
                 <div
                     aria-hidden
-                    className="absolute inset-x-6 top-3 h-full rounded-2xl border border-border/50 bg-card/40"
+                    className="absolute inset-x-8 top-4 h-full rounded-3xl border border-border/60 bg-tint-violet/40"
                 />
                 <div
                     aria-hidden
-                    className="absolute inset-x-3 top-1.5 h-full rounded-2xl border border-border/70 bg-card/60"
+                    className="absolute inset-x-4 top-2 h-full rounded-3xl border border-border bg-tint-violet/70"
                 />
 
                 <AnimatePresence initial={false} custom={direction} mode="wait">
@@ -259,11 +270,15 @@ export function FlashcardsViewer({
                                 side="Front"
                                 content={card.front}
                                 isKnown={isKnown}
+                                index={position + 1}
+                                total={cards.length}
                             />
                             <CardFace
                                 side="Back"
                                 content={card.back}
                                 isKnown={isKnown}
+                                index={position + 1}
+                                total={cards.length}
                                 back
                                 workspaceId={workspaceId}
                                 citations={card.citations}
@@ -276,56 +291,56 @@ export function FlashcardsViewer({
             <div className="flex items-center justify-between gap-2">
                 <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => goTo(-1)}
                     aria-label="Previous card"
                 >
                     <ChevronLeftIcon />
-                    Previous
+                    <span className="hidden sm:inline">Previous</span>
                 </Button>
 
-                <Button variant="ghost" size="sm" onClick={flip}>
+                <Button variant="secondary" onClick={flip} className="px-6">
                     <RotateCcwIcon />
-                    Flip
+                    {flipped ? "Show question" : "Reveal answer"}
                 </Button>
 
                 <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => goTo(1)}
                     aria-label="Next card"
                 >
-                    Next
+                    <span className="hidden sm:inline">Next</span>
                     <ChevronRightIcon />
                 </Button>
             </div>
 
-            <AnimatePresence initial={false}>
-                {flipped ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: -8, height: 0 }}
-                        animate={{ opacity: 1, y: 0, height: "auto" }}
-                        exit={{ opacity: 0, y: -8, height: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                    >
-                        <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                className="flex-1"
-                                onClick={markUnknown}
-                            >
-                                <RefreshCwIcon />
-                                Still learning
-                            </Button>
-                            <Button className="flex-1" onClick={markKnown}>
-                                <CheckIcon />
-                                Got it
-                            </Button>
-                        </div>
-                    </motion.div>
-                ) : null}
-            </AnimatePresence>
+            {/* Always rendered so flipping never moves the page; it only fades in. */}
+            <div
+                aria-hidden={!flipped}
+                inert={!flipped}
+                className={`flex gap-2 transition-opacity duration-200 ${
+                    flipped ? "opacity-100" : "pointer-events-none opacity-0"
+                }`}
+            >
+                <Button
+                    variant="outline"
+                    size="lg"
+                    className="flex-1 hover:bg-tint-rose hover:text-tint-rose-foreground"
+                    onClick={markUnknown}
+                    tabIndex={flipped ? 0 : -1}
+                >
+                    <RefreshCwIcon />
+                    Still learning
+                </Button>
+                <Button
+                    size="lg"
+                    className="flex-1"
+                    onClick={markKnown}
+                    tabIndex={flipped ? 0 : -1}
+                >
+                    <CheckIcon />
+                    Got it
+                </Button>
+            </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-4">
                 <p className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
@@ -364,9 +379,10 @@ export function FlashcardsViewer({
 }
 
 function CardFace({
-    side,
     content,
     isKnown,
+    index,
+    total,
     back = false,
     workspaceId,
     citations,
@@ -374,51 +390,82 @@ function CardFace({
     side: string;
     content: string;
     isKnown: boolean;
+    index: number;
+    total: number;
     back?: boolean;
     /** Only the back shows where the answer comes from. */
     workspaceId?: string;
     citations?: readonly ArtifactCitation[];
 }) {
+    const Watermark = back ? LightbulbIcon : LayersIcon;
+
     return (
         <div
-            className={`absolute inset-0 flex flex-col overflow-hidden rounded-2xl border p-7 shadow-raised backface-hidden ${
+            className={`absolute inset-0 flex flex-col overflow-hidden rounded-3xl border p-6 shadow-overlay backface-hidden sm:p-8 ${
                 back
-                    ? "border-border bg-card text-card-foreground transform-[rotateY(180deg)]"
-                    : "border-transparent bg-tint-violet text-foreground"
-            } ${isKnown ? "ring-2 ring-ring/50" : ""}`}
+                    ? "border-tint-green-foreground/20 bg-linear-to-br from-tint-green to-card text-foreground transform-[rotateY(180deg)]"
+                    : "border-tint-violet-foreground/20 bg-linear-to-br from-tint-violet to-card text-foreground"
+            } ${isKnown ? "ring-2 ring-primary" : ""}`}
         >
-            <div className="flex items-center justify-between">
+            <Watermark
+                aria-hidden="true"
+                className={`pointer-events-none absolute -right-8 -bottom-8 size-48 -rotate-12 ${
+                    back
+                        ? "text-tint-green-foreground/10"
+                        : "text-tint-violet-foreground/10"
+                }`}
+            />
+
+            <div className="relative flex items-center justify-between gap-3">
                 <span
-                    className={`text-eyebrow ${back ? "" : "text-tint-violet-foreground"}`}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
+                        back
+                            ? "bg-tint-green-foreground/10 text-tint-green-foreground"
+                            : "bg-tint-violet-foreground/10 text-tint-violet-foreground"
+                    }`}
                 >
-                    {side === "Front" ? "Front · Question" : "Back · Revealed"}
+                    {back ? (
+                        <LightbulbIcon aria-hidden="true" className="size-3.5" />
+                    ) : (
+                        <CircleHelpIcon aria-hidden="true" className="size-3.5" />
+                    )}
+                    {back ? "Answer" : "Question"}
                 </span>
                 {isKnown ? (
-                    <span className="flex items-center gap-1 text-xs font-medium">
-                        <CheckIcon className="size-3.5" />
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground">
+                        <CheckIcon aria-hidden="true" className="size-3.5" />
                         Learned
                     </span>
-                ) : null}
+                ) : (
+                    <span className="text-xs font-medium tabular-nums text-muted-foreground">
+                        {String(index).padStart(2, "0")} / {String(total).padStart(2, "0")}
+                    </span>
+                )}
             </div>
 
-            <div className="flex flex-1 items-center overflow-y-auto py-4">
+            <div className="relative flex flex-1 items-center overflow-y-auto py-4">
                 <StreamdownContent
                     content={content}
                     className={
                         back
-                            ? "text-body max-w-none [&_p]:my-0 [&_p+p]:mt-3"
-                            : "max-w-none font-serif text-2xl leading-snug [&_p]:my-0 [&_p+p]:mt-3"
+                            ? "text-body max-w-none text-base leading-relaxed [&_p]:my-0 [&_p+p]:mt-3"
+                            : "max-w-none font-serif text-2xl leading-snug sm:text-3xl [&_p]:my-0 [&_p+p]:mt-3"
                     }
                 />
             </div>
 
-            {back && workspaceId && citations ? (
+            {back && workspaceId && citations?.length ? (
                 <ArtifactSources
                     workspaceId={workspaceId}
                     citations={citations}
-                    className="border-t border-border/60 pt-3"
+                    className="relative border-t border-border/60 pt-3"
                 />
-            ) : null}
+            ) : (
+                <p className="relative flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <RotateCcwIcon aria-hidden="true" className="size-3.5" />
+                    {back ? "Tap to see the question" : "Tap the card to reveal the answer"}
+                </p>
+            )}
         </div>
     );
 }

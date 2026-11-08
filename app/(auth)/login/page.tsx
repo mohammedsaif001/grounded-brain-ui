@@ -6,7 +6,13 @@ import { LoginForm } from "@/features/auth";
 import { GettingStarted } from "@/features/auth/components/getting-started";
 import { redirectIfAuthenticated } from "@/features/auth/server";
 
-export const metadata: Metadata = { title: "Sign in" };
+export const metadata: Metadata = {
+    title: "Sign in",
+    description:
+        "Sign in to Grounded Brain with Google to open your private notebooks and chat with your sources.",
+    alternates: { canonical: "/login" },
+    robots: { index: false, follow: true },
+};
 
 export default async function LoginPage() {
     await redirectIfAuthenticated();

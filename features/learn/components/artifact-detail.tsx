@@ -109,7 +109,7 @@ export function ArtifactDetail({
                 "mx-auto flex w-full flex-1 flex-col gap-6",
                 isMindMap
                     ? "min-h-0 max-w-none p-4 md:p-5"
-                    : "max-w-5xl p-6 md:p-8",
+                    : "max-w-5xl p-6 md:p-8 short:gap-4 short:p-4 short:md:p-4",
             )}
         >
             <header className="flex flex-wrap items-start gap-4">
@@ -182,7 +182,7 @@ export function ArtifactDetail({
                     />
                 </div>
             ) : (
-                <div className="rounded-2xl border border-border bg-card p-5 shadow-surface md:p-8">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-surface md:p-8 short:p-4 short:md:p-4">
                     <ArtifactContentViewer
                         artifact={artifact}
                         workspaceId={workspaceId}

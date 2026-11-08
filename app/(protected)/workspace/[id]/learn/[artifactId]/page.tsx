@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { ArtifactDetail } from "@/features/learn";
+
+export const metadata: Metadata = {
+    title: "Study material",
+    description:
+        "Study with flashcards, quizzes, summaries and mind maps built from your sources.",
+};
 
 export default async function ArtifactPage({
     params,
