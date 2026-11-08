@@ -23,7 +23,8 @@ export const sourceSchema = z.object({
     workspaceId: z.string(),
     type: sourceTypeSchema,
     title: z.string(),
-    content: z.string().nullable(),
+    /** Omitted from list responses (paged or not); only the single-source GET carries it. */
+    content: z.string().nullish(),
     url: z.string().nullable(),
     status: sourceStatusSchema,
     metadata: jsonObject.nullable(),
