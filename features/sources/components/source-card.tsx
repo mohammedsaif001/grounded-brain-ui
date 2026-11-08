@@ -46,7 +46,7 @@ export function SourceCard({
                 aria-label={`Open ${source.title}`}
             />
 
-            <div className="relative flex items-start justify-between gap-3">
+            <div className="pointer-events-none relative flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                     <SourceTypeTile type={source.type} />
                     <div className="min-w-0">
@@ -60,7 +60,7 @@ export function SourceCard({
                     </div>
                 </div>
 
-                <div className="relative z-10 flex shrink-0 items-center gap-1">
+                <div className="pointer-events-auto relative z-10 flex shrink-0 items-center gap-1">
                     {onSelectedChange ? (
                         <Checkbox
                             aria-label={`Select ${source.title}`}
@@ -78,7 +78,7 @@ export function SourceCard({
                 </div>
             </div>
 
-            <div className="relative flex items-center justify-between gap-3">
+            <div className="pointer-events-none relative flex items-center justify-between gap-3">
                 <SourceStatusBadge status={source.status} />
                 {source.content ? (
                     <p className="text-caption line-clamp-1 min-w-0 flex-1 text-right">

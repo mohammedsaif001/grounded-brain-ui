@@ -38,6 +38,7 @@ import {
     buildTree,
     collectExpandableIds,
     computeTreeLayout,
+    NODE_HEIGHT,
     NODE_WIDTH,
     ROOT_WIDTH,
     type Placement,
@@ -206,6 +207,10 @@ function MindMapCanvas({ nodes, edges, workspaceId }: MindMapCanvasProps) {
                     id: node.id,
                     type: "mindmap",
                     draggable: false,
+                    // The minimap only draws nodes whose size is on the node object; the
+                    // rendered size comes from CSS, so give it the layout's own numbers.
+                    initialWidth: isRoot ? ROOT_WIDTH : NODE_WIDTH,
+                    initialHeight: NODE_HEIGHT,
                     data: {
                         label: node.label,
                         hasChildren: parentsWithChildren.has(node.id),
