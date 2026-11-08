@@ -84,7 +84,7 @@ function MindMapFlowNode({ id, data, selected }: NodeProps) {
             onClick={() => actions?.selectNode(id)}
         >
             {/* All four handles always exist, so an edge never points at a missing one
-                (React Flow error #008). Unused ones are invisible and not interactive. */}
+                (React Flow error 008). Unused ones are invisible and not interactive. */}
             <Handle
                 type="target"
                 id="tl"
