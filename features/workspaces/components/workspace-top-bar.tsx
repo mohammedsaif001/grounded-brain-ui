@@ -4,6 +4,7 @@ import {
     CircleHelpIcon,
     PlusIcon,
 } from "lucide-react";
+import { ProfileLink } from "@/features/profile";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -66,6 +67,7 @@ export function WorkspaceTopBar({
                 <span className="sr-only">Open the guide in a new tab</span>
             </Button>
             <WorkspaceHeaderActions workspace={workspace} />
+            <ProfileLink />
             <SignOutButton />
         </header>
     );

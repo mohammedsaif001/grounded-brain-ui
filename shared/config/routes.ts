@@ -11,6 +11,7 @@ export const routes = {
     login: "/login",
     dashboard: "/dashboard",
     memorySettings: "/settings/memory",
+    profile: "/settings/profile",
     docs: "/docs",
     workspace: {
         chat: (workspaceId: string) => `/workspace/${segment(workspaceId)}`,

@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/shared/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
+import { ProfileLink } from "@/features/profile";
 import { cn } from "@/lib/utils";
 import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import {
@@ -126,6 +127,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             Guide
                         </Button>
                         <ModeToggle />
+                        <ProfileLink />
                         <SignOutButton />
                     </div>
                 </div>
