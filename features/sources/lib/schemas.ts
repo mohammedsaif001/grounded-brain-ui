@@ -40,6 +40,8 @@ export const sourceChunkSchema = z.object({
     index: z.number(),
     content: z.string(),
     tokenCount: z.number().nullable(),
+    /** Kept indexed but skipped by chat retrieval and artifact generation. */
+    excluded: z.boolean().catch(false),
     metadata: jsonObject.nullable(),
     createdAt: z.string(),
 });

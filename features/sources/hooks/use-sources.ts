@@ -13,6 +13,7 @@ import {
     deleteSource,
     getGithubFiles,
     getSource,
+    getSourceChunks,
     importGithubSource,
     importWebSearchSource,
     importWebsiteSource,
@@ -21,7 +22,9 @@ import {
     listSourcesPage,
     reprocessSource,
     reprocessSources,
+    setChunkExcluded,
     syncGithubSource,
+    updateSource,
     uploadPdfSource,
 } from "../lib/api";
 import type {
@@ -32,6 +35,8 @@ import type {
     ImportYoutubeInput,
     Source,
     SourceFilters,
+    SourceChunksResponse,
+    UpdateSourceInput,
 } from "../lib/types";
 
 const POLL_INTERVAL_MS = 3_000;
@@ -44,6 +49,8 @@ export function sourceKeys(workspaceId: string) {
         pages: (filters: SourceFilters = {}) =>
             [...all, "pages", filters] as const,
         detail: (sourceId: string) => [...all, "detail", sourceId] as const,
+        chunks: (sourceId: string) =>
+            [...all, "detail", sourceId, "chunks"] as const,
         githubFiles: (sourceId: string) =>
             [...all, "detail", sourceId, "github-files"] as const,
     };
@@ -301,5 +308,71 @@ export function useSyncGithubSource(
             workspaceKeys.lists(),
         ],
         ...options,
+    });
+}
+
+/**
+ * Saves a title and/or text edit. A content edit comes back `PENDING` (re-indexing), which
+ * `useSource` then polls until `READY`.
+ */
+export function useUpdateSource(
+    workspaceId: string,
+    options?: MutationHookOptions,
+) {
+    return useInvalidatingMutation({
+        mutationFn: ({
+            sourceId,
+            input,
+        }: {
+            sourceId: string;
+            input: UpdateSourceInput;
+        }) => updateSource(workspaceId, sourceId, input),
+        updateCache: (queryClient, source) =>
+            queryClient.setQueryData(
+                sourceKeys(workspaceId).detail(source.id),
+                source,
+            ),
+        invalidates: () => [
+            sourceKeys(workspaceId).all,
+            // Notebook and chat citations show source titles.
+            workspaceKeys.summary(workspaceId),
+        ],
+        ...options,
+    });
+}
+
+export function useSourceChunks(
+    workspaceId: string,
+    sourceId: string,
+    enabled: boolean,
+) {
+    return useQuery({
+        queryKey: sourceKeys(workspaceId).chunks(sourceId),
+        queryFn: () => getSourceChunks(workspaceId, sourceId),
+        enabled,
+    });
+}
+
+export function useSetChunkExcluded(workspaceId: string, sourceId: string) {
+    return useInvalidatingMutation({
+        mutationFn: ({
+            chunkId,
+            excluded,
+        }: {
+            chunkId: string;
+            excluded: boolean;
+        }) => setChunkExcluded(workspaceId, sourceId, chunkId, excluded),
+        updateCache: (queryClient, chunk) =>
+            queryClient.setQueryData<SourceChunksResponse>(
+                sourceKeys(workspaceId).chunks(sourceId),
+                (current) =>
+                    current && {
+                        ...current,
+                        chunks: current.chunks.map((existing) =>
+                            existing.id === chunk.id ? chunk : existing,
+                        ),
+                    },
+            ),
+        invalidates: () => [],
     });
 }

@@ -1,8 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeftIcon, ExternalLinkIcon, LibraryBigIcon } from "lucide-react";
+import {
+    ArrowLeftIcon,
+    ExternalLinkIcon,
+    LibraryBigIcon,
+    PencilIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
@@ -13,8 +19,10 @@ import { routes } from "@/shared/config/routes";
 import { useSource } from "../hooks/use-sources";
 import { SOURCE_TYPE_LABELS } from "../lib/constants";
 import { describeSourceFacts } from "../lib/source-metadata";
+import { EditSourceDialog } from "./edit-source-dialog";
 import { GithubSourcePanel } from "./github-source-panel";
 import { MarkdownPreview } from "./markdown-preview";
+import { SourceChunks } from "./source-chunks";
 import { SourceStatusBadge } from "./source-status-badge";
 import { SourceTypeTile } from "./source-type-icon";
 import { LoadError } from "@/shared/components/load-error";
@@ -26,6 +34,7 @@ type SourceDetailProps = {
 
 export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
     const { data: source, isLoading, error } = useSource(workspaceId, sourceId);
+    const [editOpen, setEditOpen] = useState(false);
     const backToLibrary = (
         <Button
             nativeButton={false}
@@ -125,7 +134,23 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
                         {factsLine ? ` · ${factsLine}` : null}
                     </p>
                 </div>
+                <Button
+                    variant="outline"
+                    // A source being (re)indexed cannot be edited; the API answers 409.
+                    disabled={isProcessing}
+                    onClick={() => setEditOpen(true)}
+                >
+                    <PencilIcon aria-hidden="true" />
+                    Edit
+                </Button>
             </header>
+
+            <EditSourceDialog
+                workspaceId={workspaceId}
+                source={source}
+                open={editOpen}
+                onOpenChange={setEditOpen}
+            />
 
             {source.url ? (
                 <p className="flex min-w-0 items-center gap-2 text-sm">
@@ -185,6 +210,10 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
                     description="There's no extracted content available for this source."
                 />
             )}
+
+            {source.status === "READY" && source.type !== "GITHUB" ? (
+                <SourceChunks workspaceId={workspaceId} sourceId={source.id} />
+            ) : null}
         </div>
     );
 }

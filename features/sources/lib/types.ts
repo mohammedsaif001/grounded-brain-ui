@@ -63,3 +63,17 @@ export type ImportWebSearchInput = {
     content: string;
     url: string;
 };
+
+export type UpdateSourceInput = {
+    /** 1-200 characters. Allowed for every source type; no re-index. */
+    title?: string;
+    /** TEXT and MARKDOWN only. Replaces the text and re-indexes the source. */
+    content?: string;
+    /** The `updatedAt` last read; a mismatch fails with 409 `CONFLICT`. */
+    expectedUpdatedAt?: string;
+};
+
+/** Only these types accept a content edit; the API answers 400 for the rest. */
+export function isContentEditable(type: SourceType) {
+    return type === "TEXT" || type === "MARKDOWN";
+}
