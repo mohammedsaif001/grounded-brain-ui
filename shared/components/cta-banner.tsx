@@ -21,8 +21,9 @@ type CtaBannerProps = {
 };
 
 /**
- * Closing call to action: solid brand green with dark text, so contrast is the same in
- * the light and dark themes (a tinted surface turns muddy against the dark page).
+ * Closing call to action. Light theme: solid brand green with dark text. Dark theme: a
+ * deep green card with light text and brand-green accents, so it stands out from the
+ * page without glaring (a bright lime slab is too loud on a dark canvas).
  */
 export function CtaBanner({
     headingId,
@@ -39,22 +40,22 @@ export function CtaBanner({
     return (
         <div
             className={cn(
-                "relative isolate overflow-hidden rounded-3xl bg-linear-to-br from-primary to-[color-mix(in_oklab,var(--primary),black_14%)] px-6 py-10 text-primary-foreground shadow-overlay md:px-12 md:py-14",
+                "relative isolate overflow-hidden rounded-3xl bg-linear-to-br from-primary to-[color-mix(in_oklab,var(--primary),black_14%)] px-6 py-10 text-primary-foreground shadow-overlay md:px-12 md:py-14 dark:border dark:border-primary/25 dark:from-[color-mix(in_oklab,var(--primary),var(--card)_80%)] dark:to-card dark:text-foreground",
                 className,
             )}
         >
             <div
                 aria-hidden="true"
-                className="absolute -top-24 -right-16 -z-10 size-80 rounded-full border-[36px] border-primary-foreground/10"
+                className="absolute -top-24 -right-16 -z-10 size-80 rounded-full border-[36px] border-primary-foreground/10 dark:border-primary/10"
             />
             <div
                 aria-hidden="true"
-                className="absolute -right-4 -bottom-28 -z-10 size-72 rounded-full bg-primary-foreground/10"
+                className="absolute -right-4 -bottom-28 -z-10 size-72 rounded-full bg-primary-foreground/10 dark:bg-primary/10"
             />
 
             <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
                 <div className="max-w-xl space-y-3">
-                    <p className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-3 py-1 text-xs font-semibold">
+                    <p className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-3 py-1 text-xs font-semibold dark:bg-primary/15 dark:text-primary">
                         <SparklesIcon aria-hidden="true" className="size-3.5" />
                         {eyebrow}
                     </p>
@@ -72,7 +73,7 @@ export function CtaBanner({
                     <Button
                         size="lg"
                         nativeButton={false}
-                        className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                        className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
                         render={<Link href={primary.href} />}
                     >
                         {PrimaryIcon ? (
@@ -86,7 +87,7 @@ export function CtaBanner({
                             size="lg"
                             variant="ghost"
                             nativeButton={false}
-                            className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                            className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground dark:text-foreground dark:hover:bg-foreground/10 dark:hover:text-foreground"
                             render={<Link href={secondary.href} />}
                         >
                             {SecondaryIcon ? (
