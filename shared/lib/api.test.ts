@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
     ApiError,
     apiPath,
+    fetchOrOutage,
     parseApiResponse,
     parsePageResponse,
 } from "./api";
@@ -71,14 +72,14 @@ describe("parseApiResponse", () => {
     });
 
     it("falls back to a generic message for non-JSON errors", async () => {
-        const response = new Response("<html>Bad Gateway</html>", {
-            status: 502,
+        const response = new Response("<html>Not Found</html>", {
+            status: 404,
         });
         const error = await parseApiResponse(response, {
             fallbackMessage: "Request failed",
         }).catch((e) => e);
-        expect(error).toMatchObject({ status: 502, message: "Request failed" });
-        expect(error.isClientError).toBe(false);
+        expect(error).toMatchObject({ status: 404, message: "Request failed" });
+        expect(error.isClientError).toBe(true);
     });
 
     it("rejects payloads that do not match the schema", async () => {
@@ -138,5 +139,66 @@ describe("parsePageResponse", () => {
 
         expect(error).toBeInstanceOf(ApiError);
         expect(error.message).toBe("Bad cursor");
+    });
+});
+
+describe("outage handling", () => {
+    it("reports a non-JSON 5xx as a server outage", async () => {
+        const error = await parseApiResponse(
+            new Response("Internal Server Error", { status: 500 }),
+        ).catch((e) => e);
+
+        expect(error).toBeInstanceOf(ApiError);
+        expect(error.service).toBe("server");
+        expect(error.isOutage).toBe(true);
+    });
+
+    it("reports a gateway timeout as a server outage", async () => {
+        const error = await parseApiResponse(
+            jsonResponse({ success: false, error: { message: "x" } }, 504),
+        ).catch((e) => e);
+
+        expect(error.service).toBe("server");
+    });
+
+    it("keeps an enveloped 503 message, such as an unconfigured integration", async () => {
+        const error = await parseApiResponse(
+            jsonResponse(
+                { success: false, error: { message: "Firecrawl is not configured" } },
+                503,
+            ),
+        ).catch((e) => e);
+
+        expect(error.message).toBe("Firecrawl is not configured");
+        expect(error.isOutage).toBe(false);
+    });
+
+    it("turns an unreachable backend into a server outage", async () => {
+        const original = globalThis.fetch;
+        globalThis.fetch = (() =>
+            Promise.reject(new TypeError("fetch failed"))) as typeof fetch;
+
+        try {
+            const error = await fetchOrOutage("/api/x").catch((e) => e);
+            expect(error).toBeInstanceOf(ApiError);
+            expect(error.service).toBe("server");
+        } finally {
+            globalThis.fetch = original;
+        }
+    });
+
+    it("lets a caller's own abort through", async () => {
+        const original = globalThis.fetch;
+        globalThis.fetch = (() =>
+            Promise.reject(
+                new DOMException("aborted", "AbortError"),
+            )) as typeof fetch;
+
+        try {
+            const error = await fetchOrOutage("/api/x").catch((e) => e);
+            expect(error).not.toBeInstanceOf(ApiError);
+        } finally {
+            globalThis.fetch = original;
+        }
     });
 });

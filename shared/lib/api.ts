@@ -1,13 +1,29 @@
 import { z } from "zod";
+import {
+    isServerOutageResponse,
+    OUTAGE_COPY,
+    type OutageService,
+} from "./outage";
 
 export class ApiError extends Error {
     constructor(
         public readonly status: number,
         message: string,
         public readonly details?: unknown,
+        /** Set when the failure is an outage of a whole service rather than a rejected request. */
+        public readonly service?: OutageService,
     ) {
         super(message);
         this.name = "ApiError";
+    }
+
+    /** The backend (or Mem0) is unavailable; show the maintenance message, not a bug report. */
+    get isOutage() {
+        return this.service !== undefined;
+    }
+
+    static outage(service: OutageService, details?: unknown) {
+        return new ApiError(503, OUTAGE_COPY[service].message, details, service);
     }
 
     /** 4xx: the request itself was wrong; retrying will not help. */
@@ -37,6 +53,10 @@ function throwForFailure(
 ): void {
     if (response.ok) {
         return;
+    }
+
+    if (isServerOutageResponse(response.status, body !== null)) {
+        throw ApiError.outage("server");
     }
 
     const error = body?.error;
@@ -132,6 +152,28 @@ export type ApiFetchOptions<T> = Omit<RequestInit, "body"> & {
     schema?: z.ZodType<T>;
 };
 
+/**
+ * `fetch` that reports an unreachable backend as a server outage. A refused connection
+ * or a timeout rejects with a TypeError or TimeoutError; a caller's own abort (a query
+ * being cancelled) is not an outage and passes through untouched.
+ */
+export async function fetchOrOutage(
+    input: RequestInfo | URL,
+    init?: RequestInit,
+): Promise<Response> {
+    try {
+        return await fetch(input, init);
+    } catch (error) {
+        if (
+            error instanceof TypeError ||
+            (error instanceof DOMException && error.name === "TimeoutError")
+        ) {
+            throw ApiError.outage("server");
+        }
+        throw error;
+    }
+}
+
 /** Browser-side API call through the same-origin `/api` rewrite, with session cookies. */
 export async function apiFetch<T = void>(
     path: string,
@@ -148,7 +190,7 @@ export async function apiFetch<T = void>(
         requestBody = JSON.stringify(body);
     }
 
-    const response = await fetch(path, {
+    const response = await fetchOrOutage(path, {
         ...init,
         body: requestBody,
         credentials: "include",
@@ -163,7 +205,7 @@ export async function apiFetchPage<T>(
     path: string,
     itemSchema: z.ZodType<T>,
 ): Promise<Page<T>> {
-    const response = await fetch(path, {
+    const response = await fetchOrOutage(path, {
         credentials: "include",
         headers: { accept: "application/json" },
     });

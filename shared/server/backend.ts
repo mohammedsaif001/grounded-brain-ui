@@ -2,7 +2,11 @@ import "server-only";
 
 import { headers } from "next/headers";
 import { getServerEnv } from "@/shared/config/env";
-import { parseApiResponse, type ParseOptions } from "@/shared/lib/api";
+import {
+    fetchOrOutage,
+    parseApiResponse,
+    type ParseOptions,
+} from "@/shared/lib/api";
 
 /**
  * Calls the API directly from the server (Server Components, Route Handlers).
@@ -25,7 +29,7 @@ export async function backendFetch<T = void>(
         outgoing.set("cookie", cookie);
     }
 
-    const response = await fetch(new URL(path, env.API_URL), {
+    const response = await fetchOrOutage(new URL(path, env.API_URL), {
         ...init,
         headers: outgoing,
         cache: "no-store",
