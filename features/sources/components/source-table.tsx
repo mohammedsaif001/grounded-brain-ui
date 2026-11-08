@@ -18,6 +18,7 @@ type SourceTableProps = {
     selectedIds: ReadonlySet<string>;
     onToggleOne: (id: string, selected: boolean) => void;
     onToggleAll: (selected: boolean) => void;
+    onEdit: (source: Source) => void;
     onDelete: (source: Source) => void;
     onReprocess: (source: Source) => void;
 };
@@ -27,6 +28,7 @@ export function SourceTable({
     selectedIds,
     onToggleOne,
     onToggleAll,
+    onEdit,
     onDelete,
     onReprocess,
 }: SourceTableProps) {
@@ -154,6 +156,7 @@ export function SourceTable({
                                         )}
                                         <SourceRowActions
                                             source={source}
+                                            onEdit={onEdit}
                                             onDelete={onDelete}
                                             onReprocess={
                                                 source.status === "FAILED"

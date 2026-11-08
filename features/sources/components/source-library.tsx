@@ -47,6 +47,7 @@ import {
 import type { Source, SourceFilters } from "../lib/types";
 import { AddSourceDialog } from "./add-source-dialog";
 import { DeleteSourcesDialog } from "./delete-sources-dialog";
+import { EditSourceByIdDialog } from "./edit-source-dialog";
 import { SourceCard } from "./source-card";
 import { SourceTable } from "./source-table";
 import { LoadError } from "@/shared/components/load-error";
@@ -98,6 +99,7 @@ export function SourceLibrary({
 }: SourceLibraryProps) {
     const [view, setView] = useState<ViewMode>("list");
     const [addOpen, setAddOpen] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(
         null,
     );
@@ -356,6 +358,7 @@ export function SourceLibrary({
                         selectedIds={visibleSelected}
                         onToggleOne={toggleOne}
                         onToggleAll={toggleAll}
+                        onEdit={(source) => setEditingId(source.id)}
                         onDelete={(source) =>
                             setPendingDelete({ kind: "one", source })
                         }
@@ -371,6 +374,7 @@ export function SourceLibrary({
                                 onSelectedChange={(selected) =>
                                     toggleOne(source.id, selected)
                                 }
+                                onEdit={(target) => setEditingId(target.id)}
                                 onDelete={(target) =>
                                     setPendingDelete({
                                         kind: "one",
@@ -433,6 +437,12 @@ export function SourceLibrary({
                     <span>Ready sources are available in Chat &amp; Learn</span>
                 </footer>
             ) : null}
+
+            <EditSourceByIdDialog
+                workspaceId={workspaceId}
+                sourceId={editingId}
+                onClose={() => setEditingId(null)}
+            />
 
             <AddSourceDialog
                 workspaceId={workspaceId}

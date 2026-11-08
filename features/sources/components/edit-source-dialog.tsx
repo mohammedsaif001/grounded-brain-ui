@@ -20,7 +20,8 @@ import { toast } from "@/components/ui/toast";
 import { Callout } from "@/shared/components/callout";
 import { ApiError } from "@/shared/lib/api";
 import { getErrorMessage } from "@/shared/lib/errors";
-import { sourceKeys, useUpdateSource } from "../hooks/use-sources";
+import { Skeleton } from "@/components/ui/skeleton";
+import { sourceKeys, useSource, useUpdateSource } from "../hooks/use-sources";
 import { isContentEditable, type Source } from "../lib/types";
 
 const TITLE_MAX = 200;
@@ -51,6 +52,85 @@ export function EditSourceDialog({
                 ) : null}
             </DialogContent>
         </Dialog>
+    );
+}
+
+/**
+ * For callers that only have a list row. List responses leave out `content`, so this
+ * fetches the full source before showing the editor; opening it empty would look like
+ * the text had been lost.
+ */
+export function EditSourceByIdDialog({
+    workspaceId,
+    sourceId,
+    onClose,
+}: {
+    workspaceId: string;
+    sourceId: string | null;
+    onClose: () => void;
+}) {
+    return (
+        <Dialog
+            open={sourceId !== null}
+            onOpenChange={(open) => {
+                if (!open) onClose();
+            }}
+        >
+            <DialogContent className="sm:max-w-2xl">
+                {sourceId ? (
+                    <LoadedEditSourceForm
+                        workspaceId={workspaceId}
+                        sourceId={sourceId}
+                        onDone={onClose}
+                    />
+                ) : null}
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function LoadedEditSourceForm({
+    workspaceId,
+    sourceId,
+    onDone,
+}: {
+    workspaceId: string;
+    sourceId: string;
+    onDone: () => void;
+}) {
+    const { data: source, error } = useSource(workspaceId, sourceId);
+
+    if (source) {
+        return (
+            <EditSourceForm
+                workspaceId={workspaceId}
+                source={source}
+                onDone={onDone}
+            />
+        );
+    }
+
+    return (
+        <div className="grid gap-4">
+            <DialogHeader>
+                <DialogTitle>Edit source</DialogTitle>
+                <DialogDescription>
+                    {error ? getErrorMessage(error) : "Loading the source…"}
+                </DialogDescription>
+            </DialogHeader>
+            {error ? (
+                <DialogFooter>
+                    <Button variant="outline" onClick={onDone}>
+                        Close
+                    </Button>
+                </DialogFooter>
+            ) : (
+                <div aria-busy="true" className="space-y-3">
+                    <Skeleton className="h-9 w-full" />
+                    <Skeleton className="h-48 w-full" />
+                </div>
+            )}
+        </div>
     );
 }
 
@@ -124,7 +204,7 @@ function EditSourceForm({
     return (
         <form
             onSubmit={(event) => void handleSave(event)}
-            className="grid gap-5"
+            className="grid min-w-0 grid-cols-1 gap-5"
         >
             <DialogHeader>
                 <DialogTitle>Edit source</DialogTitle>
@@ -154,7 +234,7 @@ function EditSourceForm({
                         value={content}
                         onChange={(event) => setContent(event.target.value)}
                         rows={14}
-                        className="max-h-[50vh] text-sm"
+                        className="max-h-[50vh] field-sizing-fixed overflow-y-auto text-sm"
                         required
                     />
                 </div>

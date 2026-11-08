@@ -15,6 +15,7 @@ import { filterArtifacts, type ArtifactFilter } from "../lib/filter-artifacts";
 import type { ArtifactType, LearningArtifact } from "../lib/types";
 import { ArtifactCard } from "./artifact-card";
 import { ArtifactMaker } from "./artifact-maker";
+import { EditArtifactByIdDialog } from "./edit/edit-artifact-dialog";
 import { GenerateArtifactDialog } from "./generate-artifact-dialog";
 import { LoadError } from "@/shared/components/load-error";
 
@@ -30,6 +31,7 @@ const FILTERS: readonly { value: ArtifactFilter; label: string }[] = [
 export function LearnHub({ workspaceId }: LearnHubProps) {
     const [dialog, setDialog] = useState<{ type: ArtifactType } | null>(null);
     const [filter, setFilter] = useState<ArtifactFilter>("all");
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [pendingDelete, setPendingDelete] =
         useState<LearningArtifact | null>(null);
 
@@ -131,6 +133,7 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                                     key={artifact.id}
                                     artifact={artifact}
                                     workspaceId={workspaceId}
+                                    onEdit={(target) => setEditingId(target.id)}
                                     onDelete={setPendingDelete}
                                 />
                             ))}
@@ -156,6 +159,12 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                     onPick={openDialog}
                 />
             </div>
+
+            <EditArtifactByIdDialog
+                workspaceId={workspaceId}
+                artifactId={editingId}
+                onClose={() => setEditingId(null)}
+            />
 
             <GenerateArtifactDialog
                 workspaceId={workspaceId}

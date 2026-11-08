@@ -1,12 +1,29 @@
 "use client";
 
-import { EyeOffIcon, LayersIcon } from "lucide-react";
+import { useState } from "react";
+import {
+    ChevronsDownUpIcon,
+    ChevronsUpDownIcon,
+    EyeOffIcon,
+    LayersIcon,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { LoadError } from "@/shared/components/load-error";
 import { useSetChunkExcluded, useSourceChunks } from "../hooks/use-sources";
+
+/** Chunks shorter than this fit in the collapsed preview, so they get no toggle. */
+const PREVIEW_CHARS = 240;
+const PREVIEW_LINES = 4;
+
+function isLongChunk(content: string) {
+    return (
+        content.length > PREVIEW_CHARS ||
+        content.split("\n").length > PREVIEW_LINES
+    );
+}
 
 type SourceChunksProps = {
     workspaceId: string;
@@ -25,6 +42,19 @@ export function SourceChunks({ workspaceId, sourceId }: SourceChunksProps) {
         true,
     );
     const setExcluded = useSetChunkExcluded(workspaceId, sourceId);
+    const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(
+        () => new Set(),
+    );
+
+    function toggleExpanded(chunkId: string) {
+        setExpandedIds((current) => {
+            const next = new Set(current);
+            if (!next.delete(chunkId)) {
+                next.add(chunkId);
+            }
+            return next;
+        });
+    }
 
     if (isLoading) {
         return (
@@ -52,6 +82,10 @@ export function SourceChunks({ workspaceId, sourceId }: SourceChunksProps) {
     const excludedCount = data.chunks.filter((chunk) => chunk.excluded).length;
     const allExcluded =
         data.chunks.length > 0 && excludedCount === data.chunks.length;
+    const longChunks = data.chunks.filter((chunk) => isLongChunk(chunk.content));
+    const allExpanded =
+        longChunks.length > 0 &&
+        longChunks.every((chunk) => expandedIds.has(chunk.id));
 
     return (
         <section aria-labelledby="chunks-title" className="space-y-3">
@@ -63,9 +97,34 @@ export function SourceChunks({ workspaceId, sourceId }: SourceChunksProps) {
                         {excludedCount > 0 ? ` · ${excludedCount} excluded` : ""}
                     </span>
                 </h2>
-                <p className="text-caption">
-                    Excluded chunks are ignored by chat and by learning tools.
-                </p>
+                <div className="flex items-center gap-3">
+                    <p className="text-caption">
+                        Excluded chunks are ignored by chat and by learning
+                        tools.
+                    </p>
+                    {longChunks.length > 0 ? (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                                setExpandedIds(
+                                    allExpanded
+                                        ? new Set()
+                                        : new Set(
+                                              longChunks.map((chunk) => chunk.id),
+                                          ),
+                                )
+                            }
+                        >
+                            {allExpanded ? (
+                                <ChevronsDownUpIcon aria-hidden="true" />
+                            ) : (
+                                <ChevronsUpDownIcon aria-hidden="true" />
+                            )}
+                            {allExpanded ? "Collapse all" : "Expand all"}
+                        </Button>
+                    ) : null}
+                </div>
             </div>
 
             {allExcluded ? (
@@ -83,6 +142,8 @@ export function SourceChunks({ workspaceId, sourceId }: SourceChunksProps) {
                     const isPending =
                         setExcluded.isPending &&
                         setExcluded.variables?.chunkId === chunk.id;
+                    const isLong = isLongChunk(chunk.content);
+                    const isExpanded = expandedIds.has(chunk.id);
 
                     return (
                         <li
@@ -95,15 +156,34 @@ export function SourceChunks({ workspaceId, sourceId }: SourceChunksProps) {
                             <span className="text-caption mt-0.5 w-8 shrink-0 tabular-nums">
                                 #{chunk.index + 1}
                             </span>
-                            <p
-                                className={cn(
-                                    "text-body line-clamp-4 min-w-0 flex-1 whitespace-pre-wrap break-words",
-                                    chunk.excluded &&
-                                        "text-muted-foreground line-through decoration-muted-foreground/40",
-                                )}
-                            >
-                                {chunk.content}
-                            </p>
+                            <div className="min-w-0 flex-1 space-y-2">
+                                <p
+                                    className={cn(
+                                        "text-body wrap-break-word whitespace-pre-wrap",
+                                        !isExpanded && "line-clamp-4",
+                                        chunk.excluded &&
+                                            "text-muted-foreground line-through decoration-muted-foreground/40",
+                                    )}
+                                >
+                                    {chunk.content}
+                                </p>
+                                {isLong ? (
+                                    <button
+                                        type="button"
+                                        aria-expanded={isExpanded}
+                                        className="text-caption font-medium underline underline-offset-4 hover:text-foreground"
+                                        onClick={() => toggleExpanded(chunk.id)}
+                                    >
+                                        {isExpanded
+                                            ? "Show less"
+                                            : "Show full chunk"}
+                                        <span className="sr-only">
+                                            {" "}
+                                            for chunk {chunk.index + 1}
+                                        </span>
+                                    </button>
+                                ) : null}
+                            </div>
                             <div className="flex shrink-0 flex-col items-end gap-2">
                                 {chunk.excluded ? (
                                     <Badge variant="amber">Excluded</Badge>

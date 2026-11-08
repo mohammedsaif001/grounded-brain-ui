@@ -19,7 +19,12 @@ import { toast } from "@/components/ui/toast";
 import { Callout } from "@/shared/components/callout";
 import { ApiError } from "@/shared/lib/api";
 import { getErrorMessage } from "@/shared/lib/errors";
-import { artifactKeys, useUpdateArtifact } from "../../hooks/use-artifacts";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+    artifactKeys,
+    useArtifact,
+    useUpdateArtifact,
+} from "../../hooks/use-artifacts";
 import { ARTIFACT_TYPE_LABELS } from "../../lib/constants";
 import { parseArtifactContent } from "../../lib/content";
 import {
@@ -44,6 +49,84 @@ type EditArtifactDialogProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 };
+
+/**
+ * For callers that only have a list row (the Learn cards): fetches the full artifact
+ * before showing the editor, so the form never opens on partial content.
+ */
+export function EditArtifactByIdDialog({
+    workspaceId,
+    artifactId,
+    onClose,
+}: {
+    workspaceId: string;
+    artifactId: string | null;
+    onClose: () => void;
+}) {
+    return (
+        <Dialog
+            open={artifactId !== null}
+            onOpenChange={(open) => {
+                if (!open) onClose();
+            }}
+        >
+            <DialogContent className="flex max-h-[90vh] flex-col gap-0 p-0 sm:max-w-3xl">
+                {artifactId ? (
+                    <LoadedEditArtifactForm
+                        workspaceId={workspaceId}
+                        artifactId={artifactId}
+                        onDone={onClose}
+                    />
+                ) : null}
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function LoadedEditArtifactForm({
+    workspaceId,
+    artifactId,
+    onDone,
+}: {
+    workspaceId: string;
+    artifactId: string;
+    onDone: () => void;
+}) {
+    const { data: artifact, error } = useArtifact(workspaceId, artifactId);
+
+    if (artifact) {
+        return (
+            <EditArtifactForm
+                workspaceId={workspaceId}
+                artifact={artifact}
+                onDone={onDone}
+            />
+        );
+    }
+
+    return (
+        <div className="grid gap-4 p-6">
+            <DialogHeader>
+                <DialogTitle>Edit</DialogTitle>
+                <DialogDescription>
+                    {error ? getErrorMessage(error) : "Loading…"}
+                </DialogDescription>
+            </DialogHeader>
+            {error ? (
+                <DialogFooter>
+                    <Button variant="outline" onClick={onDone}>
+                        Close
+                    </Button>
+                </DialogFooter>
+            ) : (
+                <div aria-busy="true" className="space-y-3">
+                    <Skeleton className="h-9 w-full" />
+                    <Skeleton className="h-48 w-full" />
+                </div>
+            )}
+        </div>
+    );
+}
 
 export function EditArtifactDialog({
     workspaceId,
@@ -200,7 +283,7 @@ function EditArtifactForm({
     return (
         <form
             onSubmit={(event) => void handleSave(event)}
-            className="flex min-h-0 flex-1 flex-col"
+            className="flex min-h-0 min-w-0 flex-1 flex-col"
         >
             <DialogHeader className="border-b border-border p-6">
                 <DialogTitle>
@@ -212,7 +295,7 @@ function EditArtifactForm({
                 </DialogDescription>
             </DialogHeader>
 
-            <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
+            <div className="min-h-0 min-w-0 flex-1 space-y-6 overflow-y-auto p-6">
                 <div className="space-y-2">
                     <Label htmlFor="edit-artifact-title">Title</Label>
                     <Input
