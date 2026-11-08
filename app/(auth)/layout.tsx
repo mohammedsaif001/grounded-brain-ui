@@ -1,5 +1,7 @@
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { AppLogo } from "@/shared/components/brand/app-logo";
+import Link from "next/link";
+import { routes } from "@/shared/config/routes";
 
 export default function AuthLayout({
     children,
@@ -18,7 +20,15 @@ export default function AuthLayout({
             </main>
 
             <footer className="text-caption flex flex-wrap items-center justify-between gap-2 px-6 py-5 short:py-3 md:px-14">
-                <span>© Grounded Brain</span>
+                <span className="flex items-center gap-3">
+                    <span>© Grounded Brain</span>
+                    <Link
+                        href={routes.docs}
+                        className="underline-offset-4 hover:underline focus-visible:underline"
+                    >
+                        How it works
+                    </Link>
+                </span>
                 <span>Built for curiosity. Grounded in evidence.</span>
             </footer>
         </div>

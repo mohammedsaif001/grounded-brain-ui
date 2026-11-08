@@ -24,6 +24,12 @@ export default async function HomePage() {
                     Get started
                     <ArrowRightIcon aria-hidden="true" />
                 </Button>
+                <Link
+                    href={routes.docs}
+                    className="text-sm text-muted-foreground underline-offset-4 hover:underline focus-visible:underline"
+                >
+                    How does it work?
+                </Link>
             </div>
         </div>
     );

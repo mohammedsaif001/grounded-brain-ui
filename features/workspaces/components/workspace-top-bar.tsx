@@ -1,6 +1,9 @@
 "use client";
 
-import { PlusIcon } from "lucide-react";
+import {
+    CircleHelpIcon,
+    PlusIcon,
+} from "lucide-react";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -10,6 +13,8 @@ import {
     type WorkspaceSection,
 } from "../lib/workspace-sections";
 import { WorkspaceHeaderActions } from "./workspace-header-actions";
+import Link from "next/link";
+import { routes } from "@/shared/config/routes";
 
 type WorkspaceTopBarProps = {
     workspace: Workspace;
@@ -50,6 +55,15 @@ export function WorkspaceTopBar({
                 <PlusIcon aria-hidden="true" />
                 <span className="hidden sm:inline">Add source</span>
                 <span className="sr-only sm:hidden">Add source</span>
+            </Button>
+            <Button
+                nativeButton={false}
+                variant="ghost"
+                size="icon"
+                render={<Link href={routes.docs} target="_blank" />}
+            >
+                <CircleHelpIcon aria-hidden="true" />
+                <span className="sr-only">Open the guide in a new tab</span>
             </Button>
             <WorkspaceHeaderActions workspace={workspace} />
             <SignOutButton />

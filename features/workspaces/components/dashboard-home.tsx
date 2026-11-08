@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
     BookOpenIcon,
+    BookOpenTextIcon,
     BrainIcon,
     MessageSquareIcon,
     SearchIcon,
@@ -113,6 +114,16 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                         >
                             <BrainIcon />
                             Memory
+                        </Button>
+                        <Button
+                            nativeButton={false}
+                            variant="ghost"
+                            size="sm"
+                            className="hidden sm:inline-flex"
+                            render={<Link href={routes.docs} />}
+                        >
+                            <BookOpenTextIcon aria-hidden="true" />
+                            Guide
                         </Button>
                         <ModeToggle />
                         <SignOutButton />
