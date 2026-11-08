@@ -1,9 +1,16 @@
 "use client";
 
-import { DownloadIcon, MessageSquarePlusIcon, Trash2Icon } from "lucide-react";
+import { useState } from "react";
+import {
+    DownloadIcon,
+    MessageSquarePlusIcon,
+    PencilIcon,
+    Trash2Icon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FilterSelect } from "@/shared/components/filter-select";
 import type { Conversation } from "../lib/types";
+import { RenameConversationDialog } from "./rename-conversation-dialog";
 
 type ChatToolbarProps = {
     conversations: readonly Conversation[];
@@ -12,8 +19,10 @@ type ChatToolbarProps = {
     onNewChat: () => void;
     onExport: () => void;
     onDelete: () => void;
+    onRename: (title: string) => Promise<void>;
     canExport: boolean;
     isDeleting: boolean;
+    isRenaming: boolean;
 };
 
 export function ChatToolbar({
@@ -23,9 +32,15 @@ export function ChatToolbar({
     onNewChat,
     onExport,
     onDelete,
+    onRename,
     canExport,
     isDeleting,
+    isRenaming,
 }: ChatToolbarProps) {
+    const [renameOpen, setRenameOpen] = useState(false);
+    const activeConversation = conversations.find(
+        (conversation) => conversation.id === conversationId,
+    );
     const options = conversations.map((conversation) => ({
         value: conversation.id,
         label: conversation.title ?? "Untitled chat",
@@ -50,15 +65,32 @@ export function ChatToolbar({
                 Export Markdown
             </Button>
             {conversationId ? (
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={isDeleting}
-                    onClick={onDelete}
-                >
-                    <Trash2Icon aria-hidden="true" />
-                    <span className="sr-only">Delete conversation</span>
-                </Button>
+                <>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setRenameOpen(true)}
+                    >
+                        <PencilIcon aria-hidden="true" />
+                        <span className="sr-only">Rename conversation</span>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={isDeleting}
+                        onClick={onDelete}
+                    >
+                        <Trash2Icon aria-hidden="true" />
+                        <span className="sr-only">Delete conversation</span>
+                    </Button>
+                    <RenameConversationDialog
+                        open={renameOpen}
+                        onOpenChange={setRenameOpen}
+                        currentTitle={activeConversation?.title ?? ""}
+                        isPending={isRenaming}
+                        onRename={onRename}
+                    />
+                </>
             ) : null}
         </div>
     );
