@@ -1,21 +1,18 @@
 "use client";
 
-import {
-    CircleHelpIcon,
-    PlusIcon,
-} from "lucide-react";
-import { ProfileLink } from "@/features/profile";
-import { SignOutButton } from "@/features/auth/components/sign-out-button";
+import Link from "next/link";
+import { PlusIcon, SettingsIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { UserMenu } from "@/features/profile";
+import { routes } from "@/shared/config/routes";
 import type { Workspace } from "../lib/types";
 import {
     WORKSPACE_SECTION_LABELS,
     type WorkspaceSection,
 } from "../lib/workspace-sections";
 import { WorkspaceHeaderActions } from "./workspace-header-actions";
-import Link from "next/link";
-import { routes } from "@/shared/config/routes";
 
 type WorkspaceTopBarProps = {
     workspace: Workspace;
@@ -29,7 +26,7 @@ export function WorkspaceTopBar({
     onAddSource,
 }: WorkspaceTopBarProps) {
     return (
-        <header className="sticky top-0 z-20 flex h-[68px] shrink-0 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur-md md:px-6">
+        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b bg-background/85 px-3 backdrop-blur-md sm:gap-3 sm:px-4 md:h-[68px] md:px-6">
             <SidebarTrigger />
 
             <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
@@ -52,23 +49,28 @@ export function WorkspaceTopBar({
                 </ol>
             </nav>
 
-            <Button variant="outline" onClick={onAddSource}>
+            <Button
+                variant="outline"
+                onClick={onAddSource}
+                className="max-sm:size-9 max-sm:px-0"
+            >
                 <PlusIcon aria-hidden="true" />
                 <span className="hidden sm:inline">Add source</span>
                 <span className="sr-only sm:hidden">Add source</span>
             </Button>
-            <Button
-                nativeButton={false}
-                variant="ghost"
-                size="icon"
-                render={<Link href={routes.docs} target="_blank" />}
-            >
-                <CircleHelpIcon aria-hidden="true" />
-                <span className="sr-only">Open the guide in a new tab</span>
-            </Button>
             <WorkspaceHeaderActions workspace={workspace} />
-            <ProfileLink />
-            <SignOutButton />
+            <UserMenu>
+                {/* The gear is in the bar from md up; on a phone it lives here. */}
+                <DropdownMenuItem
+                    className="md:hidden"
+                    render={
+                        <Link href={routes.workspace.settings(workspace.id)} />
+                    }
+                >
+                    <SettingsIcon />
+                    Notebook settings
+                </DropdownMenuItem>
+            </UserMenu>
         </header>
     );
 }
