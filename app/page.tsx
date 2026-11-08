@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LandingPage } from "@/features/landing/components/landing-page";
+import { creator, getCreatorLinks } from "@/features/landing/lib/creator";
 import { FAQS } from "@/features/landing/lib/faq";
 import { redirectIfAuthenticated } from "@/features/auth/server";
 import { JsonLd } from "@/shared/components/json-ld";
@@ -15,6 +16,9 @@ export const metadata: Metadata = {
     openGraph: { title, description: siteConfig.shortDescription, url: routes.home },
 };
 
+const personId = absoluteUrl("/#creator");
+const links = getCreatorLinks();
+
 const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -24,6 +28,19 @@ const structuredData = {
             name: siteConfig.name,
             url: absoluteUrl("/"),
             logo: absoluteUrl("/icon.svg"),
+            founder: { "@id": personId },
+        },
+        {
+            "@type": "Person",
+            "@id": personId,
+            name: creator.name,
+            url: creator.portfolio.url || creator.socials[1].url,
+            description: creator.bio,
+            email: `mailto:${creator.email}`,
+            ...(creator.jobTitle ? { jobTitle: creator.jobTitle } : {}),
+            ...(creator.image ? { image: absoluteUrl(creator.image) } : {}),
+            ...(links.length > 0 ? { sameAs: links.map((link) => link.url) } : {}),
+            owns: { "@id": absoluteUrl("/#app") },
         },
         {
             "@type": "WebSite",
@@ -33,6 +50,7 @@ const structuredData = {
             description: siteConfig.description,
             inLanguage: "en",
             publisher: { "@id": absoluteUrl("/#organization") },
+            author: { "@id": personId },
         },
         {
             "@type": "SoftwareApplication",
@@ -51,6 +69,8 @@ const structuredData = {
                 "Private memory you control",
             ],
             publisher: { "@id": absoluteUrl("/#organization") },
+            author: { "@id": personId },
+            creator: { "@id": personId },
         },
         {
             "@type": "FAQPage",

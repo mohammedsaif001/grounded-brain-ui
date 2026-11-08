@@ -4,6 +4,7 @@ import {
     ArrowRightIcon,
     BookOpenTextIcon,
     BrainIcon,
+    ChevronDownIcon,
     GraduationCapIcon,
     LibraryBigIcon,
     LockKeyholeIcon,
@@ -22,6 +23,7 @@ import { TypeTile } from "@/shared/components/type-tile";
 import type { Tone } from "@/shared/components/tint";
 import { routes } from "@/shared/config/routes";
 import { FAQS } from "../lib/faq";
+import { CreatorSection } from "./creator-section";
 
 type Feature = {
     icon: LucideIcon;
@@ -335,10 +337,14 @@ export function LandingPage() {
                         {FAQS.map((faq) => (
                             <details
                                 key={faq.question}
-                                className="group rounded-2xl border border-border bg-card px-5 py-4 shadow-surface"
+                                className="group rounded-2xl border border-border bg-card px-5 py-4 shadow-surface transition-[box-shadow,border-color,background-color] duration-200 hover:border-ring/40 hover:bg-accent/40 hover:shadow-raised open:shadow-raised"
                             >
-                                <summary className="text-heading cursor-pointer list-none rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/40">
+                                <summary className="text-heading flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/40 [&::-webkit-details-marker]:hidden">
                                     {faq.question}
+                                    <ChevronDownIcon
+                                        aria-hidden="true"
+                                        className="size-5 shrink-0 text-muted-foreground transition-[transform,color] duration-200 group-hover:text-foreground group-open:rotate-180"
+                                    />
                                 </summary>
                                 <p className="text-body mt-3 text-muted-foreground">
                                     {faq.answer}
@@ -347,6 +353,8 @@ export function LandingPage() {
                         ))}
                     </div>
                 </section>
+
+                <CreatorSection />
 
                 {/* Closing call to action */}
                 <section

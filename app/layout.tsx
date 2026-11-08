@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toast";
 import { QueryProvider } from "@/shared/components/providers/query-provider";
 import { ThemeProvider } from "@/shared/components/providers/theme-provider";
+import { creator } from "@/features/landing/lib/creator";
 import { getSiteUrl, siteConfig } from "@/shared/config/site";
 
 /** UI text: neutral, highly legible sans. */
@@ -38,8 +39,8 @@ export const metadata: Metadata = {
   description: siteConfig.description,
   applicationName: siteConfig.name,
   keywords: [...siteConfig.keywords],
-  authors: [{ name: siteConfig.name }],
-  creator: siteConfig.name,
+  authors: [{ name: creator.name }],
+  creator: creator.name,
   publisher: siteConfig.name,
   category: "education",
   formatDetection: { email: false, address: false, telephone: false },

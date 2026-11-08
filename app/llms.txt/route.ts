@@ -1,4 +1,5 @@
 import { DOCS_SECTIONS } from "@/features/docs/lib/content";
+import { creator, getCreatorLinks } from "@/features/landing/lib/creator";
 import { routes } from "@/shared/config/routes";
 import { absoluteUrl, siteConfig } from "@/shared/config/site";
 
@@ -7,6 +8,10 @@ export const dynamic = "force-static";
 /** Plain-text summary for AI answer engines (llms.txt convention). */
 export function GET(): Response {
     const guide = DOCS_SECTIONS.map((s) => `- ${s.title}: ${s.summary}`).join("\n");
+
+    const links = getCreatorLinks()
+        .map((l) => `- ${l.label}: ${l.url}`)
+        .join("\n");
 
     const body = `# ${siteConfig.name}
 
@@ -22,6 +27,9 @@ export function GET(): Response {
 - Generate summaries, key takeaways, flashcards, quizzes, mind maps, reports and repo wikis
 - Keep a private, user-controlled memory across notebooks
 - Sign in with Google; notebooks, sources and memories are private to the user
+
+## Creator
+Grounded Brain was created by ${creator.name}.${links ? `\n${links}` : ""}
 
 ## Guide topics
 ${guide}
