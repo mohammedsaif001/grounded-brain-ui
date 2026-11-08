@@ -1,6 +1,12 @@
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import {
+  feedbackSurfaceClasses,
+  feedbackTone,
+  toneClasses,
+  type Feedback,
+} from "./tint";
 
 type EmptyStateProps = {
   icon: LucideIcon;
@@ -8,6 +14,8 @@ type EmptyStateProps = {
   description?: React.ReactNode;
   /** Buttons or links rendered under the copy. */
   children?: React.ReactNode;
+  /** Colours the placeholder as feedback (e.g. warning for maintenance, error for failures). */
+  feedback?: Feedback;
   className?: string;
 };
 
@@ -17,18 +25,23 @@ export function EmptyState({
   title,
   description,
   children,
+  feedback,
   className,
 }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        "flex flex-1 flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-border bg-card/50 px-6 py-16 text-center",
+        "flex flex-1 flex-col items-center justify-center gap-4 rounded-3xl border border-dashed px-6 py-16 text-center",
+        feedback ? feedbackSurfaceClasses[feedback] : "border-border bg-card/50",
         className,
       )}
     >
       <span
         aria-hidden="true"
-        className="flex size-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground"
+        className={cn(
+          "flex size-12 items-center justify-center rounded-2xl",
+          feedback ? toneClasses[feedbackTone[feedback]] : "bg-muted text-muted-foreground",
+        )}
       >
         <Icon className="size-5" />
       </span>

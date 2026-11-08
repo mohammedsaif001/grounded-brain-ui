@@ -37,6 +37,7 @@ export function RouteError({ error, retry }: RouteErrorProps) {
 
     return (
         <StatusScreen
+            feedback={isOutage ? "warning" : "error"}
             icon={isOutage ? <WrenchIcon /> : <TriangleAlertIcon />}
             title={isOutage ? OUTAGE_COPY.server.title : "Something went wrong"}
             description={

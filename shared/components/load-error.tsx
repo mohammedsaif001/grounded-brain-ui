@@ -33,6 +33,7 @@ export function LoadError({
         return (
             <EmptyState
                 icon={WrenchIcon}
+                feedback="warning"
                 title={copy.title}
                 description={copy.message}
                 className={className}
@@ -45,6 +46,7 @@ export function LoadError({
     return (
         <EmptyState
             icon={icon}
+            feedback="error"
             title={title}
             description={
                 error instanceof ApiError ? error.message : fallbackDescription
