@@ -20,6 +20,7 @@ import { useArtifact, useMarkArtifactViewed } from "../hooks/use-artifacts";
 import { isUnseenArtifact } from "../lib/types";
 import { ArtifactActions } from "./artifact-actions";
 import { ArtifactContentViewer } from "./artifact-content-viewer";
+import { LoadError } from "@/shared/components/load-error";
 
 type ArtifactDetailProps = {
     workspaceId: string;
@@ -82,13 +83,13 @@ export function ArtifactDetail({
     if (error || !artifact) {
         return (
             <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
-                <EmptyState
+                <LoadError
+                    error={error}
                     icon={GraduationCapIcon}
                     title="Could not load learning tool"
-                    description="Please try again in a moment."
                 >
                     {backToLearn}
-                </EmptyState>
+                </LoadError>
             </div>
         );
     }

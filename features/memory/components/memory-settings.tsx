@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 import { EmptyState } from "@/shared/components/empty-state";
+import { LoadError } from "@/shared/components/load-error";
 import { PageHeader } from "@/shared/components/page-header";
 import { routes } from "@/shared/config/routes";
 import {
@@ -94,10 +95,11 @@ export function MemorySettings() {
                         <Skeleton className="h-24 rounded-2xl" />
                     </div>
                 ) : error ? (
-                    <EmptyState
+                    <LoadError
+                        error={error}
                         icon={BrainIcon}
                         title="Could not load memories"
-                        description="We couldn't reach the memory service. Please try again."
+                        fallbackDescription="We couldn't reach the memory service. Please try again."
                     />
                 ) : memories.length === 0 ? (
                     <EmptyState

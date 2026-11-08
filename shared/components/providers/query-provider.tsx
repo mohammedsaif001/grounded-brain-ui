@@ -9,6 +9,7 @@ import {
 import { toast } from "@/components/ui/toast";
 import { ApiError } from "@/shared/lib/api";
 import { getErrorMessage } from "@/shared/lib/errors";
+import { OUTAGE_COPY } from "@/shared/lib/outage";
 
 declare module "@tanstack/react-query" {
     interface Register {
@@ -42,10 +43,14 @@ function createQueryClient() {
                 if (mutation.meta?.suppressErrorToast) {
                     return;
                 }
+                const outage =
+                    error instanceof ApiError && error.service
+                        ? OUTAGE_COPY[error.service]
+                        : null;
                 toast.add({
-                    type: "error",
-                    title: "Action failed",
-                    description: getErrorMessage(error),
+                    type: outage ? "warning" : "error",
+                    title: outage?.title ?? "Action failed",
+                    description: outage?.message ?? getErrorMessage(error),
                 });
             },
         }),

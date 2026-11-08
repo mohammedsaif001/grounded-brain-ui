@@ -16,6 +16,7 @@ import type { ArtifactType, LearningArtifact } from "../lib/types";
 import { ArtifactCard } from "./artifact-card";
 import { ArtifactMaker } from "./artifact-maker";
 import { GenerateArtifactDialog } from "./generate-artifact-dialog";
+import { LoadError } from "@/shared/components/load-error";
 
 type LearnHubProps = {
     workspaceId: string;
@@ -107,10 +108,10 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                             ))}
                         </div>
                     ) : error ? (
-                        <EmptyState
+                        <LoadError
+                            error={error}
                             icon={GraduationCapIcon}
                             title="Could not load learning tools"
-                            description="Please try again in a moment."
                         />
                     ) : visible.length === 0 ? (
                         <EmptyState

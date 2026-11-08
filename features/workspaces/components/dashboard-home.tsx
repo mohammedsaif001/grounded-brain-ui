@@ -18,7 +18,6 @@ import { EmptyState } from "@/shared/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
 import { cn } from "@/lib/utils";
-import { ApiError } from "@/shared/lib/api";
 import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import {
     useCreateWorkspace,
@@ -41,6 +40,7 @@ import { AppLogo } from "@/shared/components/brand/app-logo";
 import { PageHeader } from "@/shared/components/page-header";
 import { TypeTile } from "@/shared/components/type-tile";
 import { routes } from "@/shared/config/routes";
+import { LoadError } from "@/shared/components/load-error";
 
 type DashboardHomeProps = {
     userName?: string | null;
@@ -201,14 +201,10 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             ))}
                         </div>
                     ) : error ? (
-                        <EmptyState
+                        <LoadError
+                            error={error}
                             icon={BookOpenIcon}
                             title="Could not load notebooks"
-                            description={
-                                error instanceof ApiError
-                                    ? error.message
-                                    : "Please try again in a moment."
-                            }
                         />
                     ) : (
                         <div

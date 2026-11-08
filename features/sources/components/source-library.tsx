@@ -27,7 +27,6 @@ import { EmptyState } from "@/shared/components/empty-state";
 import { FilterSelect } from "@/shared/components/filter-select";
 import { PageHeader } from "@/shared/components/page-header";
 import { ViewToggle, type ViewMode } from "@/shared/components/view-toggle";
-import { ApiError } from "@/shared/lib/api";
 import {
     useBulkDeleteSources,
     useDeleteSource,
@@ -50,6 +49,7 @@ import { AddSourceDialog } from "./add-source-dialog";
 import { DeleteSourcesDialog } from "./delete-sources-dialog";
 import { SourceCard } from "./source-card";
 import { SourceTable } from "./source-table";
+import { LoadError } from "@/shared/components/load-error";
 
 type SourceLibraryProps = {
     workspaceId: string;
@@ -344,14 +344,10 @@ export function SourceLibrary({
                     ))}
                 </div>
             ) : error ? (
-                <EmptyState
+                <LoadError
+                    error={error}
                     icon={LibraryBigIcon}
                     title="Could not load sources"
-                    description={
-                        error instanceof ApiError
-                            ? error.message
-                            : "Please try again."
-                    }
                 />
             ) : sources && sources.length > 0 ? (
                 view === "list" ? (

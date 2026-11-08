@@ -17,6 +17,7 @@ import { GithubSourcePanel } from "./github-source-panel";
 import { MarkdownPreview } from "./markdown-preview";
 import { SourceStatusBadge } from "./source-status-badge";
 import { SourceTypeTile } from "./source-type-icon";
+import { LoadError } from "@/shared/components/load-error";
 
 type SourceDetailProps = {
     workspaceId: string;
@@ -62,13 +63,13 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
     if (error || !source) {
         return (
             <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
-                <EmptyState
+                <LoadError
+                    error={error}
                     icon={LibraryBigIcon}
                     title="Could not load source"
-                    description="Please try again in a moment."
                 >
                     {backToLibrary}
-                </EmptyState>
+                </LoadError>
             </div>
         );
     }
