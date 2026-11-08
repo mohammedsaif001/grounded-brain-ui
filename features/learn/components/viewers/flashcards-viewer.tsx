@@ -313,37 +313,34 @@ export function FlashcardsViewer({
                 </Button>
             </div>
 
-            <AnimatePresence initial={false}>
-                {flipped ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: -8, height: 0 }}
-                        animate={{ opacity: 1, y: 0, height: "auto" }}
-                        exit={{ opacity: 0, y: -8, height: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                    >
-                        <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                size="lg"
-                                className="flex-1 hover:bg-tint-rose hover:text-tint-rose-foreground"
-                                onClick={markUnknown}
-                            >
-                                <RefreshCwIcon />
-                                Still learning
-                            </Button>
-                            <Button
-                                size="lg"
-                                className="flex-1"
-                                onClick={markKnown}
-                            >
-                                <CheckIcon />
-                                Got it
-                            </Button>
-                        </div>
-                    </motion.div>
-                ) : null}
-            </AnimatePresence>
+            {/* Always rendered so flipping never moves the page; it only fades in. */}
+            <div
+                aria-hidden={!flipped}
+                inert={!flipped}
+                className={`flex gap-2 transition-opacity duration-200 ${
+                    flipped ? "opacity-100" : "pointer-events-none opacity-0"
+                }`}
+            >
+                <Button
+                    variant="outline"
+                    size="lg"
+                    className="flex-1 hover:bg-tint-rose hover:text-tint-rose-foreground"
+                    onClick={markUnknown}
+                    tabIndex={flipped ? 0 : -1}
+                >
+                    <RefreshCwIcon />
+                    Still learning
+                </Button>
+                <Button
+                    size="lg"
+                    className="flex-1"
+                    onClick={markKnown}
+                    tabIndex={flipped ? 0 : -1}
+                >
+                    <CheckIcon />
+                    Got it
+                </Button>
+            </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-4">
                 <p className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
