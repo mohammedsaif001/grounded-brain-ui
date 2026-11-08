@@ -23,7 +23,8 @@ export const sourceSchema = z.object({
     workspaceId: z.string(),
     type: sourceTypeSchema,
     title: z.string(),
-    content: z.string().nullable(),
+    /** Omitted by list endpoints (it can be megabytes per source); present on a single source. */
+    content: z.string().nullish(),
     url: z.string().nullable(),
     status: sourceStatusSchema,
     metadata: jsonObject.nullable(),

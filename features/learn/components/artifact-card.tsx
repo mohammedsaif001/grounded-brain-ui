@@ -34,7 +34,7 @@ export function ArtifactCard({
                 className="absolute inset-0 z-0 rounded-[inherit] outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
             />
 
-            <div className="relative space-y-4">
+            <div className="pointer-events-none relative space-y-4">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
                         <TypeTile icon={meta.icon} tone={meta.tone} size="sm" />
@@ -52,7 +52,7 @@ export function ArtifactCard({
                 <h3 className="text-heading line-clamp-2">{artifact.title}</h3>
             </div>
 
-            <div className="relative flex items-center justify-between gap-3">
+            <div className="pointer-events-none relative flex items-center justify-between gap-3">
                 <p className="text-caption">
                     Generated{" "}
                     {formatDistanceToNow(new Date(artifact.createdAt), {
@@ -63,7 +63,7 @@ export function ArtifactCard({
                     <Button
                         variant="ghost"
                         size="icon-sm"
-                        className="relative z-10 opacity-100 transition-opacity focus-visible:opacity-100 md:opacity-0 md:group-hover/card:opacity-100"
+                        className="pointer-events-auto relative z-10 opacity-100 transition-opacity focus-visible:opacity-100 md:opacity-0 md:group-hover/card:opacity-100"
                         onClick={() => onDelete(artifact)}
                     >
                         <Trash2Icon aria-hidden="true" />
