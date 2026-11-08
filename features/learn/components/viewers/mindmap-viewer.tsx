@@ -43,6 +43,7 @@ import {
     type Placement,
 } from "../../lib/mindmap-layout";
 import type { MindMapEdge, MindMapNode } from "../../lib/types";
+import { useTheme } from "next-themes";
 import { routes } from "@/shared/config/routes";
 
 type MindMapActions = {
@@ -166,6 +167,7 @@ function MindMapCanvas({ nodes, edges, workspaceId }: MindMapCanvasProps) {
     const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const { fitView } = useReactFlow();
+    const { resolvedTheme } = useTheme();
 
     const expandableIds = useMemo(
         () => (tree ? collectExpandableIds(tree) : []),
@@ -351,7 +353,8 @@ function MindMapCanvas({ nodes, edges, workspaceId }: MindMapCanvasProps) {
                         nodes={flowNodes}
                         edges={flowEdges}
                         nodeTypes={nodeTypes}
-                        colorMode="dark"
+                        colorMode={resolvedTheme === "dark" ? "dark" : "light"}
+                        className="bg-card/40"
                         fitView
                         fitViewOptions={{ padding: 0.2 }}
                         minZoom={0.15}
@@ -366,9 +369,12 @@ function MindMapCanvas({ nodes, edges, workspaceId }: MindMapCanvasProps) {
                         <MiniMap
                             pannable
                             zoomable
-                            nodeColor="var(--muted-foreground)"
-                            maskColor="color-mix(in oklab, var(--background) 75%, transparent)"
-                            className="rounded-xl! border! border-border! bg-card/90!"
+                            // `var()` does not work inside an SVG fill attribute, so the node
+                            // colour comes from a class, which wins over the attribute.
+                            nodeClassName="fill-muted-foreground stroke-none"
+                            nodeBorderRadius={6}
+                            maskColor="color-mix(in oklab, var(--background) 70%, transparent)"
+                            className="rounded-xl! border! border-border! bg-card!"
                         />
                         <Controls className="rounded-xl! border! border-border! bg-card! shadow-sm! [&>button]:border-border! [&>button]:bg-card! [&>button]:text-foreground! [&>button:hover]:bg-muted!" />
                         <Background gap={20} color="var(--border)" />
