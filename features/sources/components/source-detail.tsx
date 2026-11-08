@@ -50,10 +50,10 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
         return (
             <div
                 aria-busy="true"
-                className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-6 md:p-8"
+                className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-4 sm:p-6 md:p-8"
             >
-                <Skeleton className="h-10 w-72" />
-                <Skeleton className="h-4 w-96" />
+                <Skeleton className="h-10 w-72 max-w-full" />
+                <Skeleton className="h-4 w-96 max-w-full" />
                 <Skeleton className="h-72 w-full rounded-2xl" />
             </div>
         );
@@ -61,7 +61,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
 
     if (error instanceof ApiError && error.status === 404) {
         return (
-            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-4 sm:p-6 md:p-8">
                 <EmptyState icon={LibraryBigIcon} title="Source not found">
                     {backToLibrary}
                 </EmptyState>
@@ -71,7 +71,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
 
     if (error || !source) {
         return (
-            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-4 sm:p-6 md:p-8">
                 <LoadError
                     error={error}
                     icon={LibraryBigIcon}
@@ -99,7 +99,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
         source.status === "PENDING" || source.status === "PROCESSING";
 
     return (
-        <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-6 md:p-8">
+        <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-4 sm:p-6 md:p-8">
             <header className="flex flex-wrap items-start gap-4">
                 <Button
                     nativeButton={false}

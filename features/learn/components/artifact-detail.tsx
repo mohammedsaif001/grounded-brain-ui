@@ -68,9 +68,9 @@ export function ArtifactDetail({
         return (
             <div
                 aria-busy="true"
-                className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-6 md:p-8"
+                className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-4 sm:p-6 md:p-8"
             >
-                <Skeleton className="h-10 w-72" />
+                <Skeleton className="h-10 w-72 max-w-full" />
                 <Skeleton className="h-72 w-full rounded-2xl" />
             </div>
         );
@@ -78,7 +78,7 @@ export function ArtifactDetail({
 
     if (error instanceof ApiError && error.status === 404) {
         return (
-            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-4 sm:p-6 md:p-8">
                 <EmptyState icon={GraduationCapIcon} title="Learning tool not found">
                     {backToLearn}
                 </EmptyState>
@@ -88,7 +88,7 @@ export function ArtifactDetail({
 
     if (error || !artifact) {
         return (
-            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-4 sm:p-6 md:p-8">
                 <LoadError
                     error={error}
                     icon={GraduationCapIcon}
@@ -115,7 +115,7 @@ export function ArtifactDetail({
                 "mx-auto flex w-full flex-1 flex-col gap-6",
                 isMindMap
                     ? "min-h-0 max-w-none p-4 md:p-5"
-                    : "max-w-5xl p-6 md:p-8 short:gap-4 short:p-4 short:md:p-4",
+                    : "max-w-5xl p-4 sm:p-6 md:p-8 short:gap-4 short:p-4 short:md:p-4",
             )}
         >
             <header className="flex flex-wrap items-start gap-4">

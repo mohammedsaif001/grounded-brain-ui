@@ -55,7 +55,7 @@ export function CardGridPageSkeleton({
     return (
         <SkeletonRoot
             className={cn(
-                "mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-8",
+                "mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 md:p-8",
                 className,
             )}
         >
@@ -80,7 +80,7 @@ export function ListPageSkeleton({
     return (
         <SkeletonRoot
             className={cn(
-                "mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-8",
+                "mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 md:p-8",
                 className,
             )}
         >
@@ -106,7 +106,7 @@ export function FormPageSkeleton({ className }: { className?: string }) {
     return (
         <SkeletonRoot
             className={cn(
-                "mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-8",
+                "mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 md:p-8",
                 className,
             )}
         >

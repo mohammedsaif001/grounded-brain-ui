@@ -237,7 +237,7 @@ export function WorkspaceChat({
 
     return (
         <CitationSelectionProvider>
-            <div className="mx-auto grid min-h-0 w-full max-w-7xl flex-1 gap-6 p-6 md:p-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
+            <div className="mx-auto grid min-h-0 w-full max-w-7xl flex-1 gap-6 p-4 sm:p-6 md:p-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
                 <div className="flex min-h-0 flex-col gap-5">
                     <PageHeader
                         title={activeConversation?.title ?? "Chat"}

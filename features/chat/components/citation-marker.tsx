@@ -45,7 +45,7 @@ export function CitationMarker({
                     </button>
                 }
             />
-            <HoverCardContent side="top" align="start" className="w-80">
+            <HoverCardContent side="top" align="start" className="w-80 max-w-[calc(100vw-2rem)]">
                 <CitationPreview
                     citation={citation}
                     workspaceId={workspaceId}

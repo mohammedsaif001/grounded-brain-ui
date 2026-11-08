@@ -87,7 +87,7 @@ export function MindMapEditor({ value, onChange }: MindMapEditorProps) {
                 ) : null}
                 <ul className="space-y-2">
                     {edges.map((edge, index) => (
-                        <li key={edge.id} className="flex items-center gap-2">
+                        <li key={edge.id} className="flex flex-wrap items-center gap-2">
                             <select
                                 aria-label={`Connection ${index + 1} from`}
                                 className={nativeSelectClass}

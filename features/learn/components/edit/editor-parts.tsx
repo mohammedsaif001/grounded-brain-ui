@@ -90,4 +90,4 @@ export function AddButton({ label, onClick, disabled }: AddButtonProps) {
  * readable (white-on-white otherwise) in the dark theme.
  */
 export const nativeSelectClass =
-    "h-9 w-full min-w-0 rounded-lg border border-input bg-card px-3 text-sm text-foreground outline-none [color-scheme:light] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 dark:[color-scheme:dark] [&>option]:bg-popover [&>option]:text-popover-foreground";
+    "h-9 min-w-36 flex-1 rounded-lg border border-input bg-card px-3 text-sm text-foreground outline-none [color-scheme:light] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 dark:[color-scheme:dark] [&>option]:bg-popover [&>option]:text-popover-foreground";

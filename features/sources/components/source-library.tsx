@@ -190,7 +190,7 @@ export function SourceLibrary({
             : `${pendingDelete?.kind === "many" ? pendingDelete.ids.length : 0} sources`;
 
     return (
-        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 md:p-8">
             <PageHeader
                 eyebrow="The roots of your notebook"
                 title="Your source library"
