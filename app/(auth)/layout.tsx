@@ -12,7 +12,7 @@ export default function AuthLayout({
 }) {
     return (
         <div className="bg-page flex min-h-svh flex-col">
-            <header className="flex items-center justify-between px-6 py-5 short:py-3 md:px-14">
+            <header className="flex items-center justify-between gap-3 px-4 py-4 short:py-3 sm:px-6 sm:py-5 md:px-14">
                 <AppLogo />
                 <div className="flex items-center gap-2">
                     <Button
@@ -22,13 +22,13 @@ export default function AuthLayout({
                         render={<Link href={routes.docs} />}
                     >
                         <BookOpenTextIcon aria-hidden="true" />
-                        How it works
+                        <span className="max-sm:sr-only">How it works</span>
                     </Button>
                     <ModeToggle />
                 </div>
             </header>
 
-            <main className="flex flex-1 items-center px-6 py-8 short:py-3 md:px-14">
+            <main className="flex flex-1 items-center px-4 py-6 sm:px-6 sm:py-8 short:py-3 md:px-14">
                 {children}
             </main>
 

@@ -79,7 +79,7 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
     }
 
     return (
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 p-6">
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 p-4 sm:p-6">
             <PageHeader
                 eyebrow="Workspace"
                 title="Workspace settings"

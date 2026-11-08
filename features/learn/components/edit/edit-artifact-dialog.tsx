@@ -105,7 +105,7 @@ function LoadedEditArtifactForm({
     }
 
     return (
-        <div className="grid gap-4 p-6">
+        <div className="grid grid-cols-1 gap-4 p-6">
             <DialogHeader>
                 <DialogTitle>Edit</DialogTitle>
                 <DialogDescription>

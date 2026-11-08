@@ -96,7 +96,7 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                     {isLoading ? (
                         <div
                             aria-busy="true"
-                            className="grid gap-4 md:grid-cols-2"
+                            className="grid grid-cols-1 gap-4 md:grid-cols-2"
                         >
                             {Array.from({ length: 4 }).map((_, index) => (
                                 <Skeleton
@@ -127,7 +127,7 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                             </Button>
                         </EmptyState>
                     ) : (
-                        <div className="grid gap-4 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             {visible.map((artifact) => (
                                 <ArtifactCard
                                     key={artifact.id}

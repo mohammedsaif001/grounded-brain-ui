@@ -77,7 +77,7 @@ function RenameForm({
     }
 
     return (
-        <form onSubmit={(event) => void handleSubmit(event)} className="grid gap-5">
+        <form onSubmit={(event) => void handleSubmit(event)} className="grid grid-cols-1 gap-5">
             <DialogHeader>
                 <DialogTitle>Rename conversation</DialogTitle>
             </DialogHeader>

@@ -81,7 +81,7 @@ export function QuizViewer({
                 initial={{ opacity: 0, scale: 0.94 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ type: "spring", stiffness: 260, damping: 24 }}
-                className="mx-auto max-w-lg space-y-5 rounded-2xl border bg-card p-8 text-center shadow-surface"
+                className="mx-auto max-w-lg space-y-5 rounded-2xl border bg-card p-6 text-center shadow-surface sm:p-8"
             >
                 <motion.div
                     initial={{ scale: 0, rotate: -30 }}
@@ -158,7 +158,7 @@ export function QuizViewer({
                         className="max-w-none font-serif text-2xl leading-snug [&_p]:my-0"
                     />
 
-                    <div className="grid gap-2">
+                    <div className="grid grid-cols-1 gap-2">
                         {question.options.map((option, optionIndex) => {
                             const isSelected = selected === optionIndex;
                             const isCorrect =

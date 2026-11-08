@@ -330,8 +330,8 @@ export function SourceLibrary({
                     aria-busy="true"
                     className={
                         view === "grid"
-                            ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
-                            : "grid gap-2"
+                            ? "grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                            : "grid grid-cols-1 gap-2"
                     }
                 >
                     {Array.from({ length: 6 }).map((_, index) => (
@@ -365,7 +365,7 @@ export function SourceLibrary({
                         onReprocess={(source) => reprocessSources([source.id])}
                     />
                 ) : (
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                         {sources.map((source) => (
                             <SourceCard
                                 key={source.id}

@@ -93,7 +93,7 @@ export function WikiViewer({ wiki }: { wiki: WikiContent }) {
 
             {wiki.techStack.length > 0 ? (
                 <Section title="Tech stack">
-                    <ul className="grid gap-2 sm:grid-cols-2">
+                    <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                         {wiki.techStack.map((tech) => (
                             <li
                                 key={tech.name}

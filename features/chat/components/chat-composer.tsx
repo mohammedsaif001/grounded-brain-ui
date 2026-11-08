@@ -66,7 +66,7 @@ export function ChatComposer({
             />
 
             <div className="mt-2 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
+                <div className="flex min-w-0 flex-wrap items-center gap-x-2">
                     {onWebSearchChange ? (
                         <Button
                             type="button"
@@ -96,6 +96,7 @@ export function ChatComposer({
 
                 <Button
                     type="submit"
+                    className="shrink-0"
                     disabled={isBusy || !input.trim()}
                     aria-label="Send message"
                 >

@@ -32,7 +32,7 @@ export function FirstRunSteps() {
                     Three steps from a pile of reading to real understanding
                 </h2>
             </div>
-            <ol className="grid gap-3 md:grid-cols-3">
+            <ol className="grid grid-cols-1 gap-3 md:grid-cols-3">
                 {STEPS.map((step, index) => (
                     <li
                         key={step.title}

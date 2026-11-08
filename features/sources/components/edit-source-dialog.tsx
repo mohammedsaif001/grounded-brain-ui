@@ -111,7 +111,7 @@ function LoadedEditSourceForm({
     }
 
     return (
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 gap-4">
             <DialogHeader>
                 <DialogTitle>Edit source</DialogTitle>
                 <DialogDescription>

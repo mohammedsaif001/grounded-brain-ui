@@ -55,7 +55,7 @@ export function PdfSourceForm({
 
     return (
         <form
-            className="grid gap-4 pt-4 short:gap-3 short:pt-3"
+            className="grid grid-cols-1 gap-4 pt-4 short:gap-3 short:pt-3"
             onSubmit={(event) => {
                 event.preventDefault();
                 if (!file) {

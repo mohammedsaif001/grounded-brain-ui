@@ -113,7 +113,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
                     <span className="sr-only">Back to library</span>
                 </Button>
                 <SourceTypeTile type={source.type} size="lg" />
-                <div className="min-w-0 flex-1 space-y-1.5">
+                <div className="order-3 w-full min-w-0 space-y-1.5 sm:order-none sm:w-auto sm:flex-1">
                     <p className="text-eyebrow">
                         {SOURCE_TYPE_LABELS[source.type]}
                     </p>
@@ -136,6 +136,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
                 </div>
                 <Button
                     variant="outline"
+                    className="order-2 ml-auto sm:order-none sm:ml-0"
                     // A source being (re)indexed cannot be edited; the API answers 409.
                     disabled={isProcessing}
                     onClick={() => setEditOpen(true)}

@@ -225,7 +225,11 @@
 /* Themed page canvas (sage → lavender in Pearl, green → indigo in Forest). */
 @utility bg-page {
   background-image: var(--page-gradient);
-  background-attachment: fixed;
+  /* Fixed backgrounds are unreliable on phones (iOS ignores them, emulators mis-size
+     them, leaving a band that stops short of the content), so only desktop pins it. */
+  @media (min-width: 48rem) {
+    background-attachment: fixed;
+  }
 }
 
 /* Typography scale. Prefer these over ad-hoc size/weight combinations. */

@@ -68,7 +68,7 @@ export function DashboardHero({
                 className="pointer-events-none absolute -bottom-28 -left-12 size-64 rounded-full bg-tint-violet/70 blur-3xl"
             />
 
-            <div className="relative grid gap-6 p-5 sm:p-6 md:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-10">
+            <div className="relative grid grid-cols-1 gap-6 p-5 sm:p-6 md:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-10">
                 <div className="space-y-4">
                     <p className="text-eyebrow">
                         {greeting}, {firstName}

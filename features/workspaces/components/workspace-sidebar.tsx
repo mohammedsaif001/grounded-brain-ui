@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
     ArrowLeftIcon,
     LibraryBigIcon,
@@ -24,6 +26,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarRail,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import { AppLogo } from "@/shared/components/brand/app-logo";
 import { routes } from "@/shared/config/routes";
@@ -78,12 +81,30 @@ export function WorkspaceSidebar({
     onAddSource,
 }: WorkspaceSidebarProps) {
     const { data: summary } = useWorkspaceSummary(workspace.id);
+    const pathname = usePathname();
+    const { isMobile, setOpenMobile } = useSidebar();
+
+    // On a phone the sidebar is a drawer, so it must get out of the way once the user
+    // picks something. Closing on the tap covers links to the page you are already on
+    // (the route does not change then); the effect covers every other kind of navigation.
+    useEffect(() => {
+        setOpenMobile(false);
+    }, [pathname, setOpenMobile]);
+
+    function closeDrawerOnLink(event: React.MouseEvent) {
+        if (isMobile && (event.target as HTMLElement).closest("a[href]")) {
+            setOpenMobile(false);
+        }
+    }
     const sourceCount = summary?.sourceCount;
     const hasUnseenLearning = (summary?.unseenArtifactCount ?? 0) > 0;
 
     return (
         <Sidebar>
-            <SidebarHeader className="gap-5 px-4 pt-5">
+            <SidebarHeader
+                className="gap-5 px-4 pt-5"
+                onClick={closeDrawerOnLink}
+            >
                 <Link
                     href={routes.dashboard}
                     className="rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-sidebar-ring/40"
@@ -109,7 +130,7 @@ export function WorkspaceSidebar({
                 </div>
             </SidebarHeader>
 
-            <SidebarContent className="px-2">
+            <SidebarContent className="px-2" onClick={closeDrawerOnLink}>
                 <SidebarGroup>
                     <SidebarGroupLabel className="sr-only">
                         Workspace
@@ -165,11 +186,14 @@ export function WorkspaceSidebar({
 
                 <SourceSidebarList
                     workspaceId={workspace.id}
-                    onAddSource={onAddSource}
+                    onAddSource={() => {
+                        setOpenMobile(false);
+                        onAddSource();
+                    }}
                 />
             </SidebarContent>
 
-            <SidebarFooter className="gap-3 p-3">
+            <SidebarFooter className="gap-3 p-3" onClick={closeDrawerOnLink}>
                 <div className="flex items-start gap-3 rounded-xl bg-sidebar-accent/60 p-3">
                     <ShieldCheckIcon
                         aria-hidden="true"

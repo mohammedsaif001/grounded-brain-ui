@@ -129,7 +129,7 @@ export function ArtifactDetail({
                     <span className="sr-only">Back to Learn</span>
                 </Button>
                 <TypeTile icon={meta.icon} tone={meta.tone} size="lg" />
-                <div className="min-w-0 flex-1 space-y-1.5">
+                <div className="order-3 w-full min-w-0 space-y-1.5 sm:order-none sm:w-auto sm:flex-1">
                     <p className="text-eyebrow">
                         {ARTIFACT_TYPE_LABELS[artifact.type]}
                     </p>

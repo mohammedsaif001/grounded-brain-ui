@@ -78,7 +78,7 @@ export function ArtifactActions({ artifact, workspaceId }: ArtifactActionsProps)
     }
 
     return (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="order-4 flex w-full flex-wrap items-center gap-2 sm:order-none sm:w-auto">
             <Button
                 variant="outline"
                 disabled={!isReady}

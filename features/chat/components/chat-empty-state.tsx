@@ -19,7 +19,7 @@ type ChatEmptyStateProps = {
 
 export function ChatEmptyState({ onPick, disabled }: ChatEmptyStateProps) {
     return (
-        <div className="flex flex-col items-center gap-6 rounded-3xl border border-dashed border-border bg-card/50 px-6 py-14 text-center">
+        <div className="flex flex-col items-center gap-6 rounded-3xl border border-dashed border-border bg-card/50 px-4 py-10 text-center sm:px-6 sm:py-14">
             <span
                 aria-hidden="true"
                 className="flex size-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground"
@@ -36,9 +36,12 @@ export function ChatEmptyState({ onPick, disabled }: ChatEmptyStateProps) {
             </div>
             <ul className="flex flex-wrap justify-center gap-2">
                 {STARTER_PROMPTS.map((prompt) => (
-                    <li key={prompt}>
+                    <li key={prompt} className="max-w-full">
                         <Button
                             variant="outline"
+                            // Long prompts must wrap: a non-wrapping chip is wider than a phone
+                            // and drags the whole page's layout past the screen edge.
+                            className="h-auto min-h-9 max-w-full py-2 text-left whitespace-normal"
                             disabled={disabled}
                             onClick={() => onPick(prompt)}
                         >

@@ -172,7 +172,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                     </div>
 
                     {isLoading ? (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {Array.from({ length: 6 }).map((_, index) => (
                                 <Skeleton
                                     key={index}
@@ -190,7 +190,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                         <div
                             aria-busy={isPlaceholderData}
                             className={cn(
-                                "grid gap-4 transition-opacity sm:grid-cols-2 lg:grid-cols-3",
+                                "grid grid-cols-1 gap-4 transition-opacity sm:grid-cols-2 lg:grid-cols-3",
                                 isPlaceholderData && "opacity-60",
                             )}
                         >
