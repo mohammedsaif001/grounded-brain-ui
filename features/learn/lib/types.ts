@@ -31,6 +31,20 @@ export type CreateArtifactInput = {
     messageIds?: string[];
 };
 
+export type UpdateArtifactInput = {
+    /** 1-200 characters. A rename alone does not mark the artifact as edited. */
+    title?: string;
+    /** The full content object for the artifact's type (same shape `GET` returns). */
+    content?: ArtifactContent["content"];
+    /** The `updatedAt` last read; a mismatch fails with 409 `CONFLICT`. */
+    expectedUpdatedAt?: string;
+};
+
+/** True once the user has changed the generated content; regenerating would discard it. */
+export function isUserEdited(artifact: Pick<LearningArtifact, "metadata">) {
+    return artifact.metadata?.userEdited === true;
+}
+
 /** READY and not yet opened: shown with a "New" marker. */
 export function isUnseenArtifact(
     artifact: Pick<LearningArtifact, "status" | "viewedAt">,

@@ -10,7 +10,11 @@ import { TypeTile } from "@/shared/components/type-tile";
 import { routes } from "@/shared/config/routes";
 import { ARTIFACT_META } from "../lib/artifact-meta";
 import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
-import { isUnseenArtifact, type LearningArtifact } from "../lib/types";
+import {
+    isUnseenArtifact,
+    isUserEdited,
+    type LearningArtifact,
+} from "../lib/types";
 
 type ArtifactCardProps = {
     artifact: LearningArtifact;
@@ -45,6 +49,9 @@ export function ArtifactCard({
                     <div className="flex items-center gap-2">
                         {isUnseenArtifact(artifact) ? (
                             <Badge variant="green">New</Badge>
+                        ) : null}
+                        {isUserEdited(artifact) ? (
+                            <Badge variant="violet">Edited</Badge>
                         ) : null}
                         <StatusBadge status={artifact.status} />
                     </div>
