@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { AppLogo } from "@/shared/components/brand/app-logo";
+import { CtaBanner } from "@/shared/components/cta-banner";
 import { TypeTile } from "@/shared/components/type-tile";
 import type { Tone } from "@/shared/components/tint";
 import { routes } from "@/shared/config/routes";
@@ -323,23 +324,18 @@ export function LandingPage() {
                     aria-labelledby="cta-heading"
                     className="mx-auto max-w-6xl px-4 pt-4 pb-16 md:px-8 md:pb-24"
                 >
-                    <div className="flex flex-col items-center gap-5 rounded-3xl bg-tint-green px-6 py-12 text-center text-tint-green-foreground md:py-16">
-                        <h2 id="cta-heading" className="text-title max-w-xl">
-                            Start your first notebook in under a minute
-                        </h2>
-                        <p className="text-body max-w-md">
-                            Sign in with Google, add a source and ask your first
-                            question.
-                        </p>
-                        <Button
-                            size="lg"
-                            nativeButton={false}
-                            render={<Link href={routes.login} />}
-                        >
-                            Get started
-                            <ArrowRightIcon aria-hidden="true" />
-                        </Button>
-                    </div>
+                    <CtaBanner
+                        headingId="cta-heading"
+                        title="Start your first notebook in under a minute"
+                        description="Sign in with Google, add a source and ask your first question."
+                        primary={{ href: routes.login, label: "Get started" }}
+                        secondary={{
+                            href: routes.docs,
+                            label: "Read the guide",
+                            icon: BookOpenTextIcon,
+                        }}
+                        className="md:px-14 md:py-16"
+                    />
                 </section>
             </main>
 

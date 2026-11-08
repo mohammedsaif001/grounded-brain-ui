@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-    ArrowRightIcon,
     ChevronRightIcon,
     LayoutDashboardIcon,
     LogInIcon,
@@ -10,6 +9,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { AppLogo } from "@/shared/components/brand/app-logo";
 import { Callout } from "@/shared/components/callout";
+import { CtaBanner } from "@/shared/components/cta-banner";
 import { PageHeader } from "@/shared/components/page-header";
 import { TypeTile } from "@/shared/components/type-tile";
 import { routes } from "@/shared/config/routes";
@@ -122,25 +122,23 @@ export function DocsPage({ signedIn }: DocsPageProps) {
                             <DocsSectionCard key={section.id} section={section} />
                         ))}
 
-                        <Callout title="Ready when you are" tone="green">
-                            <div className="flex flex-wrap items-center justify-between gap-3">
-                                <p>
-                                    {signedIn
-                                        ? "Pick up where you left off."
-                                        : "Create your first notebook in under a minute."}
-                                </p>
-                                <Button
-                                    nativeButton={false}
-                                    render={<Link href={ctaHref} />}
-                                >
-                                    <CtaIcon aria-hidden="true" />
-                                    {signedIn
+                        <section aria-labelledby="docs-cta-heading">
+                            <CtaBanner
+                                headingId="docs-cta-heading"
+                                title={
+                                    signedIn
+                                        ? "Pick up where you left off"
+                                        : "Create your first notebook in under a minute"
+                                }
+                                primary={{
+                                    href: ctaHref,
+                                    label: signedIn
                                         ? "Open your notebooks"
-                                        : "Sign in to start"}
-                                    <ArrowRightIcon aria-hidden="true" />
-                                </Button>
-                            </div>
-                        </Callout>
+                                        : "Sign in to start",
+                                    icon: CtaIcon,
+                                }}
+                            />
+                        </section>
                     </div>
                 </div>
             </main>
