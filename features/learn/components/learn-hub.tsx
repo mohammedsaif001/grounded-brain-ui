@@ -4,12 +4,12 @@ import { useMemo, useState } from "react";
 import { LightbulbIcon, SparklesIcon, GraduationCapIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSources } from "@/features/sources/hooks/use-sources";
 import { Callout } from "@/shared/components/callout";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 import { EmptyState } from "@/shared/components/empty-state";
 import { PageHeader } from "@/shared/components/page-header";
-import { cn } from "@/lib/utils";
 import { useArtifacts, useDeleteArtifact } from "../hooks/use-artifacts";
 import { filterArtifacts, type ArtifactFilter } from "../lib/filter-artifacts";
 import type { ArtifactType, LearningArtifact } from "../lib/types";
@@ -67,33 +67,29 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
 
             <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
                 <div className="space-y-5">
-                    <div
-                        role="group"
-                        aria-label="Filter learning material"
-                        className="flex items-center gap-5 text-sm"
+                    <Tabs
+                        value={filter}
+                        onValueChange={(value) =>
+                            setFilter(value as ArtifactFilter)
+                        }
                     >
-                        {FILTERS.map(({ value, label }) => (
-                            <button
-                                key={value}
-                                type="button"
-                                aria-pressed={filter === value}
-                                onClick={() => setFilter(value)}
-                                className={cn(
-                                    "rounded-md py-1 outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
-                                    filter === value
-                                        ? "font-semibold text-foreground"
-                                        : "text-muted-foreground hover:text-foreground",
-                                )}
-                            >
-                                {label}
-                                {value === "all" ? (
-                                    <span className="ml-1.5 tabular-nums">
-                                        {artifacts.length}
-                                    </span>
-                                ) : null}
-                            </button>
-                        ))}
-                    </div>
+                        <TabsList aria-label="Filter learning material">
+                            {FILTERS.map(({ value, label }) => (
+                                <TabsTrigger
+                                    key={value}
+                                    value={value}
+                                    className="px-4"
+                                >
+                                    {label}
+                                    {value === "all" ? (
+                                        <span className="tabular-nums text-muted-foreground">
+                                            {artifacts.length}
+                                        </span>
+                                    ) : null}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                    </Tabs>
 
                     {isLoading ? (
                         <div
@@ -141,15 +137,17 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                         </div>
                     )}
 
-                    <Callout tone="green" className="flex items-center gap-3">
-                        <LightbulbIcon
-                            aria-hidden="true"
-                            className="size-5 shrink-0"
-                        />
-                        <span>
-                            A little effort goes a long way. Try a quiz before
-                            rereading your summary.
-                        </span>
+                    <Callout tone="green">
+                        <div className="flex items-center gap-3">
+                            <LightbulbIcon
+                                aria-hidden="true"
+                                className="size-5 shrink-0"
+                            />
+                            <span>
+                                A little effort goes a long way. Try a quiz
+                                before rereading your summary.
+                            </span>
+                        </div>
                     </Callout>
                 </div>
 
