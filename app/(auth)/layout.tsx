@@ -1,3 +1,5 @@
+import { BookOpenTextIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { AppLogo } from "@/shared/components/brand/app-logo";
 import Link from "next/link";
@@ -12,7 +14,18 @@ export default function AuthLayout({
         <div className="bg-page flex min-h-svh flex-col">
             <header className="flex items-center justify-between px-6 py-5 short:py-3 md:px-14">
                 <AppLogo />
-                <ModeToggle />
+                <div className="flex items-center gap-2">
+                    <Button
+                        nativeButton={false}
+                        variant="ghost"
+                        size="sm"
+                        render={<Link href={routes.docs} />}
+                    >
+                        <BookOpenTextIcon aria-hidden="true" />
+                        How it works
+                    </Button>
+                    <ModeToggle />
+                </div>
             </header>
 
             <main className="flex flex-1 items-center px-6 py-8 short:py-3 md:px-14">
