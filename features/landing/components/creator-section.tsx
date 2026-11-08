@@ -16,11 +16,19 @@ export function CreatorSection() {
         <section
             id="creator"
             aria-labelledby="creator-heading"
-            className="mx-auto max-w-4xl scroll-mt-20 px-4 py-12 md:px-8 md:py-16"
+            className="mx-auto max-w-6xl scroll-mt-20 px-4 py-12 md:px-8 md:py-16"
         >
-            <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-surface">
-                <div className="px-6 py-10 text-center md:px-12 md:py-14">
-                    <div className="relative mx-auto size-32 overflow-hidden rounded-full border-4 border-card bg-tint-green shadow-raised md:size-40">
+            <div className="mx-auto max-w-2xl space-y-3 text-center">
+                <p className="text-eyebrow">About the developer</p>
+                <h2 id="creator-heading" className="text-title">
+                    The developer behind Grounded Brain
+                </h2>
+                <p className="text-body text-muted-foreground">{creator.bio}</p>
+            </div>
+
+            <div className="mt-10 grid overflow-hidden rounded-3xl border border-border bg-card shadow-surface md:grid-cols-[18rem_1fr]">
+                <div className="flex flex-col items-center gap-4 bg-tint-green/40 p-6 text-center md:p-8">
+                    <div className="relative size-40 overflow-hidden rounded-3xl border border-border bg-tint-green shadow-raised">
                         {creator.image ? (
                             <Image
                                 src={creator.image}
@@ -33,73 +41,31 @@ export function CreatorSection() {
                         ) : (
                             <span
                                 aria-hidden="true"
-                                className="flex size-full items-center justify-center text-3xl font-semibold text-tint-green-foreground"
+                                className="flex size-full items-center justify-center text-4xl font-semibold text-tint-green-foreground"
                             >
                                 {initials}
                             </span>
                         )}
                     </div>
 
-                    <p className="text-eyebrow mt-5">Built by</p>
-                    <h2 id="creator-heading" className="text-title mt-1">
-                        {creator.name}
-                    </h2>
-                    {creator.jobTitle ? (
-                        <p className="mt-2 inline-flex rounded-full bg-tint-green px-3 py-1 text-xs font-semibold text-tint-green-foreground">
-                            {creator.jobTitle}
-                        </p>
-                    ) : null}
-
-                    <p className="text-body mx-auto mt-5 max-w-2xl font-medium text-balance">
-                        {creator.bio}
-                    </p>
-                    <ul className="mt-4 flex flex-wrap justify-center gap-2">
-                        {creator.skills.map((skill) => (
-                            <li
-                                key={skill}
-                                className="rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold"
-                            >
-                                {skill}
-                            </li>
-                        ))}
-                    </ul>
-                    <div className="mx-auto mt-5 max-w-2xl space-y-3">
-                        {creator.story.map((paragraph) => (
-                            <p
-                                key={paragraph}
-                                className="text-body text-muted-foreground text-pretty"
-                            >
-                                {paragraph}
+                    <div className="space-y-2">
+                        <h3 className="text-heading">{creator.name}</h3>
+                        {creator.jobTitle ? (
+                            <p className="inline-flex rounded-full bg-tint-green px-3 py-1 text-xs font-semibold text-tint-green-foreground">
+                                {creator.jobTitle}
                             </p>
-                        ))}
+                        ) : null}
                     </div>
 
-                    <div className="mx-auto mt-8 max-w-2xl border-t border-border pt-8">
-                        <h3 className="text-heading">
-                            Would love to hear from you
-                        </h3>
-                        <p className="text-body mt-1 text-muted-foreground">
-                            Have a question, an idea or just want to say hi?
-                            Let&apos;s connect.
-                        </p>
-
-                        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-                            {creator.email ? (
-                                <Button
-                                    nativeButton={false}
-                                    render={<a href={`mailto:${creator.email}`} />}
-                                >
-                                    <MailIcon aria-hidden="true" />
-                                    {creator.email}
-                                </Button>
-                            ) : null}
-                            {links.map((link) => {
-                                const Icon = getSocialIcon(link.label);
-                                return (
+                    <ul className="flex w-full flex-col gap-2">
+                        {links.map((link) => {
+                            const Icon = getSocialIcon(link.label);
+                            return (
+                                <li key={link.label}>
                                     <Button
-                                        key={link.label}
                                         nativeButton={false}
                                         variant="outline"
+                                        className="w-full"
                                         render={
                                             <a
                                                 href={link.url}
@@ -111,9 +77,42 @@ export function CreatorSection() {
                                         <Icon aria-hidden="true" />
                                         {link.label}
                                     </Button>
-                                );
-                            })}
-                        </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </div>
+
+                <div className="flex flex-col justify-between gap-8 p-6 md:p-10">
+                    <div className="space-y-4">
+                        <p className="text-eyebrow">The story</p>
+                        {creator.story.map((paragraph) => (
+                            <p
+                                key={paragraph}
+                                className="text-body text-muted-foreground text-pretty"
+                            >
+                                {paragraph}
+                            </p>
+                        ))}
+                    </div>
+
+                    <div className="space-y-3 border-t border-border pt-6">
+                        <h3 className="text-heading">
+                            Would love to hear from you
+                        </h3>
+                        <p className="text-body text-muted-foreground">
+                            Have a question, an idea or just want to say hi?
+                            Let&apos;s connect.
+                        </p>
+                        {creator.email ? (
+                            <Button
+                                nativeButton={false}
+                                render={<a href={`mailto:${creator.email}`} />}
+                            >
+                                <MailIcon aria-hidden="true" />
+                                {creator.email}
+                            </Button>
+                        ) : null}
                     </div>
                 </div>
             </div>
