@@ -63,6 +63,13 @@ function MindMapFlowNode({ id, data, selected }: NodeProps) {
     const direction = data.direction === -1 ? -1 : 1;
 
     const handleClass = "size-1.5 border-border! bg-muted-foreground!";
+    const hiddenHandleClass = "pointer-events-none opacity-0";
+
+    // Which handles carry a visible connection for this node.
+    const isTargetLeft = !isRoot && direction === 1;
+    const isTargetRight = !isRoot && direction === -1;
+    const isSourceLeft = isRoot ? hasLeftBranch : hasChildren && direction === -1;
+    const isSourceRight = isRoot ? hasRightBranch : hasChildren && direction === 1;
 
     return (
         <div
@@ -76,14 +83,20 @@ function MindMapFlowNode({ id, data, selected }: NodeProps) {
             }`}
             onClick={() => actions?.selectNode(id)}
         >
-            {!isRoot ? (
-                <Handle
-                    type="target"
-                    id={direction === 1 ? "tl" : "tr"}
-                    position={direction === 1 ? Position.Left : Position.Right}
-                    className={handleClass}
-                />
-            ) : null}
+            {/* All four handles always exist, so an edge never points at a missing one
+                (React Flow error #008). Unused ones are invisible and not interactive. */}
+            <Handle
+                type="target"
+                id="tl"
+                position={Position.Left}
+                className={isTargetLeft ? handleClass : hiddenHandleClass}
+            />
+            <Handle
+                type="target"
+                id="tr"
+                position={Position.Right}
+                className={isTargetRight ? handleClass : hiddenHandleClass}
+            />
 
             <div
                 className={`flex items-start gap-1.5 ${
@@ -122,33 +135,18 @@ function MindMapFlowNode({ id, data, selected }: NodeProps) {
                 </p>
             </div>
 
-            {isRoot ? (
-                <>
-                    {hasLeftBranch ? (
-                        <Handle
-                            type="source"
-                            id="sl"
-                            position={Position.Left}
-                            className={handleClass}
-                        />
-                    ) : null}
-                    {hasRightBranch ? (
-                        <Handle
-                            type="source"
-                            id="sr"
-                            position={Position.Right}
-                            className={handleClass}
-                        />
-                    ) : null}
-                </>
-            ) : hasChildren ? (
-                <Handle
-                    type="source"
-                    id={direction === 1 ? "sr" : "sl"}
-                    position={direction === 1 ? Position.Right : Position.Left}
-                    className={handleClass}
-                />
-            ) : null}
+            <Handle
+                type="source"
+                id="sl"
+                position={Position.Left}
+                className={isSourceLeft ? handleClass : hiddenHandleClass}
+            />
+            <Handle
+                type="source"
+                id="sr"
+                position={Position.Right}
+                className={isSourceRight ? handleClass : hiddenHandleClass}
+            />
         </div>
     );
 }
@@ -436,7 +434,7 @@ export function MindMapViewer({
 
     const containerClass = fullscreen
         ? "fixed inset-0 z-50 flex flex-col bg-background"
-        : `flex min-h-[min(74vh,780px)] flex-col overflow-hidden rounded-2xl border border-border bg-card/50 ${className ?? ""}`;
+        : `flex h-[clamp(28rem,74vh,780px)] flex-col overflow-hidden rounded-2xl border border-border bg-card/50 ${className ?? ""}`;
 
     return (
         <div className={containerClass}>
