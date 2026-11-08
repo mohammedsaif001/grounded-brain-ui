@@ -1,28 +1,24 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
     BookOpenIcon,
+    BookOpenTextIcon,
     BrainIcon,
     MessageSquareIcon,
     SearchIcon,
     SparklesIcon,
+    XIcon,
 } from "lucide-react";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-    Empty,
-    EmptyContent,
-    EmptyDescription,
-    EmptyHeader,
-    EmptyTitle,
-} from "@/components/ui/empty";
+import { EmptyState } from "@/shared/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
-import { ApiError } from "@/shared/lib/api";
+import { cn } from "@/lib/utils";
 import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import {
     useCreateWorkspace,
@@ -35,7 +31,17 @@ import { CreateWorkspaceCard } from "./create-workspace-card";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { WorkspaceCard } from "./workspace-card";
 import { WorkspaceFormDialog } from "./workspace-form-dialog";
+import { WorkspaceSortSelect } from "./workspace-sort-select";
+import {
+    DEFAULT_WORKSPACE_SORT,
+    getWorkspaceSortOption,
+    type WorkspaceSortKey,
+} from "../lib/workspace-sort";
+import { AppLogo } from "@/shared/components/brand/app-logo";
+import { PageHeader } from "@/shared/components/page-header";
+import { TypeTile } from "@/shared/components/type-tile";
 import { routes } from "@/shared/config/routes";
+import { LoadError } from "@/shared/components/load-error";
 
 type DashboardHomeProps = {
     userName?: string | null;
@@ -61,11 +67,19 @@ const FEATURES = [
 
 export function DashboardHome({ userName }: DashboardHomeProps) {
     const router = useRouter();
-    const { data: workspaces, isLoading, error } = useWorkspaces();
+    const [search, setSearch] = useState("");
+    const [sortKey, setSortKey] =
+        useState<WorkspaceSortKey>(DEFAULT_WORKSPACE_SORT);
+    const debouncedSearch = useDebouncedValue(search, 250).trim();
+    const { sort, order } = getWorkspaceSortOption(sortKey);
+    const {
+        data: workspaces,
+        isLoading,
+        isPlaceholderData,
+        error,
+    } = useWorkspaces({ q: debouncedSearch || undefined, sort, order });
     // Form dialogs render their own errors inline.
     const createWorkspace = useCreateWorkspace({ suppressErrorToast: true });
-    const [search, setSearch] = useState("");
-    const debouncedSearch = useDebouncedValue(search, 200);
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(
@@ -77,42 +91,17 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
     const updateWorkspace = useUpdateWorkspace({ suppressErrorToast: true });
     const deleteWorkspace = useDeleteWorkspace();
 
-    const filteredWorkspaces = useMemo(() => {
-        if (!workspaces) {
-            return [];
-        }
-
-        const query = debouncedSearch.trim().toLowerCase();
-        if (!query) {
-            return workspaces;
-        }
-
-        return workspaces.filter((workspace) => {
-            const haystack = [
-                workspace.title,
-                workspace.description ?? "",
-            ]
-                .join(" ")
-                .toLowerCase();
-
-            return haystack.includes(query);
-        });
-    }, [workspaces, debouncedSearch]);
-
     const greeting = userName?.split(" ")[0] ?? "there";
 
     return (
-        <div className="min-h-svh bg-muted/30">
+        <div className="bg-page min-h-svh">
             <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur-md">
                 <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 md:px-8">
                     <Link
                         href={routes.dashboard}
-                        className="flex items-center gap-2.5 font-heading text-lg font-semibold tracking-tight"
+                        className="rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
                     >
-                        <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-base">
-                            📚
-                        </span>
-                        Grounded Brain
+                        <AppLogo />
                     </Link>
 
                     <div className="flex items-center gap-1.5 sm:gap-2">
@@ -126,6 +115,16 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             <BrainIcon />
                             Memory
                         </Button>
+                        <Button
+                            nativeButton={false}
+                            variant="ghost"
+                            size="sm"
+                            className="hidden sm:inline-flex"
+                            render={<Link href={routes.docs} />}
+                        >
+                            <BookOpenTextIcon aria-hidden="true" />
+                            Guide
+                        </Button>
                         <ModeToggle />
                         <SignOutButton />
                     </div>
@@ -134,26 +133,24 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
 
             <main className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-10">
                 <section className="mb-10 space-y-6">
-                    <div className="space-y-2">
-                        <p className="text-sm font-medium text-primary">
-                            Welcome back, {greeting}
-                        </p>
-                        <h1 className="font-heading text-3xl font-semibold tracking-tight md:text-4xl">
-                            Your notebooks
-                        </h1>
-                        <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
-                            Organize sources, chat with your materials, and
-                            generate learning tools — all in one workspace.
-                        </p>
-                    </div>
+                    <PageHeader
+                        eyebrow={`Welcome back, ${greeting}`}
+                        title="Your notebooks"
+                        description="Organize sources, chat with your materials, and generate learning tools, all in one workspace."
+                    />
 
                     <div className="grid gap-3 sm:grid-cols-3">
                         {FEATURES.map((feature) => (
                             <div
                                 key={feature.title}
-                                className="rounded-2xl border bg-card/70 p-4 shadow-sm"
+                                className="rounded-2xl border bg-card p-4 shadow-surface"
                             >
-                                <feature.icon className="mb-2 size-4 text-primary" />
+                                <TypeTile
+                                    icon={feature.icon}
+                                    tone="green"
+                                    size="sm"
+                                    className="mb-3"
+                                />
                                 <p className="text-sm font-medium">
                                     {feature.title}
                                 </p>
@@ -168,25 +165,39 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                 <section className="space-y-5">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 className="font-heading text-xl font-semibold">
+                            <h2 className="text-heading">
                                 Recent notebooks
                             </h2>
                             <p className="text-sm text-muted-foreground">
                                 {workspaces?.length
-                                    ? `${workspaces.length} notebook${workspaces.length === 1 ? "" : "s"}`
-                                    : "Start with your first notebook"}
+                                    ? `${workspaces.length} notebook${workspaces.length === 1 ? "" : "s"}${debouncedSearch ? " found" : ""}`
+                                    : debouncedSearch
+                                      ? "No matches"
+                                      : "Start with your first notebook"}
                             </p>
                         </div>
 
-                        <div className="relative w-full sm:max-w-xs">
-                            <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                                value={search}
-                                onChange={(event) =>
-                                    setSearch(event.target.value)
-                                }
-                                placeholder="Search notebooks..."
-                                className="rounded-full bg-background pl-9"
+                        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                            <div className="relative w-full sm:w-64">
+                                <SearchIcon
+                                    aria-hidden="true"
+                                    className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                                />
+                                <Input
+                                    type="search"
+                                    aria-label="Search notebooks"
+                                    value={search}
+                                    maxLength={120}
+                                    onChange={(event) =>
+                                        setSearch(event.target.value)
+                                    }
+                                    placeholder="Search notebooks..."
+                                    className="pl-9"
+                                />
+                            </div>
+                            <WorkspaceSortSelect
+                                value={sortKey}
+                                onChange={setSortKey}
                             />
                         </div>
                     </div>
@@ -196,30 +207,29 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             {Array.from({ length: 6 }).map((_, index) => (
                                 <Skeleton
                                     key={index}
-                                    className="min-h-[196px] rounded-3xl"
+                                    className="min-h-56 rounded-2xl"
                                 />
                             ))}
                         </div>
                     ) : error ? (
-                        <Empty className="rounded-3xl border bg-card">
-                            <EmptyHeader>
-                                <EmptyTitle>
-                                    Could not load notebooks
-                                </EmptyTitle>
-                                <EmptyDescription>
-                                    {error instanceof ApiError
-                                        ? error.message
-                                        : "Please try again in a moment."}
-                                </EmptyDescription>
-                            </EmptyHeader>
-                        </Empty>
+                        <LoadError
+                            error={error}
+                            icon={BookOpenIcon}
+                            title="Could not load notebooks"
+                        />
                     ) : (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div
+                            aria-busy={isPlaceholderData}
+                            className={cn(
+                                "grid gap-4 transition-opacity sm:grid-cols-2 lg:grid-cols-3",
+                                isPlaceholderData && "opacity-60",
+                            )}
+                        >
                             <CreateWorkspaceCard
                                 onClick={() => setCreateOpen(true)}
                             />
 
-                            {filteredWorkspaces.map((workspace) => (
+                            {workspaces?.map((workspace) => (
                                 <WorkspaceCard
                                     key={workspace.id}
                                     workspace={workspace}
@@ -232,23 +242,19 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
 
                     {!isLoading &&
                     !error &&
-                    workspaces &&
-                    workspaces.length > 0 &&
-                    filteredWorkspaces.length === 0 ? (
-                        <Empty className="rounded-3xl border bg-card">
-                            <EmptyHeader>
-                                <EmptyTitle>No notebooks found</EmptyTitle>
-                                <EmptyDescription>
-                                    Try a different search term or create a new
-                                    notebook.
-                                </EmptyDescription>
-                            </EmptyHeader>
-                            <EmptyContent>
-                                <Button onClick={() => setSearch("")}>
-                                    Clear search
-                                </Button>
-                            </EmptyContent>
-                        </Empty>
+                    !isPlaceholderData &&
+                    debouncedSearch &&
+                    workspaces?.length === 0 ? (
+                        <EmptyState
+                            icon={SearchIcon}
+                            title="No notebooks found"
+                            description="Try a different search term or create a new notebook."
+                        >
+                            <Button onClick={() => setSearch("")}>
+                                <XIcon aria-hidden="true" />
+                                Clear search
+                            </Button>
+                        </EmptyState>
                     ) : null}
                 </section>
             </main>

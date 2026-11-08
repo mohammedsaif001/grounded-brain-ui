@@ -14,12 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 import { getErrorMessage } from "@/shared/lib/errors";
 import type { Workspace } from "../lib/types";
-
-const ICON_OPTIONS = ["📚", "📖", "📝", "🎓", "💡", "🔬", "🧠", "✨"];
-const DEFAULT_ICON = ICON_OPTIONS[0];
+import { resolveWorkspaceIcon } from "../lib/workspace-icons";
+import { WorkspaceIconPicker } from "./workspace-icon-picker";
+import { XIcon, CheckIcon, PlusIcon } from "lucide-react";
 
 export type WorkspaceFormValues = {
     title: string;
@@ -88,7 +87,7 @@ function WorkspaceForm({
     const [description, setDescription] = useState(
         workspace?.description ?? "",
     );
-    const [icon, setIcon] = useState(workspace?.icon || DEFAULT_ICON);
+    const [icon, setIcon] = useState(resolveWorkspaceIcon(workspace?.icon));
     const [error, setError] = useState<string | null>(null);
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -122,29 +121,11 @@ function WorkspaceForm({
                 <p id="workspace-icon-label" className="text-sm font-medium">
                     Icon
                 </p>
-                <div
-                    role="radiogroup"
-                    aria-labelledby="workspace-icon-label"
-                    className="flex flex-wrap gap-2"
-                >
-                    {ICON_OPTIONS.map((option) => (
-                        <button
-                            key={option}
-                            type="button"
-                            role="radio"
-                            aria-checked={icon === option}
-                            onClick={() => setIcon(option)}
-                            className={cn(
-                                "flex size-10 items-center justify-center rounded-lg border text-lg transition-colors",
-                                icon === option
-                                    ? "border-primary bg-primary/10"
-                                    : "border-border hover:bg-muted",
-                            )}
-                        >
-                            {option}
-                        </button>
-                    ))}
-                </div>
+                <WorkspaceIconPicker
+                    value={icon}
+                    onChange={setIcon}
+                    labelledBy="workspace-icon-label"
+                />
             </div>
 
             <div className="grid gap-2">
@@ -186,10 +167,17 @@ function WorkspaceForm({
                     onClick={onClose}
                     disabled={isPending}
                 >
+                    <XIcon aria-hidden="true" />
                     Cancel
                 </Button>
                 <Button type="submit" disabled={isPending}>
-                    {isPending ? <Spinner /> : null}
+                    {isPending ? (
+                        <Spinner />
+                    ) : isEditing ? (
+                        <CheckIcon aria-hidden="true" />
+                    ) : (
+                        <PlusIcon aria-hidden="true" />
+                    )}
                     {isEditing ? "Save changes" : "Create workspace"}
                 </Button>
             </DialogFooter>

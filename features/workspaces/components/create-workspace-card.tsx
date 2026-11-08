@@ -1,6 +1,6 @@
 "use client";
 
-import { PlusIcon } from "lucide-react";
+import { ArrowRightIcon, PlusIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type CreateWorkspaceCardProps = {
@@ -17,19 +17,24 @@ export function CreateWorkspaceCard({
             type="button"
             onClick={onClick}
             className={cn(
-                "group flex min-h-[196px] flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-border/80 bg-card/50 p-6 text-center transition-all hover:border-primary/40 hover:bg-muted/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "group flex min-h-56 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 p-6 text-center outline-none transition-colors hover:bg-card/80 focus-visible:ring-3 focus-visible:ring-ring/40",
                 className,
             )}
         >
-            <span className="flex size-12 items-center justify-center rounded-full bg-muted transition-colors group-hover:bg-primary/10">
-                <PlusIcon className="size-5 text-muted-foreground transition-colors group-hover:text-primary" />
+            <PlusIcon
+                aria-hidden="true"
+                className="size-6 text-muted-foreground transition-colors group-hover:text-foreground"
+            />
+            <span className="space-y-1">
+                <span className="text-heading block">Make room for an idea</span>
+                <span className="text-body block text-muted-foreground">
+                    A new notebook is a fresh space to explore.
+                </span>
             </span>
-            <div className="space-y-1">
-                <p className="font-medium">Create notebook</p>
-                <p className="text-xs text-muted-foreground">
-                    Upload sources and start chatting
-                </p>
-            </div>
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold">
+                Create notebook
+                <ArrowRightIcon aria-hidden="true" className="size-4" />
+            </span>
         </button>
     );
 }

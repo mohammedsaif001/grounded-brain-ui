@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
  *
  * `workspace/[id]/layout.tsx` awaits the API, and a segment's `loading.tsx` never
  * wraps its own layout, so this is rendered from `workspace/loading.tsx` (one level up).
- * Mirrors the real shell's geometry: 16rem sidebar, h-14 header.
+ * Mirrors the real shell's geometry: 16rem sidebar, 68px header.
  */
 export function WorkspaceShellSkeleton({
     children,
@@ -17,7 +17,7 @@ export function WorkspaceShellSkeleton({
             role="status"
             aria-busy="true"
             aria-live="polite"
-            className="flex min-h-svh w-full"
+            className="bg-page flex min-h-svh w-full"
         >
             <span className="sr-only">Loading workspace…</span>
 
@@ -34,13 +34,13 @@ export function WorkspaceShellSkeleton({
                     <div className="space-y-2">
                         <Skeleton className="h-3 w-16" />
                         {Array.from({ length: 4 }).map((_, index) => (
-                            <Skeleton key={index} className="h-8 w-full" />
+                            <Skeleton key={index} className="h-10 w-full rounded-xl" />
                         ))}
                     </div>
                     <div className="space-y-2">
                         <Skeleton className="h-3 w-14" />
                         {Array.from({ length: 3 }).map((_, index) => (
-                            <Skeleton key={index} className="h-8 w-full" />
+                            <Skeleton key={index} className="h-10 w-full rounded-xl" />
                         ))}
                     </div>
                 </div>
@@ -50,8 +50,8 @@ export function WorkspaceShellSkeleton({
                 </div>
             </aside>
 
-            <div className="flex min-w-0 flex-1 flex-col bg-background">
-                <header className="flex h-14 items-center gap-3 border-b px-4">
+            <div className="flex min-w-0 flex-1 flex-col">
+                <header className="flex h-[68px] items-center gap-3 border-b bg-background/85 px-4 md:px-6">
                     <Skeleton className="size-7" />
                     <Skeleton className="h-5 w-40" />
                     <div className="ml-auto flex items-center gap-2">

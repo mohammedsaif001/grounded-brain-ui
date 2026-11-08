@@ -35,7 +35,7 @@ export function TakeawaysViewer({ items }: { items: string[] }) {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground tabular-nums">
+                <p className="text-caption tabular-nums">
                     {items.length} key takeaways
                 </p>
                 <Button
@@ -58,21 +58,21 @@ export function TakeawaysViewer({ items }: { items: string[] }) {
                             delay: Math.min(index * 0.04, 0.4),
                             duration: 0.25,
                         }}
-                        className="group flex items-start gap-3 rounded-2xl border bg-card px-4 py-3 transition-colors hover:border-primary/40"
+                        className="group flex items-start gap-3 rounded-xl border border-border bg-card px-4 py-3.5 shadow-surface transition-colors hover:bg-muted/40"
                     >
-                        <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/12 text-xs font-medium text-primary tabular-nums">
+                        <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-tint-rose text-xs font-semibold text-tint-rose-foreground tabular-nums">
                             {index + 1}
                         </span>
 
                         <StreamdownContent
                             content={item}
-                            className="prose prose-sm dark:prose-invert min-w-0 flex-1 max-w-none [&_p]:my-0 [&_p+p]:mt-2"
+                            className="text-body min-w-0 max-w-none flex-1 [&_p]:my-0 [&_p+p]:mt-2"
                         />
 
                         <Button
                             variant="ghost"
                             size="icon-sm"
-                            className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                            className="shrink-0 opacity-100 transition-opacity focus-visible:opacity-100 md:opacity-0 md:group-hover:opacity-100"
                             onClick={() => void copyItem(item, index)}
                             aria-label="Copy takeaway"
                         >

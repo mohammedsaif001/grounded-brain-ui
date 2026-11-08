@@ -2,10 +2,18 @@
 
 import { useCallback, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { CheckIcon, RotateCcwIcon, TrophyIcon, XIcon } from "lucide-react";
+import {
+    ArrowRightIcon,
+    CheckIcon,
+    RotateCcwIcon,
+    TrophyIcon,
+    XIcon,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StreamdownContent } from "@/shared/components/streamdown-content";
 import type { QuizQuestion } from "../../lib/types";
+import { ArtifactSources } from "../artifact-sources";
 
 const questionVariants = {
     enter: { opacity: 0, x: 40 },
@@ -14,7 +22,13 @@ const questionVariants = {
 };
 
 /** Progress resets when the parent remounts it (keyed by artifact version). */
-export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
+export function QuizViewer({
+    questions,
+    workspaceId,
+}: {
+    questions: QuizQuestion[];
+    workspaceId: string;
+}) {
     const [index, setIndex] = useState(0);
     const [selected, setSelected] = useState<number | null>(null);
     const [score, setScore] = useState(0);
@@ -67,7 +81,7 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
                 initial={{ opacity: 0, scale: 0.94 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ type: "spring", stiffness: 260, damping: 24 }}
-                className="mx-auto max-w-lg space-y-5 rounded-3xl border bg-card p-8 text-center"
+                className="mx-auto max-w-lg space-y-5 rounded-2xl border bg-card p-8 text-center shadow-surface"
             >
                 <motion.div
                     initial={{ scale: 0, rotate: -30 }}
@@ -78,13 +92,13 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
                         stiffness: 240,
                         damping: 14,
                     }}
-                    className="mx-auto flex size-16 items-center justify-center rounded-full bg-primary/15"
+                    className="mx-auto flex size-16 items-center justify-center rounded-full bg-tint-green"
                 >
-                    <TrophyIcon className="size-7 text-primary" />
+                    <TrophyIcon className="size-7 text-tint-green-foreground" />
                 </motion.div>
 
                 <div className="space-y-1">
-                    <p className="font-heading text-2xl font-semibold">
+                    <p className="text-headline">
                         Quiz complete
                     </p>
                     <p className="text-muted-foreground">
@@ -92,9 +106,9 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
                     </p>
                 </div>
 
-                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-border">
                     <motion.div
-                        className="h-full rounded-full bg-primary"
+                        className="h-full rounded-full bg-ring"
                         initial={{ width: 0 }}
                         animate={{ width: `${percentage}%` }}
                         transition={{ delay: 0.2, duration: 0.6 }}
@@ -120,9 +134,9 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
                     </span>
                     <span className="tabular-nums">{score} correct</span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
                     <motion.div
-                        className="h-full rounded-full bg-primary"
+                        className="h-full rounded-full bg-ring"
                         animate={{ width: `${progress}%` }}
                         transition={{ type: "spring", stiffness: 220, damping: 30 }}
                     />
@@ -141,7 +155,7 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
                 >
                     <StreamdownContent
                         content={question.question}
-                        className="prose prose-sm dark:prose-invert max-w-none font-heading text-lg font-semibold [&_p]:my-0"
+                        className="max-w-none font-serif text-2xl leading-snug [&_p]:my-0"
                     />
 
                     <div className="grid gap-2">
@@ -152,12 +166,12 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
                             const revealed = selected !== null;
 
                             const stateClass = !revealed
-                                ? "border-border hover:border-primary/50 hover:bg-muted/50"
+                                ? "border-border bg-card hover:bg-muted/60"
                                 : isCorrect
-                                  ? "border-primary bg-primary/10"
+                                  ? "border-ring bg-accent"
                                   : isSelected
                                     ? "border-destructive bg-destructive/10"
-                                    : "border-border opacity-55";
+                                    : "border-border bg-card opacity-55";
 
                             return (
                                 <motion.button
@@ -174,15 +188,15 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
                                     whileTap={
                                         revealed ? undefined : { scale: 0.985 }
                                     }
-                                    className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-colors ${stateClass}`}
+                                    className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-sm outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30 ${stateClass}`}
                                 >
                                     <span
-                                        className={`flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-medium ${
+                                        className={`flex size-7 shrink-0 items-center justify-center rounded-lg border text-xs font-semibold ${
                                             revealed && isCorrect
-                                                ? "border-primary bg-primary text-primary-foreground"
+                                                ? "border-transparent bg-primary text-primary-foreground"
                                                 : revealed && isSelected
                                                   ? "border-destructive bg-destructive text-white"
-                                                  : "border-border text-muted-foreground"
+                                                  : "border-border bg-muted text-muted-foreground"
                                         }`}
                                     >
                                         {revealed && isCorrect ? (
@@ -212,20 +226,36 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
                         transition={{ duration: 0.22 }}
                         className="overflow-hidden"
                     >
-                        <div className="space-y-3 rounded-2xl border bg-muted/30 p-4">
-                            <p className="text-xs tracking-wider text-muted-foreground uppercase">
+                        <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-surface">
+                            <Badge
+                                variant={
+                                    selected === question.correctIndex
+                                        ? "green"
+                                        : "rose"
+                                }
+                            >
                                 {selected === question.correctIndex
-                                    ? "Correct"
+                                    ? "That's right"
                                     : "Not quite"}
-                            </p>
+                            </Badge>
                             <StreamdownContent
                                 content={question.explanation}
-                                className="prose prose-sm dark:prose-invert max-w-none [&_p]:my-0 [&_p+p]:mt-2"
+                                className="text-body max-w-none [&_p]:my-0 [&_p+p]:mt-2"
                             />
-                            <Button size="sm" onClick={nextQuestion}>
+                            <ArtifactSources
+                                workspaceId={workspaceId}
+                                citations={question.citations}
+                            />
+                            <Button onClick={nextQuestion}>
+                                {index + 1 >= questions.length ? (
+                                    <TrophyIcon aria-hidden="true" />
+                                ) : null}
                                 {index + 1 >= questions.length
                                     ? "See score"
                                     : "Next question"}
+                                {index + 1 < questions.length ? (
+                                    <ArrowRightIcon aria-hidden="true" />
+                                ) : null}
                             </Button>
                         </div>
                     </motion.div>

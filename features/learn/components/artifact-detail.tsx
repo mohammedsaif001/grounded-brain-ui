@@ -1,19 +1,26 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, GraduationCapIcon, ShieldCheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
+import { Callout } from "@/shared/components/callout";
+import { EmptyState } from "@/shared/components/empty-state";
+import { StatusBadge } from "@/shared/components/status-badge";
+import { TypeTile } from "@/shared/components/type-tile";
 import { ApiError } from "@/shared/lib/api";
-import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
-import { useArtifact } from "../hooks/use-artifacts";
-import { ArtifactContentViewer } from "./artifact-content-viewer";
-import {
-    ArtifactStatusBadge,
-    ArtifactTypeBadge,
-} from "./artifact-status-badge";
 import { routes } from "@/shared/config/routes";
+import { cn } from "@/lib/utils";
+import { ARTIFACT_META } from "../lib/artifact-meta";
+import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
+import { useArtifact, useMarkArtifactViewed } from "../hooks/use-artifacts";
+import { isUnseenArtifact } from "../lib/types";
+import { ArtifactActions } from "./artifact-actions";
+import { ArtifactContentViewer } from "./artifact-content-viewer";
+import { LoadError } from "@/shared/components/load-error";
 
 type ArtifactDetailProps = {
     workspaceId: string;
@@ -28,39 +35,66 @@ export function ArtifactDetail({
         workspaceId,
         artifactId,
     );
+    const { mutate: markViewed } = useMarkArtifactViewed(workspaceId);
+    const markedViewed = useRef(false);
+
+    // Opening a finished artifact is what clears its "new" state; fetching it is not.
+    const shouldMarkViewed = artifact ? isUnseenArtifact(artifact) : false;
+    useEffect(() => {
+        if (shouldMarkViewed && !markedViewed.current) {
+            markedViewed.current = true;
+            markViewed(artifactId);
+        }
+    }, [shouldMarkViewed, markViewed, artifactId]);
+
+    const backToLearn = (
+        <Button
+            nativeButton={false}
+            variant="outline"
+            render={<Link href={routes.workspace.learn(workspaceId)} />}
+        >
+            <ArrowLeftIcon aria-hidden="true" />
+            Back to Learn
+        </Button>
+    );
 
     if (isLoading) {
         return (
-            <div className="flex flex-1 flex-col gap-4 p-6">
-                <Skeleton className="h-8 w-48" />
-                <Skeleton className="h-64 w-full rounded-3xl" />
+            <div
+                aria-busy="true"
+                className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-6 md:p-8"
+            >
+                <Skeleton className="h-10 w-72" />
+                <Skeleton className="h-72 w-full rounded-2xl" />
             </div>
         );
     }
 
     if (error instanceof ApiError && error.status === 404) {
         return (
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-                <p className="font-medium">Learning tool not found</p>
-                <Button
-                    nativeButton={false}
-                    variant="outline"
-                    render={<Link href={routes.workspace.learn(workspaceId)} />}
-                >
-                    Back to Learn
-                </Button>
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
+                <EmptyState icon={GraduationCapIcon} title="Learning tool not found">
+                    {backToLearn}
+                </EmptyState>
             </div>
         );
     }
 
     if (error || !artifact) {
         return (
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-                <p className="font-medium">Could not load learning tool</p>
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
+                <LoadError
+                    error={error}
+                    icon={GraduationCapIcon}
+                    title="Could not load learning tool"
+                >
+                    {backToLearn}
+                </LoadError>
             </div>
         );
     }
 
+    const meta = ARTIFACT_META[artifact.type];
     const processingError =
         typeof artifact.metadata?.processingError === "string"
             ? artifact.metadata.processingError
@@ -71,50 +105,75 @@ export function ArtifactDetail({
 
     return (
         <div
-            className={`flex flex-1 flex-col ${isMindMap ? "min-h-0 gap-4 p-4 md:p-5" : "gap-6 p-6"}`}
+            className={cn(
+                "mx-auto flex w-full flex-1 flex-col gap-6",
+                isMindMap
+                    ? "min-h-0 max-w-none p-4 md:p-5"
+                    : "max-w-5xl p-6 md:p-8",
+            )}
         >
-            <div className="flex items-start gap-3">
+            <header className="flex flex-wrap items-start gap-4">
                 <Button
                     nativeButton={false}
-                    variant="ghost"
-                    size="icon-sm"
+                    variant="outline"
+                    size="icon"
                     render={<Link href={routes.workspace.learn(workspaceId)} />}
                 >
-                    <ArrowLeftIcon />
+                    <ArrowLeftIcon aria-hidden="true" />
+                    <span className="sr-only">Back to Learn</span>
                 </Button>
-                <div className="min-w-0 flex-1 space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <ArtifactTypeBadge type={artifact.type} />
-                        <h2 className="font-heading text-xl font-semibold">
-                            {artifact.title}
-                        </h2>
-                        <ArtifactStatusBadge status={artifact.status} />
+                <TypeTile icon={meta.icon} tone={meta.tone} size="lg" />
+                <div className="min-w-0 flex-1 space-y-1.5">
+                    <p className="text-eyebrow">
+                        {ARTIFACT_TYPE_LABELS[artifact.type]}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <h1 className="text-title">{artifact.title}</h1>
+                        <StatusBadge status={artifact.status} />
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                        {ARTIFACT_TYPE_LABELS[artifact.type]} · Generated{" "}
-                        {formatDistanceToNow(new Date(artifact.createdAt), {
-                            addSuffix: true,
-                        })}
+                    <p className="text-caption flex flex-wrap items-center gap-x-2">
+                        {artifact.sourceIds.length > 0 ? (
+                            <span className="inline-flex items-center gap-1.5">
+                                <ShieldCheckIcon
+                                    aria-hidden="true"
+                                    className="size-3.5"
+                                />
+                                Grounded in {artifact.sourceIds.length} source
+                                {artifact.sourceIds.length === 1 ? "" : "s"}
+                                <span aria-hidden="true">·</span>
+                            </span>
+                        ) : null}
+                        <span>
+                            Generated{" "}
+                            {formatDistanceToNow(new Date(artifact.createdAt), {
+                                addSuffix: true,
+                            })}
+                        </span>
                     </p>
                 </div>
-            </div>
+                <ArtifactActions
+                    artifact={artifact}
+                    workspaceId={workspaceId}
+                />
+            </header>
 
             {isProcessing ? (
-                <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-                    Generating {ARTIFACT_TYPE_LABELS[artifact.type].toLowerCase()}
-                    …
+                <div
+                    role="status"
+                    className="flex flex-1 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-card/50 p-10 text-center"
+                >
+                    <Spinner className="size-5" />
+                    <p className="text-body text-muted-foreground">
+                        Generating{" "}
+                        {ARTIFACT_TYPE_LABELS[artifact.type].toLowerCase()}
+                        &hellip; This page updates when it&apos;s ready.
+                    </p>
                 </div>
             ) : artifact.status === "FAILED" ? (
-                <div className="rounded-2xl border border-destructive/40 bg-destructive/5 p-6 text-sm">
-                    <p className="font-medium text-destructive">
-                        Generation failed
-                    </p>
-                    {processingError ? (
-                        <p className="mt-2 text-muted-foreground">
-                            {processingError}
-                        </p>
-                    ) : null}
-                </div>
+                <Callout tone="rose" title="Generation failed">
+                    {processingError ??
+                        "Something went wrong while generating this. Try generating it again."}
+                </Callout>
             ) : isMindMap ? (
                 <div className="min-h-0 flex-1">
                     <ArtifactContentViewer
@@ -123,7 +182,7 @@ export function ArtifactDetail({
                     />
                 </div>
             ) : (
-                <div className="rounded-3xl border bg-muted/20 p-4 md:p-6">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-surface md:p-8">
                     <ArtifactContentViewer
                         artifact={artifact}
                         workspaceId={workspaceId}

@@ -5,8 +5,15 @@ export const chatCitationSchema = z.object({
     sourceTitle: z.string(),
     sourceType: z.string(),
     chunkId: z.string().optional(),
+    /** 0-based position of the chunk in its source; show `chunkIndex + 1`. */
     chunkIndex: z.number().optional(),
+    /** Chunks in the source. Only on chunks indexed after the API added it. */
+    chunkTotal: z.number().optional(),
     page: z.number().optional(),
+    /** PDFs with a bookmark outline: the top-level bookmark the page falls under. */
+    chapter: z.string().optional(),
+    /** WEBSITE and MARKDOWN: nearest heading above the chunk. */
+    section: z.string().optional(),
     excerpt: z.string(),
     score: z.number().optional(),
     url: z.string().optional(),

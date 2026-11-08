@@ -7,7 +7,7 @@ export function DashboardSkeleton() {
             role="status"
             aria-busy="true"
             aria-live="polite"
-            className="min-h-svh bg-muted/30"
+            className="bg-page min-h-svh"
         >
             <span className="sr-only">Loading your notebooks…</span>
 
@@ -28,13 +28,13 @@ export function DashboardSkeleton() {
             <main className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-10">
                 <section className="mb-10 space-y-6">
                     <div className="space-y-3">
-                        <Skeleton className="h-4 w-36" />
+                        <Skeleton className="h-3 w-36" />
                         <Skeleton className="h-9 w-64 max-w-full" />
                         <Skeleton className="h-4 w-full max-w-2xl" />
                     </div>
                     <div className="grid gap-3 sm:grid-cols-3">
                         {Array.from({ length: 3 }).map((_, index) => (
-                            <Skeleton key={index} className="h-24" />
+                            <Skeleton key={index} className="h-24 rounded-2xl" />
                         ))}
                     </div>
                 </section>
@@ -45,13 +45,13 @@ export function DashboardSkeleton() {
                             <Skeleton className="h-6 w-44" />
                             <Skeleton className="h-4 w-32" />
                         </div>
-                        <Skeleton className="h-9 w-full rounded-full sm:max-w-xs" />
+                        <Skeleton className="h-10 w-full rounded-xl sm:max-w-xs" />
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {Array.from({ length: 6 }).map((_, index) => (
                             <Skeleton
                                 key={index}
-                                className="min-h-[196px] rounded-3xl"
+                                className="min-h-56 rounded-2xl"
                             />
                         ))}
                     </div>

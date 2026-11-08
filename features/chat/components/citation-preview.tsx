@@ -15,6 +15,7 @@ import { toast } from "@/components/ui/toast";
 import { useImportWebSearchSource } from "@/features/sources/hooks/use-sources";
 import { SOURCE_TYPE_LABELS } from "@/features/sources/lib/constants";
 import type { SourceType } from "@/features/sources/lib/types";
+import { describeCitationLocation } from "../lib/citations";
 import type { ChatCitation } from "../lib/types";
 import { routes } from "@/shared/config/routes";
 
@@ -60,7 +61,7 @@ export function CitationPreview({
                 <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex items-center gap-2">
                         {markerIndex != null ? (
-                            <span className="inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
+                            <span className="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-tint-green text-[10px] font-semibold text-tint-green-foreground">
                                 {markerIndex}
                             </span>
                         ) : null}
@@ -69,9 +70,9 @@ export function CitationPreview({
                         </p>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                        {sourceType}
-                        {citation.page ? ` · Page ${citation.page}` : null}
-                        {citation.path ? ` · ${citation.path}` : null}
+                        {[sourceType, ...describeCitationLocation(citation)].join(
+                            " · ",
+                        )}
                     </p>
                 </div>
             </div>

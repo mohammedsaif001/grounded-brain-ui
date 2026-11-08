@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { ApiError, apiPath, parseApiResponse } from "./api";
+import {
+    ApiError,
+    apiPath,
+    fetchOrOutage,
+    parseApiResponse,
+    parsePageResponse,
+} from "./api";
 
 function jsonResponse(body: unknown, status = 200) {
     return new Response(JSON.stringify(body), {
@@ -66,14 +72,14 @@ describe("parseApiResponse", () => {
     });
 
     it("falls back to a generic message for non-JSON errors", async () => {
-        const response = new Response("<html>Bad Gateway</html>", {
-            status: 502,
+        const response = new Response("<html>Not Found</html>", {
+            status: 404,
         });
         const error = await parseApiResponse(response, {
             fallbackMessage: "Request failed",
         }).catch((e) => e);
-        expect(error).toMatchObject({ status: 502, message: "Request failed" });
-        expect(error.isClientError).toBe(false);
+        expect(error).toMatchObject({ status: 404, message: "Request failed" });
+        expect(error.isClientError).toBe(true);
     });
 
     it("rejects payloads that do not match the schema", async () => {
@@ -83,5 +89,116 @@ describe("parseApiResponse", () => {
         ).catch((e) => e);
         expect(error).toBeInstanceOf(ApiError);
         expect(error.status).toBe(502);
+    });
+});
+
+describe("parsePageResponse", () => {
+    const item = z.object({ id: z.string() });
+
+    it("returns the rows together with the pagination meta", async () => {
+        const page = await parsePageResponse(
+            jsonResponse({
+                success: true,
+                data: [{ id: "1" }, { id: "2" }],
+                meta: { total: 9, nextCursor: "2" },
+            }),
+            item,
+        );
+
+        expect(page.items).toEqual([{ id: "1" }, { id: "2" }]);
+        expect(page.meta).toEqual({ total: 9, nextCursor: "2" });
+    });
+
+    it("falls back to a single page when meta is missing", async () => {
+        const page = await parsePageResponse(
+            jsonResponse({ success: true, data: [{ id: "1" }] }),
+            item,
+        );
+
+        expect(page.meta).toEqual({ total: 1, nextCursor: null });
+    });
+
+    it("rejects rows that do not match the schema", async () => {
+        const error = await parsePageResponse(
+            jsonResponse({ success: true, data: [{ nope: true }] }),
+            item,
+        ).catch((e) => e);
+
+        expect(error).toBeInstanceOf(ApiError);
+        expect(error.status).toBe(502);
+    });
+
+    it("throws ApiError for failed requests", async () => {
+        const error = await parsePageResponse(
+            jsonResponse(
+                { success: false, error: { message: "Bad cursor" } },
+                400,
+            ),
+            item,
+        ).catch((e) => e);
+
+        expect(error).toBeInstanceOf(ApiError);
+        expect(error.message).toBe("Bad cursor");
+    });
+});
+
+describe("outage handling", () => {
+    it("reports a non-JSON 5xx as a server outage", async () => {
+        const error = await parseApiResponse(
+            new Response("Internal Server Error", { status: 500 }),
+        ).catch((e) => e);
+
+        expect(error).toBeInstanceOf(ApiError);
+        expect(error.service).toBe("server");
+        expect(error.isOutage).toBe(true);
+    });
+
+    it("reports a gateway timeout as a server outage", async () => {
+        const error = await parseApiResponse(
+            jsonResponse({ success: false, error: { message: "x" } }, 504),
+        ).catch((e) => e);
+
+        expect(error.service).toBe("server");
+    });
+
+    it("keeps an enveloped 503 message, such as an unconfigured integration", async () => {
+        const error = await parseApiResponse(
+            jsonResponse(
+                { success: false, error: { message: "Firecrawl is not configured" } },
+                503,
+            ),
+        ).catch((e) => e);
+
+        expect(error.message).toBe("Firecrawl is not configured");
+        expect(error.isOutage).toBe(false);
+    });
+
+    it("turns an unreachable backend into a server outage", async () => {
+        const original = globalThis.fetch;
+        globalThis.fetch = (() =>
+            Promise.reject(new TypeError("fetch failed"))) as typeof fetch;
+
+        try {
+            const error = await fetchOrOutage("/api/x").catch((e) => e);
+            expect(error).toBeInstanceOf(ApiError);
+            expect(error.service).toBe("server");
+        } finally {
+            globalThis.fetch = original;
+        }
+    });
+
+    it("lets a caller's own abort through", async () => {
+        const original = globalThis.fetch;
+        globalThis.fetch = (() =>
+            Promise.reject(
+                new DOMException("aborted", "AbortError"),
+            )) as typeof fetch;
+
+        try {
+            const error = await fetchOrOutage("/api/x").catch((e) => e);
+            expect(error).not.toBeInstanceOf(ApiError);
+        } finally {
+            globalThis.fetch = original;
+        }
     });
 });

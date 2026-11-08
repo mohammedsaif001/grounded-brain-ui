@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { workspaceKeys } from "@/features/workspaces/hooks/use-workspaces";
 import {
     useInvalidatingMutation,
     type MutationHookOptions,
@@ -10,6 +11,7 @@ import {
     deleteArtifact,
     getArtifact,
     listArtifacts,
+    markArtifactViewed,
 } from "../lib/api";
 import type { CreateArtifactInput, LearningArtifact } from "../lib/types";
 
@@ -53,8 +55,26 @@ export function useCreateArtifact(
     return useInvalidatingMutation({
         mutationFn: (input: CreateArtifactInput) =>
             createArtifact(workspaceId, input),
-        invalidates: () => [artifactKeys(workspaceId).all],
+        invalidates: () => [
+            artifactKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+            // Notebook cards show these counts.
+            workspaceKeys.lists(),
+        ],
         ...options,
+    });
+}
+
+/** Clears the "new" state. Failing is harmless, so it never raises a toast. */
+export function useMarkArtifactViewed(workspaceId: string) {
+    return useInvalidatingMutation({
+        mutationFn: (artifactId: string) =>
+            markArtifactViewed(workspaceId, artifactId),
+        invalidates: () => [
+            artifactKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+        ],
+        suppressErrorToast: true,
     });
 }
 
@@ -69,7 +89,12 @@ export function useDeleteArtifact(
             queryClient.removeQueries({
                 queryKey: artifactKeys(workspaceId).detail(artifactId),
             }),
-        invalidates: () => [artifactKeys(workspaceId).all],
+        invalidates: () => [
+            artifactKeys(workspaceId).all,
+            workspaceKeys.summary(workspaceId),
+            // Notebook cards show these counts.
+            workspaceKeys.lists(),
+        ],
         ...options,
     });
 }

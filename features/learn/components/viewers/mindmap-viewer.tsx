@@ -436,7 +436,7 @@ export function MindMapViewer({
 
     const containerClass = fullscreen
         ? "fixed inset-0 z-50 flex flex-col bg-background"
-        : `flex min-h-[min(74vh,780px)] flex-col overflow-hidden rounded-3xl border bg-muted/20 ${className ?? ""}`;
+        : `flex min-h-[min(74vh,780px)] flex-col overflow-hidden rounded-2xl border border-border bg-card/50 ${className ?? ""}`;
 
     return (
         <div className={containerClass}>

@@ -1,5 +1,6 @@
-import { apiFetch, apiPath } from "@/shared/lib/api";
+import { apiFetch, apiFetchPage, apiPath } from "@/shared/lib/api";
 import {
+    bulkDeleteResultSchema,
     githubFilesResponseSchema,
     githubSyncResultSchema,
     reprocessManyResultSchema,
@@ -15,6 +16,7 @@ import type {
     ImportWebsiteInput,
     ImportYoutubeInput,
     SourceFilters,
+    SourcePageParams,
 } from "./types";
 
 const sourcesPath = (workspaceId: string) =>
@@ -23,18 +25,42 @@ const sourcesPath = (workspaceId: string) =>
 const sourcePath = (workspaceId: string, sourceId: string) =>
     apiPath`/api/workspaces/${workspaceId}/sources/${sourceId}`;
 
-export function listSources(workspaceId: string, filters: SourceFilters = {}) {
+function sourcesUrl(
+    workspaceId: string,
+    filters: SourceFilters,
+    page?: SourcePageParams,
+) {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) {
         if (value) {
             params.set(key, value);
         }
     }
+    if (page) {
+        params.set("limit", String(page.limit));
+        if (page.cursor) {
+            params.set("cursor", page.cursor);
+        }
+    }
     const query = params.toString();
 
-    return apiFetch(`${sourcesPath(workspaceId)}${query ? `?${query}` : ""}`, {
+    return `${sourcesPath(workspaceId)}${query ? `?${query}` : ""}`;
+}
+
+/** Every matching source, unpaginated. For small previews such as the sidebar. */
+export function listSources(workspaceId: string, filters: SourceFilters = {}) {
+    return apiFetch(sourcesUrl(workspaceId, filters), {
         schema: sourceListSchema,
     });
+}
+
+/** One page of sources plus `meta.total` across all pages. */
+export function listSourcesPage(
+    workspaceId: string,
+    filters: SourceFilters,
+    page: SourcePageParams,
+) {
+    return apiFetchPage(sourcesUrl(workspaceId, filters, page), sourceSchema);
 }
 
 export function getSource(workspaceId: string, sourceId: string) {
@@ -140,6 +166,7 @@ export function bulkDeleteSources(workspaceId: string, sourceIds: string[]) {
     return apiFetch(`${sourcesPath(workspaceId)}/bulk-delete`, {
         method: "POST",
         body: { sourceIds },
+        schema: bulkDeleteResultSchema,
     });
 }
 

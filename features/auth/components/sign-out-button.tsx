@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { signOut } from "../lib/auth-client";
 import { routes } from "@/shared/config/routes";
+import { LogOutIcon } from "lucide-react";
 
 export function SignOutButton() {
     const router = useRouter();
@@ -36,7 +37,7 @@ export function SignOutButton() {
             onClick={() => void handleSignOut()}
             disabled={isLoading}
         >
-            {isLoading ? <Spinner /> : null}
+            {isLoading ? <Spinner /> : <LogOutIcon aria-hidden="true" />}
             Sign out
         </Button>
     );

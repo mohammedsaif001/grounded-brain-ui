@@ -1,13 +1,18 @@
 export type {
     CreateWorkspaceInput,
+    SortOrder,
     UpdateWorkspaceInput,
     Workspace,
+    WorkspaceListParams,
+    WorkspaceSort,
+    WorkspaceSummary,
 } from "./lib/types";
 
 export {
     createWorkspace,
     deleteWorkspace,
     getWorkspace,
+    getWorkspaceSummary,
     listWorkspaces,
     updateWorkspace,
 } from "./lib/api";
@@ -18,6 +23,7 @@ export {
     useDeleteWorkspace,
     useUpdateWorkspace,
     useWorkspace,
+    useWorkspaceSummary,
     useWorkspaces,
     workspaceKeys,
 } from "./hooks/use-workspaces";

@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandedPage } from "@/shared/components/branded-page";
 import { RouteError } from "@/shared/components/route-error";
 
 export default function AppError({
@@ -10,8 +11,8 @@ export default function AppError({
     unstable_retry: () => void;
 }) {
     return (
-        <div className="flex min-h-svh flex-col">
+        <BrandedPage>
             <RouteError error={error} retry={unstable_retry} />
-        </div>
+        </BrandedPage>
     );
 }

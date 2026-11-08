@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Streamdown } from "streamdown";
 import { code } from "@streamdown/code";
 import { getCitationByIndex } from "../lib/citations";
+import { injectCitationTags } from "../lib/citation-tags";
 import type { ChatCitation } from "../lib/types";
 import { CitationMarker } from "./citation-marker";
 
@@ -13,12 +14,6 @@ type ChatMessageBodyProps = {
     workspaceId: string;
     isAnimating?: boolean;
 };
-
-function injectCitationTags(text: string) {
-    return text
-        .replace(/\[W(\d+)\]/g, '<cite web="$1">W$1</cite>')
-        .replace(/\[(\d+)\]/g, '<cite index="$1">$1</cite>');
-}
 
 export function ChatMessageBody({
     text,
@@ -96,7 +91,7 @@ export function ChatMessageBody({
             allowedTags={{ cite: ["index", "web"] }}
             literalTagContent={["cite"]}
             components={components}
-            className="min-w-0 text-sm leading-relaxed"
+            className="text-body min-w-0"
         >
             {markdown}
         </Streamdown>

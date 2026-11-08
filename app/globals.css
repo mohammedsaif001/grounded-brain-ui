@@ -7,13 +7,21 @@
 @source "../node_modules/@streamdown/code/dist/*.js";
 
 @custom-variant dark (&:is(.dark *));
+/* Laptop-height viewports (e.g. 1366x768, or 1080p at 125-150% scaling): tighten vertical
+   spacing so single-screen pages and dialogs fit without scrolling. */
+@custom-variant short (@media (max-height: 820px));
 
 @theme inline {
+  /* Typography — families are loaded in app/layout.tsx via next/font. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-lora), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  /* Semantic colours */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-mono);
-  --font-heading: var(--font-heading);
+  --color-surface-sunken: var(--surface-sunken);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -43,6 +51,21 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Soft tints used by status badges, type tiles and callouts.
+     Usage: bg-tint-green text-tint-green-foreground */
+  --color-tint-green: var(--tint-green);
+  --color-tint-green-foreground: var(--tint-green-foreground);
+  --color-tint-blue: var(--tint-blue);
+  --color-tint-blue-foreground: var(--tint-blue-foreground);
+  --color-tint-amber: var(--tint-amber);
+  --color-tint-amber-foreground: var(--tint-amber-foreground);
+  --color-tint-rose: var(--tint-rose);
+  --color-tint-rose-foreground: var(--tint-rose-foreground);
+  --color-tint-violet: var(--tint-violet);
+  --color-tint-violet-foreground: var(--tint-violet-foreground);
+
+  /* Radius scale */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -50,75 +73,127 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Elevation scale */
+  --shadow-surface: var(--elevation-1);
+  --shadow-raised: var(--elevation-2);
+  --shadow-overlay: var(--elevation-3);
 }
 
+/* ---------------------------------------------------------------------------
+   Pearl — light theme
+   ------------------------------------------------------------------------- */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.147 0.004 49.25);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.147 0.004 49.25);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.147 0.004 49.25);
-  --primary: oklch(0.841 0.238 128.85);
-  --primary-foreground: oklch(0.405 0.101 131.063);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0.001 106.424);
-  --muted-foreground: oklch(0.553 0.013 58.071);
-  --accent: oklch(0.97 0.001 106.424);
-  --accent-foreground: oklch(0.216 0.006 56.043);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.923 0.003 48.717);
-  --input: oklch(0.923 0.003 48.717);
-  --ring: oklch(0.709 0.01 56.259);
-  --chart-1: oklch(0.897 0.196 126.665);
-  --chart-2: oklch(0.768 0.233 130.85);
-  --chart-3: oklch(0.648 0.2 131.684);
-  --chart-4: oklch(0.532 0.157 131.589);
-  --chart-5: oklch(0.453 0.124 130.933);
+  --background: #eef3e8;
+  --foreground: #1d3029;
+  --card: #f9fdf7;
+  --card-foreground: #1d3029;
+  --popover: #fbfdf8;
+  --popover-foreground: #1d3029;
+  --primary: #d4ed9a;
+  --primary-foreground: #1f3a12;
+  --secondary: #eef3e6;
+  --secondary-foreground: #1d3029;
+  --muted: #f0f3ee;
+  --muted-foreground: #5b6c62;
+  --accent: #e5efcf;
+  --accent-foreground: #1d3029;
+  --destructive: #b3372c;
+  --border: #dbe4d2;
+  --input: #d3ddc9;
+  --ring: #6f9230;
+  --surface-sunken: #f0f3ee;
+
+  --chart-1: #9ccc3c;
+  --chart-2: #5fa36a;
+  --chart-3: #4f86a8;
+  --chart-4: #8a7fd0;
+  --chart-5: #d49a4a;
+
+  --sidebar: #f4f9ef;
+  --sidebar-foreground: #1d3029;
+  --sidebar-primary: #d4ed9a;
+  --sidebar-primary-foreground: #1f3a12;
+  --sidebar-accent: #e5efcf;
+  --sidebar-accent-foreground: #1d3029;
+  --sidebar-border: #dbe4d2;
+  --sidebar-ring: #6f9230;
+
+  --tint-green: #e5efcf;
+  --tint-green-foreground: #3d5a1a;
+  --tint-blue: #e4eef5;
+  --tint-blue-foreground: #2c5878;
+  --tint-amber: #f6ece1;
+  --tint-amber-foreground: #8a5320;
+  --tint-rose: #fbe7e4;
+  --tint-rose-foreground: #a8352b;
+  --tint-violet: #e8e6f5;
+  --tint-violet-foreground: #5a50a0;
+
+  --page-gradient: linear-gradient(135deg, #e6eddc 0%, #ebefe6 48%, #e3e5f2 100%);
+
+  --elevation-1: 0 1px 2px rgb(29 48 41 / 0.05), 0 4px 14px rgb(29 48 41 / 0.05);
+  --elevation-2: 0 2px 4px rgb(29 48 41 / 0.06), 0 10px 28px rgb(29 48 41 / 0.08);
+  --elevation-3: 0 8px 16px rgb(29 48 41 / 0.08), 0 24px 56px rgb(29 48 41 / 0.14);
+
   --radius: 0.875rem;
-  --sidebar: oklch(0.985 0.001 106.423);
-  --sidebar-foreground: oklch(0.147 0.004 49.25);
-  --sidebar-primary: oklch(0.648 0.2 131.684);
-  --sidebar-primary-foreground: oklch(0.986 0.031 120.757);
-  --sidebar-accent: oklch(0.97 0.001 106.424);
-  --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
-  --sidebar-border: oklch(0.923 0.003 48.717);
-  --sidebar-ring: oklch(0.709 0.01 56.259);
 }
 
+/* ---------------------------------------------------------------------------
+   Forest — dark theme
+   ------------------------------------------------------------------------- */
 .dark {
-  --background: oklch(0.147 0.004 49.25);
-  --foreground: oklch(0.985 0.001 106.423);
-  --card: oklch(0.216 0.006 56.043);
-  --card-foreground: oklch(0.985 0.001 106.423);
-  --popover: oklch(0.216 0.006 56.043);
-  --popover-foreground: oklch(0.985 0.001 106.423);
-  --primary: oklch(0.768 0.233 130.85);
-  --primary-foreground: oklch(0.405 0.101 131.063);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.268 0.007 34.298);
-  --muted-foreground: oklch(0.709 0.01 56.259);
-  --accent: oklch(0.268 0.007 34.298);
-  --accent-foreground: oklch(0.985 0.001 106.423);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.553 0.013 58.071);
-  --chart-1: oklch(0.897 0.196 126.665);
-  --chart-2: oklch(0.768 0.233 130.85);
-  --chart-3: oklch(0.648 0.2 131.684);
-  --chart-4: oklch(0.532 0.157 131.589);
-  --chart-5: oklch(0.453 0.124 130.933);
-  --sidebar: oklch(0.216 0.006 56.043);
-  --sidebar-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-primary: oklch(0.768 0.233 130.85);
-  --sidebar-primary-foreground: oklch(0.274 0.072 132.109);
-  --sidebar-accent: oklch(0.268 0.007 34.298);
-  --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.553 0.013 58.071);
+  --background: #16261f;
+  --foreground: #e9f1e4;
+  --card: #1b2e26;
+  --card-foreground: #e9f1e4;
+  --popover: #1f352b;
+  --popover-foreground: #e9f1e4;
+  --primary: #d4ed9a;
+  --primary-foreground: #1f3a12;
+  --secondary: #2a3f33;
+  --secondary-foreground: #e9f1e4;
+  --muted: #223a2f;
+  --muted-foreground: #9fb2a5;
+  --accent: #30452e;
+  --accent-foreground: #e9f1e4;
+  --destructive: #f08a80;
+  --border: #ffffff17;
+  --input: #ffffff22;
+  --ring: #b7d97a;
+  --surface-sunken: #14221c;
+
+  --chart-1: #c4e57d;
+  --chart-2: #7cc38a;
+  --chart-3: #7fb2d0;
+  --chart-4: #aaa2ee;
+  --chart-5: #ecb877;
+
+  --sidebar: #1c3027;
+  --sidebar-foreground: #e9f1e4;
+  --sidebar-primary: #d4ed9a;
+  --sidebar-primary-foreground: #1f3a12;
+  --sidebar-accent: #30452e;
+  --sidebar-accent-foreground: #e9f1e4;
+  --sidebar-border: #ffffff17;
+  --sidebar-ring: #b7d97a;
+
+  --tint-green: #30452e;
+  --tint-green-foreground: #cbe590;
+  --tint-blue: #25394a;
+  --tint-blue-foreground: #a3c8de;
+  --tint-amber: #45351f;
+  --tint-amber-foreground: #f0c48a;
+  --tint-rose: #4a2a2a;
+  --tint-rose-foreground: #f5a8a0;
+  --tint-violet: #353447;
+  --tint-violet-foreground: #c8c2f2;
+
+  --page-gradient: linear-gradient(135deg, #1a2d24 0%, #1f2b30 50%, #2a2b41 100%);
+
+  --elevation-1: 0 1px 2px rgb(0 0 0 / 0.25), 0 4px 14px rgb(0 0 0 / 0.2);
+  --elevation-2: 0 2px 4px rgb(0 0 0 / 0.3), 0 10px 28px rgb(0 0 0 / 0.3);
+  --elevation-3: 0 8px 16px rgb(0 0 0 / 0.35), 0 24px 56px rgb(0 0 0 / 0.45);
 }
 
 @layer base {
@@ -126,12 +201,74 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-sans text-foreground;
   }
   button:not(:disabled), [role="button"]:not(:disabled) {
     cursor: pointer;
   }
-  html {
-    @apply font-mono;
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities
+   ------------------------------------------------------------------------- */
+
+/* Themed page canvas (sage → lavender in Pearl, green → indigo in Forest). */
+@utility bg-page {
+  background-image: var(--page-gradient);
+  background-attachment: fixed;
+}
+
+/* Typography scale. Prefer these over ad-hoc size/weight combinations. */
+@utility text-display {
+  font-family: var(--font-serif);
+  font-size: clamp(2.25rem, 1.6rem + 2.4vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+@utility text-headline {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 1.25rem + 0.9vw, 2rem);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+@utility text-title {
+  font-size: clamp(1.5rem, 1.3rem + 0.7vw, 2rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+@utility text-heading {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+@utility text-body {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+@utility text-caption {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+}
+@utility text-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
 }

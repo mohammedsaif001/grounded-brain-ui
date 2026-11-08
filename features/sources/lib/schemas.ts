@@ -68,8 +68,27 @@ export const githubSyncResultSchema = z.object({
     changed: z.boolean(),
 });
 
+/** Neither bulk endpoint is atomic: each id gets its own outcome. */
+export const bulkDeleteResultSchema = z.object({
+    deleted: z.number(),
+    results: z.array(
+        z.object({
+            sourceId: z.string(),
+            status: z.enum(["deleted", "not_found", "failed"]),
+        }),
+    ),
+});
+
 export const reprocessManyResultSchema = z.object({
     reprocessed: z.number(),
+    results: z.array(
+        z.object({
+            sourceId: z.string(),
+            // "skipped" means it is still PENDING or PROCESSING: already running, not an error.
+            status: z.enum(["queued", "skipped", "not_found", "failed"]),
+            reason: z.string().optional(),
+        }),
+    ),
 });
 
 export const reprocessOneResultSchema = z.object({

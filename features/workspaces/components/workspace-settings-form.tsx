@@ -12,9 +12,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import {
+    CHAT_MODEL_ITEMS,
     CHAT_MODEL_LABELS,
     CHAT_MODELS,
     resolveChatModel,
@@ -25,8 +27,12 @@ import {
     useUpdateWorkspace,
 } from "../hooks/use-workspaces";
 import type { Workspace } from "../lib/types";
+import { resolveWorkspaceIcon } from "../lib/workspace-icons";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
+import { WorkspaceIconPicker } from "./workspace-icon-picker";
+import { PageHeader } from "@/shared/components/page-header";
 import { routes } from "@/shared/config/routes";
+import { CheckIcon, Trash2Icon } from "lucide-react";
 
 type WorkspaceSettingsFormProps = {
     workspace: Workspace;
@@ -39,7 +45,7 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [title, setTitle] = useState(workspace.title);
     const [description, setDescription] = useState(workspace.description ?? "");
-    const [icon, setIcon] = useState(workspace.icon ?? "");
+    const [icon, setIcon] = useState(resolveWorkspaceIcon(workspace.icon));
     const [defaultModel, setDefaultModel] = useState<ChatModelId>(() =>
         resolveChatModel(workspace.defaultModel),
     );
@@ -54,7 +60,7 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                     title: title.trim(),
                     // Send "" (not undefined) so an emptied description is actually cleared.
                     description: description.trim(),
-                    icon: icon.trim() || undefined,
+                    icon,
                     defaultModel,
                 },
             });
@@ -74,14 +80,11 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
 
     return (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 p-6">
-            <div>
-                <h2 className="font-heading text-xl font-semibold">
-                    Workspace settings
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                    Manage this workspace&apos;s details and defaults.
-                </p>
-            </div>
+            <PageHeader
+                eyebrow="Workspace"
+                title="Workspace settings"
+                description="Manage this workspace's details and defaults."
+            />
 
             <form onSubmit={(event) => void handleSave(event)} className="space-y-6">
                 <div className="space-y-2">
@@ -105,19 +108,20 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="icon">Icon</Label>
-                    <Input
-                        id="icon"
+                    <p id="workspace-icon-label" className="text-sm font-medium">
+                        Icon
+                    </p>
+                    <WorkspaceIconPicker
                         value={icon}
-                        onChange={(event) => setIcon(event.target.value)}
-                        placeholder="📚"
-                        maxLength={8}
+                        onChange={setIcon}
+                        labelledBy="workspace-icon-label"
                     />
                 </div>
 
                 <div className="space-y-2">
                     <Label htmlFor="defaultModel">Default chat model</Label>
                     <Select
+                        items={CHAT_MODEL_ITEMS}
                         value={defaultModel}
                         onValueChange={(value) =>
                             setDefaultModel(value as ChatModelId)
@@ -136,14 +140,27 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                     </Select>
                 </div>
 
-                <Button type="submit" disabled={updateWorkspace.isPending}>
+                <Button type="submit" size="lg" disabled={updateWorkspace.isPending}>
+                    {updateWorkspace.isPending ? (
+                        <Spinner />
+                    ) : (
+                        <CheckIcon aria-hidden="true" />
+                    )}
                     Save changes
                 </Button>
             </form>
 
-            <div className="rounded-xl border border-destructive/30 p-4">
-                <h3 className="font-medium text-destructive">Danger zone</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
+            <section
+                aria-labelledby="danger-zone-title"
+                className="rounded-2xl border border-destructive/30 bg-tint-rose/50 p-5"
+            >
+                <h2
+                    id="danger-zone-title"
+                    className="text-heading text-destructive"
+                >
+                    Danger zone
+                </h2>
+                <p className="text-body mt-1 text-muted-foreground">
                     Deleting this workspace removes all sources, conversations,
                     and indexed vectors permanently.
                 </p>
@@ -153,9 +170,10 @@ export function WorkspaceSettingsForm({ workspace }: WorkspaceSettingsFormProps)
                     className="mt-4"
                     onClick={() => setDeleteOpen(true)}
                 >
+                    <Trash2Icon aria-hidden="true" />
                     Delete workspace
                 </Button>
-            </div>
+            </section>
 
             <DeleteWorkspaceDialog
                 workspace={workspace}

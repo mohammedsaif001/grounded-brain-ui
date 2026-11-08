@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useWorkspaceChatPrefs } from "@/features/chat/stores/chat-preferences";
 import {
+    CHAT_MODEL_ITEMS,
     CHAT_MODEL_LABELS,
     CHAT_MODELS,
     isChatModel,
@@ -35,6 +36,7 @@ export function WorkspaceHeaderActions({
     return (
         <div className="flex items-center gap-2">
             <Select
+                items={CHAT_MODEL_ITEMS}
                 value={model}
                 onValueChange={(value) => {
                     if (isChatModel(value)) {

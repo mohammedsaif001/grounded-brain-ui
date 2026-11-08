@@ -14,7 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
 import { StreamdownContent } from "@/shared/components/streamdown-content";
-import type { Flashcard } from "../../lib/types";
+import type { ArtifactCitation, Flashcard } from "../../lib/types";
+import { ArtifactSources } from "../artifact-sources";
 
 const SWIPE_THRESHOLD = 90;
 const SWIPE_VELOCITY = 400;
@@ -47,7 +48,13 @@ function shuffleOrder(length: number) {
 }
 
 /** Progress resets when the parent remounts it (keyed by artifact version). */
-export function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
+export function FlashcardsViewer({
+    cards,
+    workspaceId,
+}: {
+    cards: Flashcard[];
+    workspaceId: string;
+}) {
     const [order, setOrder] = useState(() =>
         Array.from({ length: cards.length }, (_, index) => index),
     );
@@ -180,7 +187,7 @@ export function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
     const allKnown = known.size === cards.length;
 
     return (
-        <div className="mx-auto flex w-full max-w-xl flex-col gap-5">
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-5">
             <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground tabular-nums">
@@ -191,23 +198,23 @@ export function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
                         {known.size} learned
                     </span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
                     <motion.div
-                        className="h-full rounded-full bg-primary"
+                        className="h-full rounded-full bg-ring"
                         animate={{ width: `${progress}%` }}
                         transition={{ type: "spring", stiffness: 220, damping: 30 }}
                     />
                 </div>
             </div>
 
-            <div className="relative h-72 perspective-[1600px]">
+            <div className="relative h-80 perspective-[1600px]">
                 <div
                     aria-hidden
-                    className="absolute inset-x-6 top-3 h-full rounded-3xl border border-border/50 bg-card/40"
+                    className="absolute inset-x-6 top-3 h-full rounded-2xl border border-border/50 bg-card/40"
                 />
                 <div
                     aria-hidden
-                    className="absolute inset-x-3 top-1.5 h-full rounded-3xl border border-border/70 bg-card/60"
+                    className="absolute inset-x-3 top-1.5 h-full rounded-2xl border border-border/70 bg-card/60"
                 />
 
                 <AnimatePresence initial={false} custom={direction} mode="wait">
@@ -258,6 +265,8 @@ export function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
                                 content={card.back}
                                 isKnown={isKnown}
                                 back
+                                workspaceId={workspaceId}
+                                citations={card.citations}
                             />
                         </motion.div>
                     </motion.div>
@@ -344,7 +353,7 @@ export function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
                         initial={{ opacity: 0, scale: 0.96 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.96 }}
-                        className="rounded-2xl border border-primary/40 bg-primary/10 px-4 py-3 text-center text-sm"
+                        className="rounded-xl bg-tint-green px-4 py-3 text-center text-sm text-tint-green-foreground"
                     >
                         You have marked every card as learned. Nice work.
                     </motion.div>
@@ -359,36 +368,57 @@ function CardFace({
     content,
     isKnown,
     back = false,
+    workspaceId,
+    citations,
 }: {
     side: string;
     content: string;
     isKnown: boolean;
     back?: boolean;
+    /** Only the back shows where the answer comes from. */
+    workspaceId?: string;
+    citations?: readonly ArtifactCitation[];
 }) {
     return (
         <div
-            className={`absolute inset-0 flex flex-col overflow-hidden rounded-3xl border bg-card p-6 shadow-lg backface-hidden ${
-                isKnown ? "border-primary/50" : "border-border"
-            } ${back ? "transform-[rotateY(180deg)]" : ""}`}
+            className={`absolute inset-0 flex flex-col overflow-hidden rounded-2xl border p-7 shadow-raised backface-hidden ${
+                back
+                    ? "border-border bg-card text-card-foreground transform-[rotateY(180deg)]"
+                    : "border-transparent bg-tint-violet text-foreground"
+            } ${isKnown ? "ring-2 ring-ring/50" : ""}`}
         >
             <div className="flex items-center justify-between">
-                <span className="text-xs tracking-wider text-muted-foreground uppercase">
-                    {side}
+                <span
+                    className={`text-eyebrow ${back ? "" : "text-tint-violet-foreground"}`}
+                >
+                    {side === "Front" ? "Front · Question" : "Back · Revealed"}
                 </span>
                 {isKnown ? (
-                    <span className="flex items-center gap-1 text-xs text-primary">
+                    <span className="flex items-center gap-1 text-xs font-medium">
                         <CheckIcon className="size-3.5" />
                         Learned
                     </span>
                 ) : null}
             </div>
 
-            <div className="flex flex-1 items-center justify-center overflow-y-auto py-4">
+            <div className="flex flex-1 items-center overflow-y-auto py-4">
                 <StreamdownContent
                     content={content}
-                    className="prose prose-sm dark:prose-invert max-w-none text-center [&_p]:my-0 [&_p+p]:mt-3"
+                    className={
+                        back
+                            ? "text-body max-w-none [&_p]:my-0 [&_p+p]:mt-3"
+                            : "max-w-none font-serif text-2xl leading-snug [&_p]:my-0 [&_p+p]:mt-3"
+                    }
                 />
             </div>
+
+            {back && workspaceId && citations ? (
+                <ArtifactSources
+                    workspaceId={workspaceId}
+                    citations={citations}
+                    className="border-t border-border/60 pt-3"
+                />
+            ) : null}
         </div>
     );
 }

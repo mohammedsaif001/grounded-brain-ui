@@ -17,6 +17,9 @@ import { useSources } from "../hooks/use-sources";
 import { SourceTypeIcon } from "./source-type-icon";
 import { routes } from "@/shared/config/routes";
 
+/** How many sources the sidebar previews; the full list lives on the Sources page. */
+const RECENT_LIMIT = 3;
+
 type SourceSidebarListProps = {
     workspaceId: string;
     onAddSource: () => void;
@@ -30,7 +33,7 @@ export function SourceSidebarList({
 
     return (
         <SidebarGroup>
-            <SidebarGroupLabel>Sources</SidebarGroupLabel>
+            <SidebarGroupLabel>Recent sources</SidebarGroupLabel>
             <SidebarGroupAction
                 title="Add source"
                 onClick={onAddSource}
@@ -47,7 +50,7 @@ export function SourceSidebarList({
                     </div>
                 ) : sources && sources.length > 0 ? (
                     <SidebarMenu>
-                        {sources.slice(0, 8).map((source) => (
+                        {sources.slice(0, RECENT_LIMIT).map((source) => (
                             <SidebarMenuItem key={source.id}>
                                 <SidebarMenuButton
                                     render={
@@ -59,14 +62,17 @@ export function SourceSidebarList({
                                         />
                                     }
                                 >
-                                    <SourceTypeIcon type={source.type} />
+                                    <SourceTypeIcon
+                                        type={source.type}
+                                        className="text-muted-foreground"
+                                    />
                                     <span className="truncate">
                                         {source.title}
                                     </span>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         ))}
-                        {sources.length > 8 ? (
+                        {sources.length > RECENT_LIMIT ? (
                             <SidebarMenuItem>
                                 <SidebarMenuButton
                                     render={
@@ -90,7 +96,7 @@ export function SourceSidebarList({
                         <Button
                             size="sm"
                             variant="outline"
-                            className="w-full"
+                            className="w-full bg-sidebar"
                             onClick={onAddSource}
                         >
                             <PlusIcon />

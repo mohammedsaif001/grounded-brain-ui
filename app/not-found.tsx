@@ -1,12 +1,16 @@
 import Link from "next/link";
-import { SearchXIcon } from "lucide-react";
+import {
+    ArrowLeftIcon,
+    SearchXIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandedPage } from "@/shared/components/branded-page";
 import { routes } from "@/shared/config/routes";
 import { StatusScreen } from "@/shared/components/status-screen";
 
 export default function NotFound() {
     return (
-        <div className="flex min-h-svh flex-col">
+        <BrandedPage>
             <StatusScreen
                 icon={<SearchXIcon />}
                 title="Page not found"
@@ -16,10 +20,11 @@ export default function NotFound() {
                         nativeButton={false}
                         render={<Link href={routes.dashboard} />}
                     >
+                        <ArrowLeftIcon aria-hidden="true" />
                         Back to dashboard
                     </Button>
                 }
             />
-        </div>
+        </BrandedPage>
     );
 }

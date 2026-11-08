@@ -15,6 +15,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { getErrorMessage } from "@/shared/lib/errors";
 import type { UserMemory } from "../lib/types";
+import { XIcon, CheckIcon, PlusIcon } from "lucide-react";
 
 type MemoryFormValues = { memory: string };
 
@@ -114,10 +115,17 @@ function MemoryForm({ memory, onSubmit, onClose, isPending }: MemoryFormProps) {
                     onClick={onClose}
                     disabled={isPending}
                 >
+                    <XIcon aria-hidden="true" />
                     Cancel
                 </Button>
                 <Button type="submit" disabled={isPending}>
-                    {isPending ? <Spinner /> : null}
+                    {isPending ? (
+                        <Spinner />
+                    ) : isEditing ? (
+                        <CheckIcon aria-hidden="true" />
+                    ) : (
+                        <PlusIcon aria-hidden="true" />
+                    )}
                     {isEditing ? "Save" : "Add"}
                 </Button>
             </DialogFooter>

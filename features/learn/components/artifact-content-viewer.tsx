@@ -35,14 +35,30 @@ export function ArtifactContentViewer({
 
     switch (parsed.type) {
         case "SUMMARY":
-            return <SummaryViewer markdown={parsed.content.markdown} />;
+            return (
+                <SummaryViewer
+                    markdown={parsed.content.markdown}
+                    citations={parsed.content.citations}
+                    workspaceId={workspaceId}
+                />
+            );
         case "TAKEAWAYS":
             return <TakeawaysViewer items={parsed.content.items} />;
         case "FLASHCARDS":
-            return <FlashcardsViewer key={versionKey} cards={parsed.content.cards} />;
+            return (
+                <FlashcardsViewer
+                    key={versionKey}
+                    cards={parsed.content.cards}
+                    workspaceId={workspaceId}
+                />
+            );
         case "QUIZ":
             return (
-                <QuizViewer key={versionKey} questions={parsed.content.questions} />
+                <QuizViewer
+                    key={versionKey}
+                    questions={parsed.content.questions}
+                    workspaceId={workspaceId}
+                />
             );
         case "MINDMAP":
             return (
@@ -57,6 +73,7 @@ export function ArtifactContentViewer({
                 <ReportViewer
                     markdown={parsed.content.markdown}
                     sections={parsed.content.sections}
+                    workspaceId={workspaceId}
                 />
             );
         case "WIKI":
