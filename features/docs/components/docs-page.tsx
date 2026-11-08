@@ -69,7 +69,7 @@ export function DocsPage({ signedIn }: DocsPageProps) {
                     <h2 id="flow-heading" className="text-heading">
                         The flow at a glance
                     </h2>
-                    <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                    <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:gap-x-9">
                         {quickStart.map((section, index) => (
                             <li key={section.id} className="relative">
                                 <a
@@ -98,7 +98,7 @@ export function DocsPage({ signedIn }: DocsPageProps) {
                                 {index < quickStart.length - 1 ? (
                                     <ChevronRightIcon
                                         aria-hidden="true"
-                                        className="absolute top-1/2 -right-3 hidden size-5 -translate-y-1/2 text-muted-foreground lg:block"
+                                        className="absolute top-1/2 -right-[28px] hidden size-5 -translate-y-1/2 text-muted-foreground lg:block"
                                     />
                                 ) : null}
                             </li>
