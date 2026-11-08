@@ -12,6 +12,8 @@ export class ApiError extends Error {
         public readonly details?: unknown,
         /** Set when the failure is an outage of a whole service rather than a rejected request. */
         public readonly service?: OutageService,
+        /** The API's machine-readable `error.code`, e.g. `CONFLICT` or `ARTIFACT_EDITED`. */
+        public readonly code?: string,
     ) {
         super(message);
         this.name = "ApiError";
@@ -24,6 +26,31 @@ export class ApiError extends Error {
 
     static outage(service: OutageService, details?: unknown) {
         return new ApiError(503, OUTAGE_COPY[service].message, details, service);
+    }
+
+    /** 409 `CONFLICT`: the item changed since it was loaded; reload before retrying. */
+    get isConflict() {
+        return this.status === 409 && this.code === "CONFLICT";
+    }
+
+    /**
+     * Field-level problems from a 400 `VALIDATION_ERROR`, keyed by dotted path
+     * (`content.questions.0.correctIndex`). Empty for any other error.
+     */
+    get fieldErrors(): Record<string, string[]> {
+        const details = this.details;
+        if (!details || typeof details !== "object" || Array.isArray(details)) {
+            return {};
+        }
+        const result: Record<string, string[]> = {};
+        for (const [path, messages] of Object.entries(details)) {
+            if (Array.isArray(messages)) {
+                result[path] = messages.filter(
+                    (message): message is string => typeof message === "string",
+                );
+            }
+        }
+        return result;
     }
 
     /** 4xx: the request itself was wrong; retrying will not help. */
@@ -64,6 +91,8 @@ function throwForFailure(
         response.status,
         (typeof error === "string" ? error : error?.message) ?? fallbackMessage,
         typeof error === "object" ? error?.details : undefined,
+        undefined,
+        typeof error === "object" ? error?.code : undefined,
     );
 }
 
