@@ -2,6 +2,7 @@
 
 import { ArrowRightIcon, PlusIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TypeTile } from "@/shared/components/type-tile";
 
 type CreateWorkspaceCardProps = {
     onClick: () => void;
@@ -17,13 +18,14 @@ export function CreateWorkspaceCard({
             type="button"
             onClick={onClick}
             className={cn(
-                "group flex min-h-56 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 p-6 text-center outline-none transition-colors hover:bg-card/80 focus-visible:ring-3 focus-visible:ring-ring/40",
+                "group flex min-h-40 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 p-6 text-center outline-none transition-colors hover:border-ring/50 hover:bg-card/80 focus-visible:ring-3 focus-visible:ring-ring/40 sm:min-h-52",
                 className,
             )}
         >
-            <PlusIcon
-                aria-hidden="true"
-                className="size-6 text-muted-foreground transition-colors group-hover:text-foreground"
+            <TypeTile
+                icon={PlusIcon}
+                tone="green"
+                className="transition-transform group-hover:scale-110 motion-reduce:transform-none"
             />
             <span className="space-y-1">
                 <span className="text-heading block">Make room for an idea</span>
@@ -33,7 +35,10 @@ export function CreateWorkspaceCard({
             </span>
             <span className="inline-flex items-center gap-1.5 text-sm font-semibold">
                 Create notebook
-                <ArrowRightIcon aria-hidden="true" className="size-4" />
+                <ArrowRightIcon
+                    aria-hidden="true"
+                    className="size-4 transition-transform group-hover:translate-x-0.5"
+                />
             </span>
         </button>
     );

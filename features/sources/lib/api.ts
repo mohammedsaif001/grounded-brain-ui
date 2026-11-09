@@ -5,6 +5,7 @@ import {
     githubSyncResultSchema,
     reprocessManyResultSchema,
     reprocessOneResultSchema,
+    sourceChunkSchema,
     sourceChunksResponseSchema,
     sourceListSchema,
     sourceSchema,
@@ -17,6 +18,7 @@ import type {
     ImportYoutubeInput,
     SourceFilters,
     SourcePageParams,
+    UpdateSourceInput,
 } from "./types";
 
 const sourcesPath = (workspaceId: string) =>
@@ -73,6 +75,31 @@ export function getSourceChunks(workspaceId: string, sourceId: string) {
     return apiFetch(`${sourcePath(workspaceId, sourceId)}/chunks`, {
         schema: sourceChunksResponseSchema,
     });
+}
+
+export function updateSource(
+    workspaceId: string,
+    sourceId: string,
+    input: UpdateSourceInput,
+) {
+    return apiFetch(sourcePath(workspaceId, sourceId), {
+        method: "PATCH",
+        body: input,
+        schema: sourceSchema,
+    });
+}
+
+/** Excluded chunks stay indexed but are skipped by chat and artifact generation. */
+export function setChunkExcluded(
+    workspaceId: string,
+    sourceId: string,
+    chunkId: string,
+    excluded: boolean,
+) {
+    return apiFetch(
+        `${sourcePath(workspaceId, sourceId)}/chunks/${encodeURIComponent(chunkId)}`,
+        { method: "PATCH", body: { excluded }, schema: sourceChunkSchema },
+    );
 }
 
 export function createSource(workspaceId: string, input: CreateSourceInput) {

@@ -56,12 +56,13 @@ export function WorkspaceHeaderActions({
                 </SelectContent>
             </Select>
 
-            <ModeToggle />
+            <ModeToggle className="hidden sm:inline-flex" />
 
             <Button
                 nativeButton={false}
                 variant="ghost"
                 size="icon-sm"
+                className="hidden md:inline-flex"
                 render={
                     <Link href={routes.workspace.settings(workspace.id)} />
                 }

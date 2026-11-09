@@ -69,7 +69,7 @@ export function SummaryViewer({
     );
 
     return (
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
             <div className="min-w-0 space-y-5">
                 <Badge variant="green" className="uppercase tracking-wide">
                     {minutes} min read

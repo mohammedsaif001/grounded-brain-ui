@@ -101,15 +101,15 @@ function GenerateForm({ workspaceId, initialType, onClose }: GenerateFormProps) 
     }
 
     return (
-        <form onSubmit={(event) => void handleSubmit(event)} className="grid gap-5">
-            <div className="grid gap-2">
+        <form onSubmit={(event) => void handleSubmit(event)} className="grid grid-cols-1 gap-5">
+            <div className="grid grid-cols-1 gap-2">
                 <p id="artifact-type-label" className="text-sm font-medium">
                     Type
                 </p>
                 <div
                     role="radiogroup"
                     aria-labelledby="artifact-type-label"
-                    className="grid gap-2 sm:grid-cols-2"
+                    className="grid grid-cols-1 gap-2 sm:grid-cols-2"
                 >
                     {ARTIFACT_TYPES.map((artifactType) => {
                         const meta = ARTIFACT_META[artifactType];
@@ -147,7 +147,7 @@ function GenerateForm({ workspaceId, initialType, onClose }: GenerateFormProps) 
                 </div>
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid grid-cols-1 gap-2">
                 <Label htmlFor="artifact-title">Title (optional)</Label>
                 <Input
                     id="artifact-title"

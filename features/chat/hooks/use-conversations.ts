@@ -10,6 +10,7 @@ import {
     deleteConversation,
     listConversationMessages,
     listConversations,
+    renameConversation,
 } from "../lib/api";
 import type { ChatCitation, ChatMessage } from "../lib/types";
 
@@ -48,6 +49,23 @@ export function useCreateConversation(
 ) {
     return useInvalidatingMutation({
         mutationFn: (title?: string) => createConversation(workspaceId, title),
+        invalidates: () => [chatKeys(workspaceId).conversations()],
+        ...options,
+    });
+}
+
+export function useRenameConversation(
+    workspaceId: string,
+    options?: MutationHookOptions,
+) {
+    return useInvalidatingMutation({
+        mutationFn: ({
+            conversationId,
+            title,
+        }: {
+            conversationId: string;
+            title: string;
+        }) => renameConversation(workspaceId, conversationId, title),
         invalidates: () => [chatKeys(workspaceId).conversations()],
         ...options,
     });

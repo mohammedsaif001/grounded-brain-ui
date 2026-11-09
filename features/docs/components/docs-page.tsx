@@ -69,7 +69,7 @@ export function DocsPage({ signedIn }: DocsPageProps) {
                     <h2 id="flow-heading" className="text-heading">
                         The flow at a glance
                     </h2>
-                    <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:gap-x-9">
+                    <ol className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:gap-x-9">
                         {quickStart.map((section, index) => (
                             <li key={section.id} className="relative">
                                 <a

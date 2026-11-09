@@ -1,18 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { PencilIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { routes } from "@/shared/config/routes";
 import { SOURCE_TYPE_LABELS } from "../lib/constants";
 import { describeSource } from "../lib/source-metadata";
 import type { Source } from "../lib/types";
-import { SourceRowActions } from "./source-row-actions";
+import { isIngesting, SourceRowActions } from "./source-row-actions";
 import { SourceStatusBadge } from "./source-status-badge";
 import { SourceTypeTile } from "./source-type-icon";
 
 type SourceCardProps = {
     source: Source;
+    onEdit?: (source: Source) => void;
     onDelete?: (source: Source) => void;
     onReprocess?: (source: Source) => void;
     /** When provided, a selection checkbox is rendered. */
@@ -23,6 +26,7 @@ type SourceCardProps = {
 
 export function SourceCard({
     source,
+    onEdit,
     onDelete,
     onReprocess,
     selected,
@@ -69,6 +73,17 @@ export function SourceCard({
                                 onSelectedChange(checked)
                             }
                         />
+                    ) : null}
+                    {onEdit ? (
+                        <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            disabled={isIngesting(source)}
+                            onClick={() => onEdit(source)}
+                        >
+                            <PencilIcon aria-hidden="true" />
+                            <span className="sr-only">Edit {source.title}</span>
+                        </Button>
                     ) : null}
                     <SourceRowActions
                         source={source}

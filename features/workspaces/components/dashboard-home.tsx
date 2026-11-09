@@ -6,10 +6,7 @@ import { useRouter } from "next/navigation";
 import {
     BookOpenIcon,
     BookOpenTextIcon,
-    BrainIcon,
-    MessageSquareIcon,
     SearchIcon,
-    SparklesIcon,
     XIcon,
 } from "lucide-react";
 import { ModeToggle } from "@/components/ui/mode-toggle";
@@ -17,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/shared/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SignOutButton } from "@/features/auth/components/sign-out-button";
+import { UserMenu } from "@/features/profile";
 import { cn } from "@/lib/utils";
 import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import {
@@ -27,43 +24,30 @@ import {
     useWorkspaces,
 } from "../hooks/use-workspaces";
 import type { Workspace } from "../lib/types";
+import { ContinueCard } from "./continue-card";
 import { CreateWorkspaceCard } from "./create-workspace-card";
+import { DashboardHero } from "./dashboard-hero";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
+import { FirstRunSteps } from "./first-run-steps";
 import { WorkspaceCard } from "./workspace-card";
 import { WorkspaceFormDialog } from "./workspace-form-dialog";
 import { WorkspaceSortSelect } from "./workspace-sort-select";
+import {
+    getDashboardTotals,
+    getMostRecentWorkspace,
+} from "../lib/dashboard";
 import {
     DEFAULT_WORKSPACE_SORT,
     getWorkspaceSortOption,
     type WorkspaceSortKey,
 } from "../lib/workspace-sort";
 import { AppLogo } from "@/shared/components/brand/app-logo";
-import { PageHeader } from "@/shared/components/page-header";
-import { TypeTile } from "@/shared/components/type-tile";
 import { routes } from "@/shared/config/routes";
 import { LoadError } from "@/shared/components/load-error";
 
 type DashboardHomeProps = {
     userName?: string | null;
 };
-
-const FEATURES = [
-    {
-        icon: BookOpenIcon,
-        title: "Upload sources",
-        description: "PDFs, websites, YouTube, and notes in one place",
-    },
-    {
-        icon: MessageSquareIcon,
-        title: "Chat with context",
-        description: "Ask questions grounded in your materials",
-    },
-    {
-        icon: SparklesIcon,
-        title: "Learn faster",
-        description: "Flashcards, quizzes, mind maps, and summaries",
-    },
-] as const;
 
 export function DashboardHome({ userName }: DashboardHomeProps) {
     const router = useRouter();
@@ -91,82 +75,66 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
     const updateWorkspace = useUpdateWorkspace({ suppressErrorToast: true });
     const deleteWorkspace = useDeleteWorkspace();
 
-    const greeting = userName?.split(" ")[0] ?? "there";
+    const firstName = userName?.trim().split(/\s+/)[0] || "there";
+    // Unfiltered list for the totals and the "continue" shortcut. It shares its cache
+    // entry with the grid whenever no search is active, so it costs no extra request.
+    const { data: allWorkspaces } = useWorkspaces({
+        sort: "updatedAt",
+        order: "desc",
+    });
+    const totals = allWorkspaces ? getDashboardTotals(allWorkspaces) : undefined;
+    const mostRecent = allWorkspaces
+        ? getMostRecentWorkspace(allWorkspaces)
+        : undefined;
+    const hasNoNotebooks = allWorkspaces?.length === 0;
 
     return (
         <div className="bg-page min-h-svh">
             <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur-md">
-                <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 md:px-8">
+                <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 md:px-8">
                     <Link
                         href={routes.dashboard}
-                        className="rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+                        className="min-w-0 rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
                     >
                         <AppLogo />
                     </Link>
 
-                    <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="flex items-center gap-2 sm:gap-3">
                         <Button
                             nativeButton={false}
                             variant="ghost"
                             size="sm"
-                            className="hidden sm:inline-flex"
-                            render={<Link href={routes.memorySettings} />}
-                        >
-                            <BrainIcon />
-                            Memory
-                        </Button>
-                        <Button
-                            nativeButton={false}
-                            variant="ghost"
-                            size="sm"
-                            className="hidden sm:inline-flex"
+                            className="hidden lg:inline-flex"
                             render={<Link href={routes.docs} />}
                         >
                             <BookOpenTextIcon aria-hidden="true" />
                             Guide
                         </Button>
-                        <ModeToggle />
-                        <SignOutButton />
+                        <ModeToggle className="hidden sm:inline-flex" />
+                        <UserMenu />
                     </div>
                 </div>
             </header>
 
-            <main className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-10">
-                <section className="mb-10 space-y-6">
-                    <PageHeader
-                        eyebrow={`Welcome back, ${greeting}`}
-                        title="Your notebooks"
-                        description="Organize sources, chat with your materials, and generate learning tools, all in one workspace."
-                    />
+            <main className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-6 md:gap-10 md:px-8 md:py-10">
+                <DashboardHero
+                    firstName={firstName}
+                    totals={totals}
+                    onCreate={() => setCreateOpen(true)}
+                />
 
-                    <div className="grid gap-3 sm:grid-cols-3">
-                        {FEATURES.map((feature) => (
-                            <div
-                                key={feature.title}
-                                className="rounded-2xl border bg-card p-4 shadow-surface"
-                            >
-                                <TypeTile
-                                    icon={feature.icon}
-                                    tone="green"
-                                    size="sm"
-                                    className="mb-3"
-                                />
-                                <p className="text-sm font-medium">
-                                    {feature.title}
-                                </p>
-                                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                                    {feature.description}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+                {mostRecent && !debouncedSearch ? (
+                    <ContinueCard workspace={mostRecent} />
+                ) : null}
+                {hasNoNotebooks ? <FirstRunSteps /> : null}
 
-                <section className="space-y-5">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <section aria-labelledby="notebooks-title" className="space-y-5">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                         <div>
-                            <h2 className="text-heading">
-                                Recent notebooks
+                            <h2 id="notebooks-title" className="text-heading">
+                                {debouncedSearch
+                                    ? "Search results"
+                                    : "Your notebooks"}
                             </h2>
                             <p className="text-sm text-muted-foreground">
                                 {workspaces?.length
@@ -177,8 +145,8 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             </p>
                         </div>
 
-                        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-                            <div className="relative w-full sm:w-64">
+                        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto">
+                            <div className="relative w-full sm:flex-1 lg:w-72 lg:flex-none">
                                 <SearchIcon
                                     aria-hidden="true"
                                     className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
@@ -198,16 +166,17 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                             <WorkspaceSortSelect
                                 value={sortKey}
                                 onChange={setSortKey}
+                                className="w-full sm:w-auto"
                             />
                         </div>
                     </div>
 
                     {isLoading ? (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {Array.from({ length: 6 }).map((_, index) => (
                                 <Skeleton
                                     key={index}
-                                    className="min-h-56 rounded-2xl"
+                                    className="min-h-48 rounded-2xl sm:min-h-52"
                                 />
                             ))}
                         </div>
@@ -221,7 +190,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                         <div
                             aria-busy={isPlaceholderData}
                             className={cn(
-                                "grid gap-4 transition-opacity sm:grid-cols-2 lg:grid-cols-3",
+                                "grid grid-cols-1 gap-4 transition-opacity sm:grid-cols-2 lg:grid-cols-3",
                                 isPlaceholderData && "opacity-60",
                             )}
                         >

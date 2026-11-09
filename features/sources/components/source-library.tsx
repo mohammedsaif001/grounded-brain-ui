@@ -47,6 +47,7 @@ import {
 import type { Source, SourceFilters } from "../lib/types";
 import { AddSourceDialog } from "./add-source-dialog";
 import { DeleteSourcesDialog } from "./delete-sources-dialog";
+import { EditSourceByIdDialog } from "./edit-source-dialog";
 import { SourceCard } from "./source-card";
 import { SourceTable } from "./source-table";
 import { LoadError } from "@/shared/components/load-error";
@@ -98,6 +99,7 @@ export function SourceLibrary({
 }: SourceLibraryProps) {
     const [view, setView] = useState<ViewMode>("list");
     const [addOpen, setAddOpen] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(
         null,
     );
@@ -188,7 +190,7 @@ export function SourceLibrary({
             : `${pendingDelete?.kind === "many" ? pendingDelete.ids.length : 0} sources`;
 
     return (
-        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 md:p-8">
             <PageHeader
                 eyebrow="The roots of your notebook"
                 title="Your source library"
@@ -328,8 +330,8 @@ export function SourceLibrary({
                     aria-busy="true"
                     className={
                         view === "grid"
-                            ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
-                            : "grid gap-2"
+                            ? "grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                            : "grid grid-cols-1 gap-2"
                     }
                 >
                     {Array.from({ length: 6 }).map((_, index) => (
@@ -356,13 +358,14 @@ export function SourceLibrary({
                         selectedIds={visibleSelected}
                         onToggleOne={toggleOne}
                         onToggleAll={toggleAll}
+                        onEdit={(source) => setEditingId(source.id)}
                         onDelete={(source) =>
                             setPendingDelete({ kind: "one", source })
                         }
                         onReprocess={(source) => reprocessSources([source.id])}
                     />
                 ) : (
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                         {sources.map((source) => (
                             <SourceCard
                                 key={source.id}
@@ -371,6 +374,7 @@ export function SourceLibrary({
                                 onSelectedChange={(selected) =>
                                     toggleOne(source.id, selected)
                                 }
+                                onEdit={(target) => setEditingId(target.id)}
                                 onDelete={(target) =>
                                     setPendingDelete({
                                         kind: "one",
@@ -433,6 +437,12 @@ export function SourceLibrary({
                     <span>Ready sources are available in Chat &amp; Learn</span>
                 </footer>
             ) : null}
+
+            <EditSourceByIdDialog
+                workspaceId={workspaceId}
+                sourceId={editingId}
+                onClose={() => setEditingId(null)}
+            />
 
             <AddSourceDialog
                 workspaceId={workspaceId}

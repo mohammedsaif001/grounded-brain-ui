@@ -15,6 +15,7 @@ import { filterArtifacts, type ArtifactFilter } from "../lib/filter-artifacts";
 import type { ArtifactType, LearningArtifact } from "../lib/types";
 import { ArtifactCard } from "./artifact-card";
 import { ArtifactMaker } from "./artifact-maker";
+import { EditArtifactByIdDialog } from "./edit/edit-artifact-dialog";
 import { GenerateArtifactDialog } from "./generate-artifact-dialog";
 import { LoadError } from "@/shared/components/load-error";
 
@@ -30,6 +31,7 @@ const FILTERS: readonly { value: ArtifactFilter; label: string }[] = [
 export function LearnHub({ workspaceId }: LearnHubProps) {
     const [dialog, setDialog] = useState<{ type: ArtifactType } | null>(null);
     const [filter, setFilter] = useState<ArtifactFilter>("all");
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [pendingDelete, setPendingDelete] =
         useState<LearningArtifact | null>(null);
 
@@ -52,7 +54,7 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
     }
 
     return (
-        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 md:p-8">
             <PageHeader
                 eyebrow="Knowledge, made yours"
                 title="Learn something that lasts."
@@ -94,7 +96,7 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                     {isLoading ? (
                         <div
                             aria-busy="true"
-                            className="grid gap-4 md:grid-cols-2"
+                            className="grid grid-cols-1 gap-4 md:grid-cols-2"
                         >
                             {Array.from({ length: 4 }).map((_, index) => (
                                 <Skeleton
@@ -125,12 +127,13 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                             </Button>
                         </EmptyState>
                     ) : (
-                        <div className="grid gap-4 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             {visible.map((artifact) => (
                                 <ArtifactCard
                                     key={artifact.id}
                                     artifact={artifact}
                                     workspaceId={workspaceId}
+                                    onEdit={(target) => setEditingId(target.id)}
                                     onDelete={setPendingDelete}
                                 />
                             ))}
@@ -156,6 +159,12 @@ export function LearnHub({ workspaceId }: LearnHubProps) {
                     onPick={openDialog}
                 />
             </div>
+
+            <EditArtifactByIdDialog
+                workspaceId={workspaceId}
+                artifactId={editingId}
+                onClose={() => setEditingId(null)}
+            />
 
             <GenerateArtifactDialog
                 workspaceId={workspaceId}

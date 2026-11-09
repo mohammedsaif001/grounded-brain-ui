@@ -1,8 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeftIcon, ExternalLinkIcon, LibraryBigIcon } from "lucide-react";
+import {
+    ArrowLeftIcon,
+    ExternalLinkIcon,
+    LibraryBigIcon,
+    PencilIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
@@ -13,8 +19,10 @@ import { routes } from "@/shared/config/routes";
 import { useSource } from "../hooks/use-sources";
 import { SOURCE_TYPE_LABELS } from "../lib/constants";
 import { describeSourceFacts } from "../lib/source-metadata";
+import { EditSourceDialog } from "./edit-source-dialog";
 import { GithubSourcePanel } from "./github-source-panel";
 import { MarkdownPreview } from "./markdown-preview";
+import { SourceChunks } from "./source-chunks";
 import { SourceStatusBadge } from "./source-status-badge";
 import { SourceTypeTile } from "./source-type-icon";
 import { LoadError } from "@/shared/components/load-error";
@@ -26,6 +34,7 @@ type SourceDetailProps = {
 
 export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
     const { data: source, isLoading, error } = useSource(workspaceId, sourceId);
+    const [editOpen, setEditOpen] = useState(false);
     const backToLibrary = (
         <Button
             nativeButton={false}
@@ -41,10 +50,10 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
         return (
             <div
                 aria-busy="true"
-                className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-6 md:p-8"
+                className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-4 sm:p-6 md:p-8"
             >
-                <Skeleton className="h-10 w-72" />
-                <Skeleton className="h-4 w-96" />
+                <Skeleton className="h-10 w-72 max-w-full" />
+                <Skeleton className="h-4 w-96 max-w-full" />
                 <Skeleton className="h-72 w-full rounded-2xl" />
             </div>
         );
@@ -52,7 +61,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
 
     if (error instanceof ApiError && error.status === 404) {
         return (
-            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-4 sm:p-6 md:p-8">
                 <EmptyState icon={LibraryBigIcon} title="Source not found">
                     {backToLibrary}
                 </EmptyState>
@@ -62,7 +71,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
 
     if (error || !source) {
         return (
-            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-4 sm:p-6 md:p-8">
                 <LoadError
                     error={error}
                     icon={LibraryBigIcon}
@@ -90,7 +99,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
         source.status === "PENDING" || source.status === "PROCESSING";
 
     return (
-        <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-6 md:p-8">
+        <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-4 sm:p-6 md:p-8">
             <header className="flex flex-wrap items-start gap-4">
                 <Button
                     nativeButton={false}
@@ -104,7 +113,7 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
                     <span className="sr-only">Back to library</span>
                 </Button>
                 <SourceTypeTile type={source.type} size="lg" />
-                <div className="min-w-0 flex-1 space-y-1.5">
+                <div className="order-3 w-full min-w-0 space-y-1.5 sm:order-none sm:w-auto sm:flex-1">
                     <p className="text-eyebrow">
                         {SOURCE_TYPE_LABELS[source.type]}
                     </p>
@@ -125,7 +134,24 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
                         {factsLine ? ` · ${factsLine}` : null}
                     </p>
                 </div>
+                <Button
+                    variant="outline"
+                    className="order-2 ml-auto sm:order-none sm:ml-0"
+                    // A source being (re)indexed cannot be edited; the API answers 409.
+                    disabled={isProcessing}
+                    onClick={() => setEditOpen(true)}
+                >
+                    <PencilIcon aria-hidden="true" />
+                    Edit
+                </Button>
             </header>
+
+            <EditSourceDialog
+                workspaceId={workspaceId}
+                source={source}
+                open={editOpen}
+                onOpenChange={setEditOpen}
+            />
 
             {source.url ? (
                 <p className="flex min-w-0 items-center gap-2 text-sm">
@@ -185,6 +211,10 @@ export function SourceDetail({ workspaceId, sourceId }: SourceDetailProps) {
                     description="There's no extracted content available for this source."
                 />
             )}
+
+            {source.status === "READY" && source.type !== "GITHUB" ? (
+                <SourceChunks workspaceId={workspaceId} sourceId={source.id} />
+            ) : null}
         </div>
     );
 }

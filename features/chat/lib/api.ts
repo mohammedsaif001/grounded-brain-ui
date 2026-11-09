@@ -36,6 +36,17 @@ export function listConversationMessages(
     );
 }
 
+export function renameConversation(
+    workspaceId: string,
+    conversationId: string,
+    title: string,
+) {
+    return apiFetch(
+        `${conversationsPath(workspaceId)}/${encodeURIComponent(conversationId)}`,
+        { method: "PATCH", body: { title }, schema: conversationSchema },
+    );
+}
+
 export function deleteConversation(
     workspaceId: string,
     conversationId: string,

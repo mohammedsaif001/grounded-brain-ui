@@ -3,7 +3,13 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeftIcon, GraduationCapIcon, ShieldCheckIcon } from "lucide-react";
+import {
+    ArrowLeftIcon,
+    GraduationCapIcon,
+    PencilIcon,
+    ShieldCheckIcon,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
@@ -17,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { ARTIFACT_META } from "../lib/artifact-meta";
 import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
 import { useArtifact, useMarkArtifactViewed } from "../hooks/use-artifacts";
-import { isUnseenArtifact } from "../lib/types";
+import { isUnseenArtifact, isUserEdited } from "../lib/types";
 import { ArtifactActions } from "./artifact-actions";
 import { ArtifactContentViewer } from "./artifact-content-viewer";
 import { LoadError } from "@/shared/components/load-error";
@@ -62,9 +68,9 @@ export function ArtifactDetail({
         return (
             <div
                 aria-busy="true"
-                className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-6 md:p-8"
+                className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-4 sm:p-6 md:p-8"
             >
-                <Skeleton className="h-10 w-72" />
+                <Skeleton className="h-10 w-72 max-w-full" />
                 <Skeleton className="h-72 w-full rounded-2xl" />
             </div>
         );
@@ -72,7 +78,7 @@ export function ArtifactDetail({
 
     if (error instanceof ApiError && error.status === 404) {
         return (
-            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-4 sm:p-6 md:p-8">
                 <EmptyState icon={GraduationCapIcon} title="Learning tool not found">
                     {backToLearn}
                 </EmptyState>
@@ -82,7 +88,7 @@ export function ArtifactDetail({
 
     if (error || !artifact) {
         return (
-            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6 md:p-8">
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-4 sm:p-6 md:p-8">
                 <LoadError
                     error={error}
                     icon={GraduationCapIcon}
@@ -109,7 +115,7 @@ export function ArtifactDetail({
                 "mx-auto flex w-full flex-1 flex-col gap-6",
                 isMindMap
                     ? "min-h-0 max-w-none p-4 md:p-5"
-                    : "max-w-5xl p-6 md:p-8 short:gap-4 short:p-4 short:md:p-4",
+                    : "max-w-5xl p-4 sm:p-6 md:p-8 short:gap-4 short:p-4 short:md:p-4",
             )}
         >
             <header className="flex flex-wrap items-start gap-4">
@@ -123,13 +129,19 @@ export function ArtifactDetail({
                     <span className="sr-only">Back to Learn</span>
                 </Button>
                 <TypeTile icon={meta.icon} tone={meta.tone} size="lg" />
-                <div className="min-w-0 flex-1 space-y-1.5">
+                <div className="order-3 w-full min-w-0 space-y-1.5 sm:order-none sm:w-auto sm:flex-1">
                     <p className="text-eyebrow">
                         {ARTIFACT_TYPE_LABELS[artifact.type]}
                     </p>
                     <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-title">{artifact.title}</h1>
                         <StatusBadge status={artifact.status} />
+                        {isUserEdited(artifact) ? (
+                            <Badge variant="violet">
+                                <PencilIcon aria-hidden="true" />
+                                Edited
+                            </Badge>
+                        ) : null}
                     </div>
                     <p className="text-caption flex flex-wrap items-center gap-x-2">
                         {artifact.sourceIds.length > 0 ? (

@@ -15,7 +15,7 @@ const SCAN_DIRS = ["app", "components", "features", "shared"];
 /** Files that legitimately contain literal colours, with the reason. */
 const ALLOWED_HEX = new Set([
     // Brand-mandated Google "G" logo colours.
-    "features/auth/components/login-form.tsx",
+    "shared/components/brand/google-icon.tsx",
     // Replaces the whole document, so it cannot use stylesheet tokens.
     "app/global-error.tsx",
 ]);

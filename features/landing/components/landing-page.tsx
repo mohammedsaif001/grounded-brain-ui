@@ -139,7 +139,10 @@ export function LandingPage() {
                             render={<Link href={routes.login} />}
                         >
                             Get started
-                            <ArrowRightIcon aria-hidden="true" />
+                            <ArrowRightIcon
+                                aria-hidden="true"
+                                className="max-sm:hidden"
+                            />
                         </Button>
                         <ModeToggle />
                     </div>
@@ -256,7 +259,7 @@ export function LandingPage() {
                             notebook.
                         </p>
                     </div>
-                    <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {FEATURES.map((feature) => (
                             <li
                                 key={feature.title}
@@ -299,7 +302,7 @@ export function LandingPage() {
                                 Read the full guide
                             </Button>
                         </div>
-                        <ol className="mt-8 grid gap-6 md:grid-cols-3">
+                        <ol className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
                             {STEPS.map((step, index) => (
                                 <li key={step.title} className="flex gap-4">
                                     <span

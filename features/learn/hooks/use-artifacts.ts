@@ -12,8 +12,14 @@ import {
     getArtifact,
     listArtifacts,
     markArtifactViewed,
+    regenerateArtifact,
+    updateArtifact,
 } from "../lib/api";
-import type { CreateArtifactInput, LearningArtifact } from "../lib/types";
+import type {
+    CreateArtifactInput,
+    LearningArtifact,
+    UpdateArtifactInput,
+} from "../lib/types";
 
 const POLL_INTERVAL_MS = 3_000;
 
@@ -95,6 +101,52 @@ export function useDeleteArtifact(
             // Notebook cards show these counts.
             workspaceKeys.lists(),
         ],
+        ...options,
+    });
+}
+
+/** Saves a rename and/or content edit; the detail cache is replaced with the saved artifact. */
+export function useUpdateArtifact(
+    workspaceId: string,
+    options?: MutationHookOptions,
+) {
+    return useInvalidatingMutation({
+        mutationFn: ({
+            artifactId,
+            input,
+        }: {
+            artifactId: string;
+            input: UpdateArtifactInput;
+        }) => updateArtifact(workspaceId, artifactId, input),
+        updateCache: (queryClient, artifact) =>
+            queryClient.setQueryData(
+                artifactKeys(workspaceId).detail(artifact.id),
+                artifact,
+            ),
+        invalidates: () => [artifactKeys(workspaceId).list()],
+        ...options,
+    });
+}
+
+/** Re-runs generation in place; the artifact comes back `PENDING` and `useArtifact` polls it. */
+export function useRegenerateArtifact(
+    workspaceId: string,
+    options?: MutationHookOptions,
+) {
+    return useInvalidatingMutation({
+        mutationFn: ({
+            artifactId,
+            force,
+        }: {
+            artifactId: string;
+            force?: boolean;
+        }) => regenerateArtifact(workspaceId, artifactId, force),
+        updateCache: (queryClient, artifact) =>
+            queryClient.setQueryData(
+                artifactKeys(workspaceId).detail(artifact.id),
+                artifact,
+            ),
+        invalidates: () => [artifactKeys(workspaceId).list()],
         ...options,
     });
 }

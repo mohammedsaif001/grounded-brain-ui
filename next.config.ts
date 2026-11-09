@@ -16,7 +16,8 @@ const contentSecurityPolicy = [
     "default-src 'self'",
     `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isProduction ? "" : " 'unsafe-eval'"}`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' blob: data:",
+    // Google sign-in users' pictures are served from googleusercontent.com.
+    "img-src 'self' blob: data: https://*.googleusercontent.com",
     "font-src 'self'",
     "connect-src 'self'",
     "object-src 'none'",

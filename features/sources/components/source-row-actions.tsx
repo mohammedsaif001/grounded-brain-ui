@@ -1,6 +1,11 @@
 "use client";
 
-import { MoreHorizontalIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
+import {
+    MoreHorizontalIcon,
+    PencilIcon,
+    RefreshCwIcon,
+    Trash2Icon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -10,8 +15,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Source } from "../lib/types";
 
+/** A source being indexed cannot be edited; the API answers 409. */
+export function isIngesting(source: Pick<Source, "status">) {
+    return source.status === "PENDING" || source.status === "PROCESSING";
+}
+
 type SourceRowActionsProps = {
     source: Source;
+    onEdit?: (source: Source) => void;
     onDelete?: (source: Source) => void;
     onReprocess?: (source: Source) => void;
 };
@@ -19,10 +30,11 @@ type SourceRowActionsProps = {
 /** Per-source overflow menu shared by the table rows and grid cards. */
 export function SourceRowActions({
     source,
+    onEdit,
     onDelete,
     onReprocess,
 }: SourceRowActionsProps) {
-    if (!onDelete && !onReprocess) return null;
+    if (!onEdit && !onDelete && !onReprocess) return null;
 
     return (
         <DropdownMenu>
@@ -39,6 +51,15 @@ export function SourceRowActions({
                 <span className="sr-only">Actions for {source.title}</span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+                {onEdit ? (
+                    <DropdownMenuItem
+                        disabled={isIngesting(source)}
+                        onClick={() => onEdit(source)}
+                    >
+                        <PencilIcon />
+                        Edit
+                    </DropdownMenuItem>
+                ) : null}
                 {onReprocess ? (
                     <DropdownMenuItem onClick={() => onReprocess(source)}>
                         <RefreshCwIcon />

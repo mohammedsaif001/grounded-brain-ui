@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowUpRightIcon, Trash2Icon } from "lucide-react";
+import { ArrowUpRightIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/shared/components/status-badge";
@@ -10,17 +10,23 @@ import { TypeTile } from "@/shared/components/type-tile";
 import { routes } from "@/shared/config/routes";
 import { ARTIFACT_META } from "../lib/artifact-meta";
 import { ARTIFACT_TYPE_LABELS } from "../lib/constants";
-import { isUnseenArtifact, type LearningArtifact } from "../lib/types";
+import {
+    isUnseenArtifact,
+    isUserEdited,
+    type LearningArtifact,
+} from "../lib/types";
 
 type ArtifactCardProps = {
     artifact: LearningArtifact;
     workspaceId: string;
+    onEdit: (artifact: LearningArtifact) => void;
     onDelete: (artifact: LearningArtifact) => void;
 };
 
 export function ArtifactCard({
     artifact,
     workspaceId,
+    onEdit,
     onDelete,
 }: ArtifactCardProps) {
     const meta = ARTIFACT_META[artifact.type];
@@ -46,6 +52,9 @@ export function ArtifactCard({
                         {isUnseenArtifact(artifact) ? (
                             <Badge variant="green">New</Badge>
                         ) : null}
+                        {isUserEdited(artifact) ? (
+                            <Badge variant="violet">Edited</Badge>
+                        ) : null}
                         <StatusBadge status={artifact.status} />
                     </div>
                 </div>
@@ -60,6 +69,19 @@ export function ArtifactCard({
                     })}
                 </p>
                 <div className="flex items-center gap-1">
+                    {artifact.status === "READY" ? (
+                        <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="pointer-events-auto relative z-10"
+                            onClick={() => onEdit(artifact)}
+                        >
+                            <PencilIcon aria-hidden="true" />
+                            <span className="sr-only">
+                                Edit {artifact.title}
+                            </span>
+                        </Button>
+                    ) : null}
                     <Button
                         variant="ghost"
                         size="icon-sm"

@@ -116,8 +116,8 @@ function WorkspaceForm({
     }
 
     return (
-        <form className="grid gap-4" onSubmit={(event) => void handleSubmit(event)}>
-            <div className="grid gap-2">
+        <form className="grid grid-cols-1 gap-4" onSubmit={(event) => void handleSubmit(event)}>
+            <div className="grid grid-cols-1 gap-2">
                 <p id="workspace-icon-label" className="text-sm font-medium">
                     Icon
                 </p>
@@ -128,7 +128,7 @@ function WorkspaceForm({
                 />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid grid-cols-1 gap-2">
                 <Label htmlFor="workspace-title">Title</Label>
                 <Input
                     id="workspace-title"
@@ -141,7 +141,7 @@ function WorkspaceForm({
                 />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid grid-cols-1 gap-2">
                 <Label htmlFor="workspace-description">Description</Label>
                 <Textarea
                     id="workspace-description"

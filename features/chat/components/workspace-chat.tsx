@@ -24,6 +24,7 @@ import {
     useConversationMessages,
     useConversations,
     useDeleteConversation,
+    useRenameConversation,
 } from "../hooks/use-conversations";
 import { ChatComposer } from "./chat-composer";
 import { ChatEmptyState } from "./chat-empty-state";
@@ -71,6 +72,7 @@ export function WorkspaceChat({
     const { data: storedMessages, isLoading: messagesLoading } =
         useConversationMessages(workspaceId, conversationId);
     const deleteConversation = useDeleteConversation(workspaceId);
+    const renameConversation = useRenameConversation(workspaceId);
     const { data: sources } = useSources(workspaceId);
 
     // Citations come from the persisted messages; derived, never copied into state.
@@ -206,6 +208,13 @@ export function WorkspaceChat({
         });
     }
 
+    async function handleRenameConversation(title: string) {
+        if (!conversationId) {
+            return;
+        }
+        await renameConversation.mutateAsync({ conversationId, title });
+    }
+
     function handleExportChat() {
         if (messages.length === 0) {
             return;
@@ -228,7 +237,7 @@ export function WorkspaceChat({
 
     return (
         <CitationSelectionProvider>
-            <div className="mx-auto grid min-h-0 w-full max-w-7xl flex-1 gap-6 p-6 md:p-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
+            <div className="mx-auto grid min-h-0 w-full max-w-7xl flex-1 grid-cols-[minmax(0,1fr)] gap-6 p-4 sm:p-6 md:p-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
                 <div className="flex min-h-0 flex-col gap-5">
                     <PageHeader
                         title={activeConversation?.title ?? "Chat"}
@@ -243,8 +252,10 @@ export function WorkspaceChat({
                                 onNewChat={handleNewChat}
                                 onExport={handleExportChat}
                                 onDelete={handleDeleteConversation}
+                                onRename={handleRenameConversation}
                                 canExport={messages.length > 0}
                                 isDeleting={deleteConversation.isPending}
+                                isRenaming={renameConversation.isPending}
                             />
                         }
                     />

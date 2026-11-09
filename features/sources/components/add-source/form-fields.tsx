@@ -62,7 +62,7 @@ type TextFieldProps = Omit<ComponentProps<typeof Input>, "onChange"> & {
 
 export function TextField({ id, label, onValueChange, ...props }: TextFieldProps) {
     return (
-        <div className="grid gap-2">
+        <div className="grid grid-cols-1 gap-2">
             <Label htmlFor={id}>{label}</Label>
             <Input
                 id={id}
@@ -87,7 +87,7 @@ export function TextAreaField({
     ...props
 }: TextAreaFieldProps) {
     return (
-        <div className="grid gap-2">
+        <div className="grid grid-cols-1 gap-2">
             <Label htmlFor={id}>{label}</Label>
             <Textarea
                 id={id}

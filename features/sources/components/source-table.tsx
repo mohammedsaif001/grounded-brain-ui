@@ -18,6 +18,7 @@ type SourceTableProps = {
     selectedIds: ReadonlySet<string>;
     onToggleOne: (id: string, selected: boolean) => void;
     onToggleAll: (selected: boolean) => void;
+    onEdit: (source: Source) => void;
     onDelete: (source: Source) => void;
     onReprocess: (source: Source) => void;
 };
@@ -27,6 +28,7 @@ export function SourceTable({
     selectedIds,
     onToggleOne,
     onToggleAll,
+    onEdit,
     onDelete,
     onReprocess,
 }: SourceTableProps) {
@@ -67,7 +69,7 @@ export function SourceTable({
                         >
                             Status
                         </th>
-                        <th scope="col" className="w-28 py-3 pr-4 text-right font-semibold">
+                        <th scope="col" className="w-px py-3 pr-3 text-right font-semibold whitespace-nowrap sm:pr-4">
                             <span className="sr-only">Actions</span>
                         </th>
                     </tr>
@@ -154,6 +156,7 @@ export function SourceTable({
                                         )}
                                         <SourceRowActions
                                             source={source}
+                                            onEdit={onEdit}
                                             onDelete={onDelete}
                                             onReprocess={
                                                 source.status === "FAILED"
