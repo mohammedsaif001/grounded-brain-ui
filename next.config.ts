@@ -59,6 +59,9 @@ export default function nextConfig(phase: string): NextConfig {
 
     return {
         output: "standalone",
+        // Pin the tracing root to this project so a stray lockfile in a parent folder can't
+        // make Next nest server.js under a deep path inside .next/standalone.
+        outputFileTracingRoot: __dirname,
         poweredByHeader: false,
 
         experimental: {
