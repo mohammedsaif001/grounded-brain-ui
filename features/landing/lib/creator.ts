@@ -18,7 +18,7 @@ export const creator = {
     ],
     /** Path under /public. Empty shows initials instead. */
     image: "/images/mohammed-saif.png",
-    portfolio: { label: "Portfolio", url: "https://mohammedsaif001.github.io/portfolioResume/" } satisfies CreatorLink,
+    portfolio: { label: "Portfolio", url: "https://imohdsaif.in" } satisfies CreatorLink,
     socials: [
         { label: "GitHub", url: "https://github.com/mohammedsaif001" },
         { label: "LinkedIn", url: "https://www.linkedin.com/in/mohammedsaif001/" },

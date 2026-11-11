@@ -38,6 +38,8 @@ jobs:
         env:
           # Required: the /api rewrite to the backend is baked into the build (see next.config.ts).
           API_URL: ${{ vars.API_URL }}
+          # Public origin baked into robots.txt, sitemap.xml and other prerendered SEO output.
+          SITE_URL: https://grounded-brain.imohdsaif.in
           NEXT_TELEMETRY_DISABLED: 1
         run: npm run build
 
