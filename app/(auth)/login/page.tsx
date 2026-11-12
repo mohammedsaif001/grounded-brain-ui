@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { QuoteIcon } from "lucide-react";
 import { LoginForm } from "@/features/auth";
-import { GettingStarted } from "@/features/auth/components/getting-started";
 import { redirectIfAuthenticated } from "@/features/auth/server";
 
 export const metadata: Metadata = {
@@ -18,19 +17,13 @@ export default async function LoginPage() {
     await redirectIfAuthenticated();
 
     return (
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 short:gap-4">
-        <div className="grid w-full items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+        <div className="mx-auto grid w-full max-w-5xl items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
             <section className="space-y-6 short:space-y-4">
-                <p className="text-eyebrow">A quieter space for big ideas</p>
-                <h1 className="text-display text-foreground">
+                <h1 className="text-headline text-foreground">
                     Collect knowledge. Grow understanding.
                 </h1>
-                <p className="text-body max-w-md text-muted-foreground">
-                    Turn the things you read, watch and discover into insights
-                    that stay with you. Always rooted in your sources.
-                </p>
 
-                <figure className="relative hidden h-[clamp(9rem,28svh,18rem)] max-w-xl overflow-hidden rounded-3xl shadow-raised md:block">
+                <figure className="relative hidden h-[clamp(11rem,38svh,22rem)] max-w-xl overflow-hidden rounded-3xl shadow-raised md:block">
                     <Image
                         src="/images/login-hero.svg"
                         alt="A glass book with leaves growing from its pages"
@@ -49,8 +42,6 @@ export default async function LoginPage() {
             <Suspense>
                 <LoginForm />
             </Suspense>
-        </div>
-        <GettingStarted />
         </div>
     );
 }

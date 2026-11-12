@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import {
-    LibraryBigIcon,
-    QuoteIcon,
-    ShieldCheckIcon,
-    SparklesIcon,
-} from "lucide-react";
+import { ShieldCheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,14 +15,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { signIn } from "../lib/auth-client";
 import { GoogleIcon } from "@/shared/components/brand/google-icon";
-import { TypeTile } from "@/shared/components/type-tile";
 import { safeRedirectPath } from "@/shared/config/routes";
-
-const HIGHLIGHTS = [
-    { icon: LibraryBigIcon, tone: "green", label: "All your sources in one place" },
-    { icon: QuoteIcon, tone: "violet", label: "Answers you can trace and trust" },
-    { icon: SparklesIcon, tone: "amber", label: "Study material made for your mind" },
-] as const;
 
 export function LoginForm({
     className,
@@ -86,7 +74,7 @@ export function LoginForm({
                             type="submit"
                             variant="outline"
                             size="lg"
-                            className="w-full"
+                            className="h-12 w-full text-base"
                             disabled={isLoading}
                         >
                             {isLoading ? <Spinner /> : <GoogleIcon />}
@@ -101,18 +89,6 @@ export function LoginForm({
                             </p>
                         ) : null}
                     </form>
-
-                    <ul className="space-y-3 short:space-y-2">
-                        {HIGHLIGHTS.map(({ icon, tone, label }) => (
-                            <li
-                                key={label}
-                                className="flex items-center gap-3 text-sm font-medium"
-                            >
-                                <TypeTile icon={icon} tone={tone} size="sm" />
-                                {label}
-                            </li>
-                        ))}
-                    </ul>
 
                     <div className="space-y-4 border-t pt-5 short:space-y-2 short:pt-3">
                         <p className="text-caption">
