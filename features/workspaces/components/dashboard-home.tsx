@@ -92,12 +92,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
         <div className="bg-page min-h-svh">
             <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur-md">
                 <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 md:px-8">
-                    <Link
-                        href={routes.dashboard}
-                        className="min-w-0 rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
-                    >
-                        <AppLogo />
-                    </Link>
+                    <AppLogo />
 
                     <div className="flex items-center gap-2 sm:gap-3">
                         <Button

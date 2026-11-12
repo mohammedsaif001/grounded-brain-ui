@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { routes } from "@/shared/config/routes";
 
 import { LogoMark } from "./logo-mark";
 
@@ -10,7 +12,14 @@ type AppLogoProps = {
 
 export function AppLogo({ markOnly = false, className }: AppLogoProps) {
   return (
-    <span className={cn("inline-flex items-center gap-2 sm:gap-2.5", className)}>
+    <Link
+      href={routes.home}
+      aria-label="Grounded Brain home"
+      className={cn(
+        "inline-flex min-w-0 items-center gap-2 rounded-xl outline-none transition-opacity hover:opacity-80 focus-visible:ring-3 focus-visible:ring-ring/40 sm:gap-2.5",
+        className,
+      )}
+    >
       <LogoMark className="size-8 drop-shadow-sm sm:size-9" />
       {markOnly ? (
         <span className="sr-only">Grounded Brain</span>
@@ -19,6 +28,6 @@ export function AppLogo({ markOnly = false, className }: AppLogoProps) {
           Grounded Brain
         </span>
       )}
-    </span>
+    </Link>
   );
 }

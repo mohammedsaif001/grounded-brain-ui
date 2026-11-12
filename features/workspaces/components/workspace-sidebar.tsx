@@ -105,12 +105,7 @@ export function WorkspaceSidebar({
                 className="gap-5 px-4 pt-5"
                 onClick={closeDrawerOnLink}
             >
-                <Link
-                    href={routes.dashboard}
-                    className="rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-sidebar-ring/40"
-                >
-                    <AppLogo />
-                </Link>
+                <AppLogo />
 
                 <div className="flex items-center gap-3">
                     <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sidebar-accent text-sidebar-accent-foreground">
