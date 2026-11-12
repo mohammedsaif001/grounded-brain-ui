@@ -1,18 +1,30 @@
 "use client";
 
-import { BrainIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
+import { useSession } from "@/features/auth/lib/auth-client";
+import { getInitials } from "@/features/profile";
+import { LogoMark } from "@/shared/components/brand/logo-mark";
+import { UserAvatar } from "@/shared/components/user-avatar";
 import { uniqueCitationsBySource } from "../lib/citations";
 import type { ChatCitation } from "../lib/types";
 import { ChatMessageBody } from "./chat-message-body";
 import { CitationSources } from "./citation-sources";
 
 export function UserTurn({ text }: { text: string }) {
+    const { data: session } = useSession();
+    const user = session?.user;
+
     return (
-        <div className="flex items-baseline gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-surface sm:gap-4 sm:px-5 sm:py-4">
-            <span className="text-eyebrow shrink-0">You</span>
-            <p className="text-body min-w-0 font-medium whitespace-pre-wrap break-words">
+        <div className="flex flex-row-reverse items-end gap-2.5 sm:gap-3">
+            <UserAvatar
+                name={user?.name}
+                image={user?.image}
+                initials={getInitials(user?.name ?? user?.email)}
+                size="sm"
+                className="mb-0.5"
+            />
+            <p className="text-body max-w-[85%] min-w-0 rounded-2xl rounded-br-md bg-primary px-4 py-2.5 font-medium whitespace-pre-wrap break-words text-primary-foreground shadow-surface sm:max-w-[75%]">
                 {text}
             </p>
         </div>
@@ -36,12 +48,13 @@ export function AssistantTurn({
     const isWaiting = isAnimating && text.trim().length === 0;
 
     return (
+        <div className="flex items-start gap-2.5 sm:gap-3">
+            <LogoMark className="size-8 drop-shadow-sm" />
         <article
             aria-label="Grounded Brain answer"
-            className="min-w-0 space-y-4 rounded-2xl border border-border bg-card p-4 shadow-surface sm:space-y-5 sm:p-6"
+            className="min-w-0 max-w-full flex-1 space-y-4 rounded-2xl rounded-tl-md border border-border bg-card p-4 shadow-surface sm:space-y-5 sm:p-5"
         >
             <header className="flex items-center gap-2.5">
-                <BrainIcon aria-hidden="true" className="size-5" />
                 <span className="text-sm font-semibold">Grounded Brain</span>
                 {sourceCount > 0 ? (
                     <Badge variant="green">
@@ -76,5 +89,6 @@ export function AssistantTurn({
                 />
             ) : null}
         </article>
+        </div>
     );
 }
