@@ -23,6 +23,10 @@ export const FAQS: readonly Faq[] = [
         answer: "Yes. You sign in with Google, and your notebooks, sources and memories are visible only to you. You can edit or delete anything, including what the assistant remembers.",
     },
     {
+        question: "Who built Grounded Brain?",
+        answer: "Grounded Brain was built by Mohammed Saif, a senior software engineer focused on full-stack development and generative AI. You can find more about him and his other work at his portfolio, https://www.imohdsaif.in/.",
+    },
+    {
         question: "How do I get started?",
         answer: "Sign in with Google, create a notebook, add a source and ask your first question. It takes under a minute.",
     },

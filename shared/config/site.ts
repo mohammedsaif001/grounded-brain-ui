@@ -5,11 +5,19 @@ export const siteConfig = {
     name: "Grounded Brain",
     tagline: "Chat with your sources, grounded in citations",
     description:
-        "Grounded Brain is an AI notebook that answers from your own PDFs, websites, YouTube videos and GitHub repos, with citations to the exact passage. Turn sources into flashcards, quizzes, summaries and mind maps.",
+        "Grounded Brain, built by Mohammed Saif (imohdsaif.in), is an AI notebook that answers from your own PDFs, websites, YouTube videos and GitHub repos, with citations to the exact passage. Turn sources into flashcards, quizzes, summaries and mind maps.",
     shortDescription:
         "Chat with your PDFs, websites, YouTube videos and GitHub repos. Every answer is cited. Generate flashcards, quizzes and mind maps.",
     keywords: [
         "Grounded Brain",
+        "Grounded Brain by Mohammed Saif",
+        "Grounded Brain AI",
+        "Grounded Brain app",
+        "Mohammed Saif",
+        "Mohammed Saif portfolio",
+        "Mohammed Saif software engineer",
+        "imohdsaif",
+        "imohdsaif.in",
         "AI notebook",
         "chat with PDF",
         "chat with documents",

@@ -1,6 +1,8 @@
 # grounded-brain-ui
 
-**Live site:** <https://grounded-brain.imohdsaif.in/dashboard>
+**Live site:** <https://grounded-brain.imohdsaif.in>
+
+Built by [Mohammed Saif](https://www.imohdsaif.in/) · portfolio: <https://www.imohdsaif.in/>
 
 Web client for **Grounded Brain**: upload sources (PDFs, websites, YouTube, GitHub repos, notes), chat with them with citations, and generate study material (summaries, flashcards, quizzes, mind maps, repo wikis).
 

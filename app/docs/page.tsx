@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { getSessionCookie } from "better-auth/cookies";
 import { DocsPage } from "@/features/docs/components/docs-page";
 import { DOCS_SECTIONS, QUICK_START_IDS } from "@/features/docs/lib/content";
+import { creator } from "@/features/landing/lib/creator";
 import { JsonLd } from "@/shared/components/json-ld";
 import { routes } from "@/shared/config/routes";
 import { absoluteUrl } from "@/shared/config/site";
@@ -20,7 +21,9 @@ export const metadata: Metadata = {
         "AI flashcards tutorial",
         "cited AI answers tutorial",
         "AI notebook tutorial",
+        "Grounded Brain by Mohammed Saif",
     ],
+    authors: [{ name: creator.name, url: creator.portfolio.url }],
     alternates: { canonical: routes.docs },
     openGraph: {
         type: "article",

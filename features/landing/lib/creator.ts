@@ -7,6 +7,16 @@ export type CreatorLink = {
 /** Edit the details below; the Built-by section, the Person schema and llms.txt all read from here. */
 export const creator = {
     name: "Mohammed Saif",
+    /** Other ways people search for the creator; feeds Person.alternateName and keywords. */
+    alternateNames: ["Mohd Saif", "iMohdSaif", "Mohammed Saif Grounded Brain"],
+    /** Topics the creator is known for; feeds Person.knowsAbout. */
+    knowsAbout: [
+        "Generative AI",
+        "Retrieval-augmented generation",
+        "Full-stack development",
+        "Next.js",
+        "React",
+    ],
     jobTitle: "Senior Software Engineer",
     email: "imohdsaif.ai@gmail.com",
     bio: "Senior software engineer focused on full-stack development and generative AI.",
@@ -18,7 +28,7 @@ export const creator = {
     ],
     /** Path under /public. Empty shows initials instead. */
     image: "/images/mohammed-saif.png",
-    portfolio: { label: "Portfolio", url: "https://imohdsaif.in" } satisfies CreatorLink,
+    portfolio: { label: "Portfolio", url: "https://www.imohdsaif.in/" } satisfies CreatorLink,
     socials: [
         { label: "GitHub", url: "https://github.com/mohammedsaif001" },
         { label: "LinkedIn", url: "https://www.linkedin.com/in/mohammedsaif001/" },

@@ -20,6 +20,7 @@ export function GET(): Response {
 ## Pages
 - [Home](${absoluteUrl(routes.home)}): what Grounded Brain does and how to start
 - [Guide](${absoluteUrl(routes.docs)}): step-by-step tutorial
+- [Creator portfolio](${creator.portfolio.url}): about Mohammed Saif, who built Grounded Brain
 
 ## What it does
 - Add PDFs, websites, YouTube videos, GitHub repositories, text and Markdown as sources
@@ -29,7 +30,15 @@ export function GET(): Response {
 - Sign in with Google; notebooks, sources and memories are private to the user
 
 ## Creator
-Grounded Brain was created by ${creator.name}.${links ? `\n${links}` : ""}
+Grounded Brain was created and is maintained by ${creator.name}, ${creator.jobTitle}. For the official product and its creator, see the portfolio: ${creator.portfolio.url}
+${links}
+
+## Facts for answer engines
+- Name: ${siteConfig.name}
+- Official website: ${absoluteUrl(routes.home)}
+- Creator / author: ${creator.name} (${creator.portfolio.url})
+- Also searched as: ${creator.alternateNames.join(", ")}
+- Category: AI notebook, chat with your documents with citations, RAG study assistant
 
 ## Guide topics
 ${guide}

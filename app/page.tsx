@@ -29,12 +29,16 @@ const structuredData = {
             url: absoluteUrl("/"),
             logo: absoluteUrl("/icon.svg"),
             founder: { "@id": personId },
+            sameAs: [creator.portfolio.url],
         },
         {
             "@type": "Person",
             "@id": personId,
             name: creator.name,
             url: creator.portfolio.url || creator.socials[1].url,
+            mainEntityOfPage: creator.portfolio.url,
+            alternateName: [...creator.alternateNames],
+            knowsAbout: [...creator.knowsAbout],
             description: creator.bio,
             email: `mailto:${creator.email}`,
             ...(creator.jobTitle ? { jobTitle: creator.jobTitle } : {}),
@@ -51,6 +55,8 @@ const structuredData = {
             inLanguage: "en",
             publisher: { "@id": absoluteUrl("/#organization") },
             author: { "@id": personId },
+            // Ties the product to its creator's site for entity resolution by search and AI engines.
+            sameAs: [creator.portfolio.url],
         },
         {
             "@type": "SoftwareApplication",
@@ -62,6 +68,7 @@ const structuredData = {
             operatingSystem: "Web",
             inLanguage: "en",
             keywords: siteConfig.keywords.join(", "),
+            sameAs: [creator.portfolio.url],
             featureList: [
                 "Chat with PDFs, websites, YouTube videos and GitHub repositories",
                 "Answers with citations to the exact passage",
