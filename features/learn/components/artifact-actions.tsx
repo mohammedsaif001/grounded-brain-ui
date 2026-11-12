@@ -114,6 +114,8 @@ export function ArtifactActions({ artifact, workspaceId }: ArtifactActionsProps)
                 open={confirmOpen}
                 title="Discard your edits?"
                 description="Regenerating builds a fresh version from your sources and replaces the changes you made. This can't be undone."
+                tone="warning"
+                icon={RefreshCwIcon}
                 confirmLabel="Regenerate"
                 isPending={regenerate.isPending}
                 onConfirm={() => runRegenerate(true)}

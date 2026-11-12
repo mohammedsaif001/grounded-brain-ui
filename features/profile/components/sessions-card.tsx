@@ -149,6 +149,8 @@ export function SessionsCard({
                 open={confirmOpen}
                 title="Sign out other devices?"
                 description={`This signs ${others.length} other ${others.length === 1 ? "device" : "devices"} out of your account. You stay signed in here.`}
+                tone="warning"
+                icon={LogOutIcon}
                 confirmLabel="Sign them out"
                 isPending={revokeOthers.isPending}
                 onConfirm={() =>

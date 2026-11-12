@@ -1,16 +1,6 @@
 "use client";
 
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Spinner } from "@/components/ui/spinner";
+import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 import type { Workspace } from "../lib/types";
 
 type DeleteWorkspaceDialogProps = {
@@ -29,36 +19,22 @@ export function DeleteWorkspaceDialog({
     isPending = false,
 }: DeleteWorkspaceDialogProps) {
     return (
-        <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Delete workspace?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        This will permanently delete{" "}
-                        <span className="font-medium text-foreground">
-                            {workspace?.title}
-                        </span>
-                        . This action cannot be undone.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isPending}>
-                        Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                        variant="destructive"
-                        disabled={isPending}
-                        onClick={(event) => {
-                            event.preventDefault();
-                            // Failures are reported by the global mutation error toast.
-                            onConfirm().catch(() => undefined);
-                        }}
-                    >
-                        {isPending ? <Spinner /> : null}
-                        Delete
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+        <ConfirmDialog
+            open={open}
+            title="Delete workspace?"
+            description={
+                <>
+                    This will permanently delete{" "}
+                    <span className="font-medium text-foreground">
+                        {workspace?.title}
+                    </span>
+                    . This action cannot be undone.
+                </>
+            }
+            isPending={isPending}
+            // Failures are reported by the global mutation error toast.
+            onConfirm={() => onConfirm().catch(() => undefined)}
+            onCancel={() => onOpenChange(false)}
+        />
     );
 }
