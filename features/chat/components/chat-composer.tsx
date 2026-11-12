@@ -1,13 +1,15 @@
 "use client";
 
 import { useId, useState } from "react";
-import { ArrowUpIcon, GlobeIcon } from "lucide-react";
+import { ArrowUpIcon, GlobeIcon, SquareIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 type ChatComposerProps = {
     onSubmit: (text: string) => void;
+    /** When given, the send button becomes a stop button while an answer streams. */
+    onStop?: () => void;
     disabled?: boolean;
     isStreaming?: boolean;
     webSearchEnabled?: boolean;
@@ -19,6 +21,7 @@ type ChatComposerProps = {
 
 export function ChatComposer({
     onSubmit,
+    onStop,
     disabled = false,
     isStreaming = false,
     webSearchEnabled = false,
@@ -94,19 +97,35 @@ export function ChatComposer({
                     ) : null}
                 </div>
 
-                <Button
-                    type="submit"
-                    className="shrink-0"
-                    disabled={isBusy || !input.trim()}
-                    aria-label="Send message"
-                >
-                    {isStreaming ? (
-                        <Spinner />
-                    ) : (
-                        <ArrowUpIcon aria-hidden="true" />
-                    )}
-                    Send
-                </Button>
+                {isStreaming && onStop ? (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="shrink-0"
+                        aria-label="Stop generating"
+                        onClick={onStop}
+                    >
+                        <SquareIcon
+                            aria-hidden="true"
+                            className="fill-current"
+                        />
+                        Stop
+                    </Button>
+                ) : (
+                    <Button
+                        type="submit"
+                        className="shrink-0"
+                        disabled={isBusy || !input.trim()}
+                        aria-label="Send message"
+                    >
+                        {isStreaming ? (
+                            <Spinner />
+                        ) : (
+                            <ArrowUpIcon aria-hidden="true" />
+                        )}
+                        Send
+                    </Button>
+                )}
             </div>
         </form>
     );

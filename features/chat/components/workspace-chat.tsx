@@ -14,7 +14,6 @@ import {
     MessageScrollerProvider,
     MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
-import { MessageGroup } from "@/components/ui/message";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSources } from "@/features/sources/hooks/use-sources";
 import { PageHeader } from "@/shared/components/page-header";
@@ -29,7 +28,12 @@ import {
 import { ChatComposer } from "./chat-composer";
 import { ChatEmptyState } from "./chat-empty-state";
 import { ChatToolbar } from "./chat-toolbar";
-import { AssistantTurn, UserTurn } from "./chat-turns";
+import {
+    AssistantErrorTurn,
+    AssistantPendingTurn,
+    AssistantTurn,
+    UserTurn,
+} from "./chat-turns";
 import { CitationPanel } from "./citation-panel";
 import {
     CitationSelectionProvider,
@@ -38,6 +42,7 @@ import {
 import { LearnPromptCard } from "./learn-prompt-card";
 import { useWorkspaceChatPrefs } from "../stores/chat-preferences";
 import { chatStreamPath } from "../lib/api";
+import { describeChatError } from "../lib/chat-error";
 import { exportConversationMarkdown } from "../lib/export-chat";
 import { downloadMarkdown } from "@/shared/lib/download";
 import { routes } from "@/shared/config/routes";
@@ -134,19 +139,60 @@ export function WorkspaceChat({
         ],
     );
 
-    const { messages, sendMessage, setMessages, status, error } = useChat({
+    const {
+        messages,
+        sendMessage,
+        regenerate,
+        stop,
+        clearError,
+        setMessages,
+        status,
+        error,
+    } = useChat({
         transport,
     });
 
     const isStreaming = status === "streaming" || status === "submitted";
+    const hasError = status === "error";
+    const lastMessage = messages.at(-1);
+    // Between sending and the first streamed token there is no assistant message yet.
+    const isAwaitingFirstToken =
+        status === "submitted" && lastMessage?.role === "user";
+    // The question most recently asked, so a failed turn can be retried even if the
+    // thread was reloaded from history in the meantime.
+    const lastPromptRef = useRef<string | null>(null);
 
+    const ask = useCallback(
+        (text: string) => {
+            lastPromptRef.current = text;
+            void sendMessage({ text });
+        },
+        [sendMessage],
+    );
+
+    function handleRetry() {
+        if (lastMessage?.role === "user") {
+            void regenerate();
+        } else if (lastPromptRef.current) {
+            ask(lastPromptRef.current);
+        }
+    }
+
+    const localMessageCount = messages.length;
+
+    // Replace the live thread with the persisted one (server ids carry the citations).
+    // Clearing is done by handleNewChat/handleSelectConversation, never here: this effect
+    // reruns when streaming starts, and in a new chat conversationId is still null at that
+    // moment, so clearing here would wipe the question that was just sent.
     useEffect(() => {
-        if (!conversationId) {
-            setMessages([]);
+        // While failed, keep the unanswered question on screen next to its error.
+        if (!conversationId || !storedMessages || isStreaming || hasError) {
             return;
         }
 
-        if (!storedMessages || isStreaming) {
+        // History fetched mid-stream predates the answer. Applying it when the stream
+        // ends would drop the answer until the refetch brings it back (a visible flicker).
+        if (storedMessages.length < localMessageCount) {
             return;
         }
 
@@ -157,7 +203,14 @@ export function WorkspaceChat({
                 parts: [{ type: "text" as const, text: message.content }],
             })),
         );
-    }, [conversationId, storedMessages, setMessages, isStreaming]);
+    }, [
+        conversationId,
+        storedMessages,
+        setMessages,
+        isStreaming,
+        hasError,
+        localMessageCount,
+    ]);
 
     useEffect(() => {
         if (status !== "ready" || !conversationId) {
@@ -181,19 +234,30 @@ export function WorkspaceChat({
         }
 
         handledAskPrompt.current = askPrompt;
-        void sendMessage({ text: askPrompt });
+        ask(askPrompt);
         router.replace(routes.workspace.chat(workspaceId));
     }, [
         askPrompt,
         status,
         conversationId,
         messages.length,
-        sendMessage,
+        ask,
         router,
         workspaceId,
     ]);
 
+    function handleSelectConversation(id: string) {
+        // A failure belongs to the thread it happened in; don't carry it over.
+        clearError();
+        if (id !== conversationId) {
+            // Clear the old thread so the skeleton shows while the new one loads.
+            setMessages([]);
+        }
+        setConversationId(id);
+    }
+
     function handleNewChat() {
+        clearError();
         setConversationId(null);
         setMessages([]);
     }
@@ -233,7 +297,18 @@ export function WorkspaceChat({
 
     const readySourceCount =
         sources?.filter((source) => source.status === "READY").length ?? 0;
-    const isLoadingHistory = conversationsLoading || messagesLoading;
+    // Only show the skeleton when there is nothing on screen. A new chat gets its
+    // conversation id mid-request, which starts a history fetch; the live thread (question
+    // plus the thinking wave) must stay visible while that loads.
+    const isLoadingHistory =
+        messages.length === 0 &&
+        !isStreaming &&
+        (conversationsLoading || messagesLoading);
+
+    const hasThread = messages.length > 0 || hasError;
+    const lastUserIndex = messages.findLastIndex(
+        (message) => message.role === "user",
+    );
 
     return (
         <CitationSelectionProvider>
@@ -250,7 +325,9 @@ export function WorkspaceChat({
                                 conversations={conversations}
                                 conversationId={conversationId}
                                 onSelectConversation={(id) =>
-                                    id ? setConversationId(id) : handleNewChat()
+                                    id
+                                        ? handleSelectConversation(id)
+                                        : handleNewChat()
                                 }
                                 onNewChat={handleNewChat}
                                 onExport={handleExportChat}
@@ -273,98 +350,104 @@ export function WorkspaceChat({
                         Source-grounded answers
                     </p>
 
-                    <MessageScrollerProvider>
-                        <MessageScroller className="min-h-0 flex-1">
-                            <MessageScrollerViewport>
-                                <MessageScrollerContent className="w-full pb-4">
-                                    {isLoadingHistory ? (
-                                        <div
-                                            aria-busy="true"
-                                            className="space-y-4"
-                                        >
-                                            <Skeleton className="h-14 rounded-2xl" />
-                                            <Skeleton className="h-56 rounded-2xl" />
-                                        </div>
-                                    ) : messages.length === 0 ? (
-                                        <ChatEmptyState
-                                            disabled={isStreaming}
-                                            onPick={(prompt) =>
-                                                void sendMessage({
-                                                    text: prompt,
-                                                })
-                                            }
-                                        />
-                                    ) : (
-                                        <MessageGroup className="gap-5">
-                                            {messages.map(
-                                                (message, messageIndex) => {
-                                                    const isUser =
-                                                        message.role === "user";
-                                                    const text =
-                                                        getMessageText(message);
-                                                    const isAnimating =
-                                                        !isUser &&
-                                                        isStreaming &&
-                                                        messageIndex ===
-                                                            messages.length - 1;
-
-                                                    return (
-                                                        <MessageScrollerItem
-                                                            key={message.id}
-                                                            scrollAnchor
-                                                        >
-                                                            {isUser ? (
-                                                                <UserTurn
-                                                                    text={text}
-                                                                />
-                                                            ) : (
-                                                                <AssistantTurn
-                                                                    text={text}
-                                                                    workspaceId={
-                                                                        workspaceId
-                                                                    }
-                                                                    citations={
-                                                                        citationsByMessageId[
-                                                                            message
-                                                                                .id
-                                                                        ]
-                                                                    }
-                                                                    isAnimating={
-                                                                        isAnimating
-                                                                    }
-                                                                />
-                                                            )}
-                                                        </MessageScrollerItem>
-                                                    );
-                                                },
-                                            )}
-                                        </MessageGroup>
-                                    )}
-                                </MessageScrollerContent>
-                            </MessageScrollerViewport>
-                            <MessageScrollerButton direction="end" />
-                        </MessageScroller>
-                    </MessageScrollerProvider>
-
-                    {error ? (
-                        <p
-                            role="alert"
-                            className="shrink-0 rounded-xl bg-tint-rose px-4 py-2.5 text-sm text-tint-rose-foreground"
+                    {isLoadingHistory ? (
+                        <div
+                            aria-busy="true"
+                            className="min-h-0 flex-1 space-y-4 overflow-hidden"
                         >
-                            {error.message}
-                        </p>
-                    ) : null}
+                            <Skeleton className="h-14 rounded-2xl" />
+                            <Skeleton className="h-56 rounded-2xl" />
+                        </div>
+                    ) : !hasThread ? (
+                        <div className="min-h-0 flex-1 overflow-y-auto">
+                            <ChatEmptyState
+                                disabled={isStreaming}
+                                onPick={ask}
+                            />
+                        </div>
+                    ) : (
+                        // Mounted only once there are real turns: the scroller applies its
+                        // initial "scroll to end" to the first content it sees, so a skeleton
+                        // or empty state in here would make an opened thread land mid-way.
+                        <MessageScrollerProvider autoScroll>
+                            <MessageScroller className="min-h-0 flex-1">
+                                <MessageScrollerViewport>
+                                    {/* Items must be direct children of the content and carry a
+                                        messageId, or the scroller can't anchor new turns into view. */}
+                                    <MessageScrollerContent className="w-full gap-5 pb-4">
+                                        {messages.map((message, messageIndex) => {
+                                            const isUser = message.role === "user";
+                                            const text = getMessageText(message);
+                                            const isAnimating =
+                                                !isUser &&
+                                                isStreaming &&
+                                                messageIndex === messages.length - 1;
 
-                    <div className="shrink-0 bg-gradient-to-t from-background via-background to-transparent pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
-                    <ChatComposer
-                        isStreaming={isStreaming}
-                        webSearchEnabled={chatPrefs.webSearch}
-                        onWebSearchChange={chatPrefs.setWebSearch}
-                        sourceCount={readySourceCount}
-                        onSubmit={(text) => {
-                            void sendMessage({ text });
-                        }}
-                    />
+                                            return (
+                                                <MessageScrollerItem
+                                                    // Keyed by position, not id: once a reply
+                                                    // finishes, the thread reloads from the
+                                                    // server with new ids. Id keys would
+                                                    // remount every turn and make the scroller
+                                                    // re-anchor (the up-and-down jump).
+                                                    key={messageIndex}
+                                                    messageId={message.id}
+                                                    // Only the newest question is an anchor. The
+                                                    // scroller jumps to any anchor it hasn't
+                                                    // scrolled to yet, so marking older questions
+                                                    // sends the view back up when an answer lands.
+                                                    scrollAnchor={
+                                                        messageIndex === lastUserIndex
+                                                    }
+                                                >
+                                                    {isUser ? (
+                                                        <UserTurn text={text} />
+                                                    ) : (
+                                                        <AssistantTurn
+                                                            text={text}
+                                                            workspaceId={workspaceId}
+                                                            citations={
+                                                                citationsByMessageId[
+                                                                    message.id
+                                                                ]
+                                                            }
+                                                            isAnimating={isAnimating}
+                                                        />
+                                                    )}
+                                                </MessageScrollerItem>
+                                            );
+                                        })}
+
+                                        {isAwaitingFirstToken ? (
+                                            <MessageScrollerItem messageId="pending-answer">
+                                                <AssistantPendingTurn />
+                                            </MessageScrollerItem>
+                                        ) : null}
+
+                                        {hasError ? (
+                                            <MessageScrollerItem messageId="failed-answer">
+                                                <AssistantErrorTurn
+                                                    message={describeChatError(error)}
+                                                    onRetry={handleRetry}
+                                                />
+                                            </MessageScrollerItem>
+                                        ) : null}
+                                    </MessageScrollerContent>
+                                </MessageScrollerViewport>
+                                <MessageScrollerButton direction="end" />
+                            </MessageScroller>
+                        </MessageScrollerProvider>
+                    )}
+
+                    <div className="shrink-0 bg-linear-to-t from-background via-background to-transparent pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
+                        <ChatComposer
+                            isStreaming={isStreaming}
+                            onStop={() => void stop()}
+                            webSearchEnabled={chatPrefs.webSearch}
+                            onWebSearchChange={chatPrefs.setWebSearch}
+                            sourceCount={readySourceCount}
+                            onSubmit={ask}
+                        />
                     </div>
                 </div>
 

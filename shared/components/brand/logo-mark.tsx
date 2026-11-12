@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { cn } from "@/lib/utils";
 
 type LogoMarkProps = {
@@ -10,6 +11,11 @@ type LogoMarkProps = {
  * the same drawing with literal colours for the browser tab.
  */
 export function LogoMark({ className }: LogoMarkProps) {
+    // Each instance needs its own gradient id: `url(#id)` resolves to the first match in
+    // the document, and if that copy is hidden (e.g. the mobile header on desktop) the
+    // gradient doesn't paint and every other mark loses its tile.
+    const gradientId = `gb-mark-bg-${useId().replace(/:/g, "")}`;
+
     return (
         <svg
             viewBox="0 0 40 40"
@@ -19,7 +25,7 @@ export function LogoMark({ className }: LogoMarkProps) {
         >
             <defs>
                 <linearGradient
-                    id="gb-mark-bg"
+                    id={gradientId}
                     x1="4"
                     y1="2"
                     x2="36"
@@ -30,7 +36,7 @@ export function LogoMark({ className }: LogoMarkProps) {
                     <stop offset="1" style={{ stopColor: "color-mix(in oklab, var(--primary), black 14%)" }} />
                 </linearGradient>
             </defs>
-            <rect width="40" height="40" rx="11" fill="url(#gb-mark-bg)" />
+            <rect width="40" height="40" rx="11" fill={`url(#${gradientId})`} />
 
             {/* Hemispheres */}
             <g
