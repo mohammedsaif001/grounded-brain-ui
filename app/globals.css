@@ -203,8 +203,23 @@
   body {
     @apply bg-background font-sans text-foreground;
   }
-  button:not(:disabled), [role="button"]:not(:disabled) {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  [role="menuitem"]:not([aria-disabled="true"], [data-disabled]),
+  [role="option"]:not([aria-disabled="true"], [data-disabled]),
+  [role="tab"]:not([aria-disabled="true"], [data-disabled]),
+  [role="combobox"]:not([aria-disabled="true"], [data-disabled]),
+  [role="checkbox"]:not([aria-disabled="true"], [data-disabled]),
+  a[href],
+  summary,
+  select:not(:disabled),
+  label[for]:has(+ input[type="checkbox"]) {
     cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"],
+  [data-disabled] {
+    cursor: not-allowed;
   }
   @media (prefers-reduced-motion: reduce) {
     *,

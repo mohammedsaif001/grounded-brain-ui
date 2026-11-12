@@ -69,6 +69,7 @@ export function ChatToolbar({
                     <Button
                         variant="ghost"
                         size="icon"
+                        title="Rename conversation"
                         onClick={() => setRenameOpen(true)}
                     >
                         <PencilIcon aria-hidden="true" />
@@ -77,6 +78,8 @@ export function ChatToolbar({
                     <Button
                         variant="ghost"
                         size="icon"
+                        title="Delete conversation"
+                        className="hover:bg-destructive/10 hover:text-destructive"
                         disabled={isDeleting}
                         onClick={onDelete}
                     >
