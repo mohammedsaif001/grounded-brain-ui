@@ -25,7 +25,7 @@ export function BulkActionBar({
       role="region"
       aria-label="Bulk actions"
       className={cn(
-        "flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-accent px-4 py-3 text-accent-foreground",
+        "flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-foreground shadow-surface",
         className,
       )}
     >

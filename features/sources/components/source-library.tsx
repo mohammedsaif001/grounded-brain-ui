@@ -297,7 +297,7 @@ export function SourceLibrary({
                     onClear={clearSelection}
                 >
                     <Button
-                        variant="ghost"
+                        variant="warning"
                         disabled={reprocess.isPending}
                         onClick={() =>
                             reprocessSources([...visibleSelected], clearSelection)
@@ -311,7 +311,7 @@ export function SourceLibrary({
                         Reprocess
                     </Button>
                     <Button
-                        variant="ghost"
+                        variant="destructive"
                         onClick={() =>
                             setPendingDelete({
                                 kind: "many",
