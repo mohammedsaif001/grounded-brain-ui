@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -115,6 +115,7 @@ function LoadedEditArtifactForm({
             {error ? (
                 <DialogFooter>
                     <Button variant="outline" onClick={onDone}>
+                        <XIcon aria-hidden="true" />
                         Close
                     </Button>
                 </DialogFooter>
@@ -364,6 +365,7 @@ function EditArtifactForm({
                         onClick={onDone}
                         disabled={updateArtifact.isPending}
                     >
+                        <XIcon aria-hidden="true" />
                         Cancel
                     </Button>
                     <Button

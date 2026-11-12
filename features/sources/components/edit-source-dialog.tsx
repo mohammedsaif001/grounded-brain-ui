@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -121,6 +121,7 @@ function LoadedEditSourceForm({
             {error ? (
                 <DialogFooter>
                     <Button variant="outline" onClick={onDone}>
+                        <XIcon aria-hidden="true" />
                         Close
                     </Button>
                 </DialogFooter>
@@ -275,6 +276,7 @@ function EditSourceForm({
                     onClick={onDone}
                     disabled={updateSource.isPending}
                 >
+                    <XIcon aria-hidden="true" />
                     Cancel
                 </Button>
                 <Button

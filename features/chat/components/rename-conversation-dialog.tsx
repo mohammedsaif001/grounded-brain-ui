@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -99,6 +99,7 @@ function RenameForm({
                     onClick={onClose}
                     disabled={isPending}
                 >
+                    <XIcon aria-hidden="true" />
                     Cancel
                 </Button>
                 <Button type="submit" disabled={!canSave || isPending}>
