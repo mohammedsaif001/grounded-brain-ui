@@ -237,9 +237,12 @@ export function WorkspaceChat({
 
     return (
         <CitationSelectionProvider>
-            <div className="mx-auto grid min-h-0 w-full max-w-7xl flex-1 grid-cols-[minmax(0,1fr)] gap-6 p-4 sm:p-6 md:p-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
-                <div className="flex min-h-0 flex-col gap-5">
+            {/* Fill exactly the space under the sticky top bar so the page itself never scrolls:
+                only the message list scrolls and the composer stays pinned to the bottom. */}
+            <div className="mx-auto grid h-[calc(100dvh-3.5rem)] min-h-0 w-full max-w-7xl grid-cols-[minmax(0,1fr)] gap-6 overflow-hidden px-4 pt-4 sm:px-6 sm:pt-6 md:h-[calc(100dvh-68px)] md:px-8 md:pt-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
+                <div className="flex min-h-0 min-w-0 flex-col gap-4">
                     <PageHeader
+                        className="shrink-0"
                         title={activeConversation?.title ?? "Chat"}
                         description="Chat with your sources. Follow every thought back to its roots."
                         actions={
@@ -260,7 +263,7 @@ export function WorkspaceChat({
                         }
                     />
 
-                    <p className="text-caption flex items-center gap-2">
+                    <p className="text-caption flex shrink-0 items-center gap-2">
                         <ShieldCheckIcon
                             aria-hidden="true"
                             className="size-4"
@@ -273,7 +276,7 @@ export function WorkspaceChat({
                     <MessageScrollerProvider>
                         <MessageScroller className="min-h-0 flex-1">
                             <MessageScrollerViewport>
-                                <MessageScrollerContent className="w-full pb-2">
+                                <MessageScrollerContent className="w-full pb-4">
                                     {isLoadingHistory ? (
                                         <div
                                             aria-busy="true"
@@ -346,12 +349,13 @@ export function WorkspaceChat({
                     {error ? (
                         <p
                             role="alert"
-                            className="rounded-xl bg-tint-rose px-4 py-2.5 text-sm text-tint-rose-foreground"
+                            className="shrink-0 rounded-xl bg-tint-rose px-4 py-2.5 text-sm text-tint-rose-foreground"
                         >
                             {error.message}
                         </p>
                     ) : null}
 
+                    <div className="shrink-0 bg-gradient-to-t from-background via-background to-transparent pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
                     <ChatComposer
                         isStreaming={isStreaming}
                         webSearchEnabled={chatPrefs.webSearch}
@@ -361,6 +365,7 @@ export function WorkspaceChat({
                             void sendMessage({ text });
                         }}
                     />
+                    </div>
                 </div>
 
                 <ChatSidePanel
@@ -389,7 +394,7 @@ function ChatSidePanel({
     const selection = useCitationSelection();
 
     return (
-        <aside className="hidden min-h-0 flex-col gap-4 overflow-y-auto xl:flex">
+        <aside className="hidden min-h-0 flex-col gap-4 overflow-y-auto pb-8 xl:flex">
             {selection?.selected ? (
                 <CitationPanel
                     workspaceId={workspaceId}
