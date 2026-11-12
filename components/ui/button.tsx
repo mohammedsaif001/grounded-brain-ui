@@ -18,7 +18,13 @@ const buttonVariants = cva(
         ghost:
           "text-foreground hover:bg-muted aria-expanded:bg-muted dark:hover:bg-muted/60",
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+          "border-destructive/25 bg-destructive/10 text-destructive hover:border-destructive/40 hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+        success:
+          "bg-tint-green text-tint-green-foreground hover:bg-[color-mix(in_oklch,var(--tint-green),var(--tint-green-foreground)_14%)] focus-visible:ring-tint-green-foreground/30",
+        warning:
+          "bg-tint-amber text-tint-amber-foreground hover:bg-[color-mix(in_oklch,var(--tint-amber),var(--tint-amber-foreground)_14%)] focus-visible:ring-tint-amber-foreground/30",
+        info:
+          "bg-tint-blue text-tint-blue-foreground hover:bg-[color-mix(in_oklch,var(--tint-blue),var(--tint-blue-foreground)_14%)] focus-visible:ring-tint-blue-foreground/30",
         link: "text-foreground underline underline-offset-4 decoration-border hover:decoration-foreground",
       },
       size: {
